@@ -1,0 +1,8 @@
+{
+  "devices": {
+    "hood": "launcher/hood.json",
+    "shooter": "launcher/shooter.json",
+    "turret": "launcher/turret.json"
+  },
+  "display": true
+}

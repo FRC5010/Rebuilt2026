@@ -23,12 +23,11 @@ public abstract class OdometryThread extends Thread {
   protected final List<DoubleSupplier> genericSignals = new ArrayList<>();
   protected final List<Queue<Double>> genericQueues = new ArrayList<>();
   protected final List<Queue<Double>> timestampQueues = new ArrayList<>();
-  public static OdometryThread instance;
+  protected static OdometryThread commonInstance;
 
   public static OdometryThread getInstance() {
-    return instance;
+    return commonInstance;
   }
-
   /** Creates a new odometry thread with the specified name. */
   protected OdometryThread(String threadName) {
     setName(threadName);

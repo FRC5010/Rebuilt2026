@@ -91,6 +91,7 @@
       "/Shuffleboard/BabySwerve/Auto Modes": "String Chooser",
       "/Shuffleboard/ExampleRobot/Auto Modes": "String Chooser",
       "/SmartDashboard/Alerts": "Alerts",
+      "/SmartDashboard/Alpha/Auto Modes": "String Chooser",
       "/SmartDashboard/Arm/mechanism": "Mechanism2d",
       "/SmartDashboard/Auto Modes": "String Chooser",
       "/SmartDashboard/Drive Visual": "Mechanism2d",
@@ -111,10 +112,12 @@
       "/SmartDashboard/PhotonAlerts": "Alerts",
       "/SmartDashboard/Pigeon 2 (v6) [13]": "Gyro",
       "/SmartDashboard/Pigeon 2 [13]": "Gyro",
+      "/SmartDashboard/Rebuilt/Auto Modes": "String Chooser",
       "/SmartDashboard/Robot Visual": "Mechanism2d",
       "/SmartDashboard/SendableChooser[0]": "String Chooser",
       "/SmartDashboard/Shooter/mechanism": "Mechanism2d",
       "/SmartDashboard/Swerve Drive": "Alerts",
+      "/SmartDashboard/TigerShark/Auto Modes": "String Chooser",
       "/SmartDashboard/Turret/mechanism": "Mechanism2d",
       "/SmartDashboard/VisionSystemSim-Vision/Sim Field": "Field2d",
       "/SmartDashboard/VisionSystemSim-main/Sim Field": "Field2d",
@@ -128,6 +131,11 @@
         }
       },
       "/SmartDashboard/Arm/mechanism": {
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Drive Visual": {
         "window": {
           "visible": true
         }
@@ -663,11 +671,6 @@
           "visible": true
         }
       },
-      "/SmartDashboard/ExampleRobot/Auto Modes": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/Field": {
         "OdometryPose": {
           "arrowColor": [
@@ -694,6 +697,11 @@
         "right": 3466,
         "top": 291,
         "width": 17.54825210571289,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Rebuilt/Auto Modes": {
         "window": {
           "visible": true
         }
@@ -764,6 +772,12 @@
         "Camera": {
           "open": true
         },
+        "Characterization": {
+          "Steer": {
+            "open": true
+          },
+          "open": true
+        },
         "Drive Feedforward": {
           "open": true
         },
@@ -815,5 +829,8 @@
   },
   "NetworkTables Info": {
     "visible": true
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }

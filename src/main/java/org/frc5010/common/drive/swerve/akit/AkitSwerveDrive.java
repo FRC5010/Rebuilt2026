@@ -32,6 +32,7 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Force;
+import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -105,7 +106,7 @@ public class AkitSwerveDrive extends SwerveDriveFunctions {
     HAL.report(tResourceType.kResourceType_RobotDrive, tInstances.kRobotDriveSwerve_AdvantageKit);
 
     // Start odometry thread
-    PhoenixOdometryThread.getInstance().start();
+    OdometryThread.getInstance().start();
 
     // Should we keep this?
     // Pathfinding.setPathfinder(new LocalADStarAK());
@@ -211,7 +212,19 @@ public class AkitSwerveDrive extends SwerveDriveFunctions {
   /** Runs the drive in a straight line with the specified drive output. */
   public void runCharacterization(double output) {
     for (int i = 0; i < 4; i++) {
-      modules[i].runCharacterization(output);
+      modules[i].runCharacterization(output, config);
+    }
+  }
+
+  /**
+   * Runs the steer characterization routine on all modules. This command is used to measure the
+   * feedforward constants of the steer motors.
+   *
+   * @param output The output to send to the modules in volts.
+   */
+  public void runSteerCharacterization(double output) {
+    for (int i = 0; i < 4; i++) {
+      modules[i].runSteerCharacterization(output);
     }
   }
 
@@ -282,10 +295,19 @@ public class AkitSwerveDrive extends SwerveDriveFunctions {
   }
 
   /** Returns the average velocity of the modules in rad/sec. */
-  public double getFFCharacterizationVelocity() {
+  public double getDriveFFCharacterizationVelocity() {
     double output = 0.0;
     for (int i = 0; i < 4; i++) {
-      output += modules[i].getFFCharacterizationVelocity() / 4.0;
+      output += modules[i].getDriveFFCharacterizationVelocity() / 4.0;
+    }
+    return output;
+  }
+
+  /** Returns the average velocity of the modules in rad/sec. */
+  public double getSteerFFCharacterizationVelocity() {
+    double output = 0.0;
+    for (int i = 0; i < 4; i++) {
+      output += modules[i].getSteerFFCharacterizationVelocity() / 4.0;
     }
     return output;
   }
@@ -486,10 +508,26 @@ public class AkitSwerveDrive extends SwerveDriveFunctions {
   public void addAutoCommands(
       LoggedDashboardChooser<Command> selectableCommand, GenericSwerveDrivetrain drivetrain) {
     selectableCommand.addOption(
-        "Swerve Wheel Radius Characterization",
+        "PRO: Swerve Wheel Radius Characterization",
         AkitDriveCommands.wheelRadiusCharacterization(drivetrain, this));
     selectableCommand.addOption(
-        "Swerve Feedforward Characterization",
-        AkitDriveCommands.feedforwardCharacterization(drivetrain, this));
+        "PRO: Swerve Drive Feedforward Characterization",
+        AkitDriveCommands.feedforwardCharacterization(
+            drivetrain,
+            this,
+            (Voltage voltage) -> runCharacterization(voltage.in(Volts)),
+            () -> getDriveFFCharacterizationVelocity()));
+    selectableCommand.addOption(
+        "PRO: Swerve Steer Feedforward Characterization",
+        AkitDriveCommands.feedforwardCharacterization(
+            drivetrain,
+            this,
+            (Voltage voltage) -> runSteerCharacterization(voltage.in(Volts)),
+            () -> getSteerFFCharacterizationVelocity()));
+
+    selectableCommand.addOption(
+        "PRO: Swerve Angle PID Tuning", AkitDriveCommands.steerPIDTuning(drivetrain, this));
+    selectableCommand.addOption(
+        "PRO: Swerve Drive PID Tuning", AkitDriveCommands.drivePIDTuning(drivetrain, this));
   }
 }

@@ -1,8 +1,17 @@
 {
   "devices": {
-    "percent_motor": "example/percent_motor.json",
-    "velocity_motor": "example/velocity_motor.json",
-    "yams_shooter": "example/yams_shooter.json"
+    "duty_cycle": {
+      "device": "percent_motor",
+      "file": "example/percent_motor.json"
+    },
+    "velocity_control": {
+      "device": "velocity_motor",
+      "file": "example/velocity_motor.json"
+    },
+    "shooter": {
+      "device": "yams_shooter",
+      "file": "example/yams_shooter.json"
+    }
   },
   "display": true
 }

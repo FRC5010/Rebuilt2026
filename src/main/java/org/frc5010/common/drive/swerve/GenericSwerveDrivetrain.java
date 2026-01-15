@@ -151,10 +151,10 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
       motorDials.get(moduleKey).setAngle(turningDeg + 90);
       motorDials
           .get(moduleKey)
-          .setLength(0.0001 * modules[moduleKey].steerVelocityDegreesPerSecond() + 0.002);
+          .setLength(0.1 * modules[moduleKey].steerVelocityDegreesPerSecond() + 0.02);
       expectDials
           .get(moduleKey)
-          .setLength(0.0001 * modules[moduleKey].driveVelocityMetersPerSecond() + 0.002);
+          .setLength(0.1 * modules[moduleKey].driveVelocityMetersPerSecond() + 0.02);
       expectDials.get(moduleKey).setAngle(modules[moduleKey].expectedSteerDegrees() + 90);
     }
   }
@@ -226,7 +226,7 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
               .get(i)
               .append(
                   new LoggedMechanismLigament2d(
-                      i + "-Abs", 0.10, 90, 6, new Color8Bit(Color.kBlue))));
+                      i + "-Abs", 0.50, 90, 6, new Color8Bit(Color.kBlue))));
       expectDials.put(
           i,
           visualRoots

@@ -1,0 +1,48 @@
+{
+  "motorSetup": {
+    "name": "shooter_motor",
+    "controllerType": "spark",
+    "motorType": "Neo",
+    "canId": 14
+  },
+  "motorSystemId": {
+    "feedBack": {
+      "p": 4,
+      "i": 0.0,
+      "d": 0.0
+    },
+    "feedForward": {
+      "s": 0.0,
+      "v": 0.0,
+      "a": 0.0
+    },
+    "maxVelocity": {
+      "val": 180,
+      "uom": "deg/s"
+    },
+    "maxAcceleration": {
+      "val": 90,
+      "uom": "deg/s^2"
+    }
+  },
+  "lowerSoftLimit": {
+    "val": 0,
+    "uom": "rpm"
+  },
+  "upperSoftLimit": {
+    "val": 5000,
+    "uom": "rpm"
+  },
+  "gearing": [
+    3,
+    4
+  ],
+  "mass": {
+    "val": 2,
+    "uom": "kg"
+  },
+  "diameter": {
+    "val": 0.05,
+    "uom": "m"
+  }
+}

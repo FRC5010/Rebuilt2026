@@ -1,0 +1,7 @@
+{
+  "devices": {
+    "feeder": "indexer/feeder.json",
+    "indexer": "indexer/indexer.json"
+  },
+  "display": true
+}

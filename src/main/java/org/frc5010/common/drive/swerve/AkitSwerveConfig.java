@@ -46,6 +46,7 @@ public class AkitSwerveConfig extends SwerveDriveConfig {
       BackRight;
   public double ODOMETRY_FREQUENCY;
   public final double DRIVE_BASE_RADIUS;
+  protected SwerveModuleConstants[] MODULES;
   private final CANBus kCANBus;
 
   public AkitSwerveConfig(AkitTalonFXSwerveConfigBuilder builder) {
@@ -55,6 +56,7 @@ public class AkitSwerveConfig extends SwerveDriveConfig {
     this.FrontRight = builder.FrontRight;
     this.BackLeft = builder.BackLeft;
     this.BackRight = builder.BackRight;
+    MODULES = new SwerveModuleConstants[] {FrontLeft, FrontRight, BackLeft, BackRight};
     this.kCANBus = builder.kCANBus;
     DRIVE_BASE_RADIUS =
         Math.max(
@@ -64,6 +66,10 @@ public class AkitSwerveConfig extends SwerveDriveConfig {
             Math.max(
                 Math.hypot(BackLeft.LocationX, BackLeft.LocationY),
                 Math.hypot(BackRight.LocationX, BackRight.LocationY)));
+  }
+
+  public SwerveModuleConstants getModuleConstants(int index) {
+    return MODULES[index];
   }
 
   public static AkitSwerveConfig builder(

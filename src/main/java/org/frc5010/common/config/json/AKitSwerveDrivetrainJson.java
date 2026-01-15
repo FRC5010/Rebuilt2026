@@ -34,8 +34,8 @@ import org.frc5010.common.drive.swerve.akit.ModuleIOSpark;
 import org.frc5010.common.drive.swerve.akit.ModuleIOSparkTalon;
 import org.frc5010.common.drive.swerve.akit.ModuleIOTalonFXReal;
 import org.frc5010.common.drive.swerve.akit.ModuleIOTalonFXSim;
-import org.frc5010.common.drive.swerve.akit.PhoenixOdometryThread;
 import org.frc5010.common.drive.swerve.akit.SparkOdometryThread;
+import org.frc5010.common.drive.swerve.akit.TalonFXOdometryThread;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.drivesims.COTS;
@@ -100,7 +100,7 @@ public class AKitSwerveDrivetrainJson implements DrivetrainPropertiesJson {
               SwerveDriveFunctions.mapleSimConfig, new Pose2d(3, 3, new Rotation2d()));
       SimulatedArena.getInstance().addDriveTrainSimulation(SwerveDriveFunctions.driveSimulation);
       if ("TalonFX".equals(type)) {
-        PhoenixOdometryThread.createInstance(config);
+        TalonFXOdometryThread.createInstance(config);
         driveFunctions =
             new AkitSwerveDrive(
                 config,
@@ -117,7 +117,7 @@ public class AKitSwerveDrivetrainJson implements DrivetrainPropertiesJson {
                     config, config.BackRight, SwerveDriveFunctions.driveSimulation.getModules()[3]),
                 SwerveDriveFunctions.driveSimulation::setSimulationWorldPose);
       } else {
-        PhoenixOdometryThread.createInstance(config);
+        TalonFXOdometryThread.createInstance(config);
         driveFunctions =
             new AkitSwerveDrive(
                 config,
@@ -131,6 +131,7 @@ public class AKitSwerveDrivetrainJson implements DrivetrainPropertiesJson {
     } else {
       config.ODOMETRY_FREQUENCY = config.getCANBus().isNetworkFD() ? 250.0 : 100.0;
       if ("SparkTalon".equals(type)) {
+        TalonFXOdometryThread.createInstance(config);
         SparkOdometryThread.createInstance();
         driveFunctions =
             new AkitSwerveDrive(
@@ -153,7 +154,7 @@ public class AKitSwerveDrivetrainJson implements DrivetrainPropertiesJson {
                 new ModuleIOSpark(3),
                 (pose) -> {});
       } else if ("TalonFX".equals(type)) {
-        PhoenixOdometryThread.createInstance(config);
+        TalonFXOdometryThread.createInstance(config);
         driveFunctions =
             new AkitSwerveDrive(
                 config,

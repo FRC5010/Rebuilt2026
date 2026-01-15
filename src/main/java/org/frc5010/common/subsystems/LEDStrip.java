@@ -171,7 +171,7 @@ public class LEDStrip extends GenericSubsystem {
    * Sets the default pattern to run on the entire LED strip when the LED subsystem is not running a
    * command.
    *
-   * @param defaultPattern the LED pattern to run by default
+   * @param pattern the LED pattern to run by default
    */
   public void setFullPattern(LEDPattern pattern) {
     this.defaultPattern = pattern;
@@ -189,7 +189,7 @@ public class LEDStrip extends GenericSubsystem {
   /**
    * Creates a command that runs a pattern on the entire LED strip.
    *
-   * @param defaultPattern the LED pattern to run
+   * @return a command that runs the pattern
    */
   public Command runPattern() {
     return run(

@@ -1,0 +1,8 @@
+{
+  "devices": {
+    "percent_motor": "example/percent_motor.json",
+    "velocity_motor": "example/velocity_motor.json",
+    "yams_shooter": "example/yams_shooter.json"
+  },
+  "display": true
+}

@@ -19,7 +19,6 @@ import static org.frc5010.common.drive.swerve.akit.DriveConstants.turnPIDMaxInpu
 import static org.frc5010.common.drive.swerve.akit.DriveConstants.turnPIDMinInput;
 import static org.frc5010.common.drive.swerve.akit.util.SparkUtil.ifOk;
 import static org.frc5010.common.drive.swerve.akit.util.SparkUtil.sparkStickyFault;
-import static org.frc5010.common.drive.swerve.akit.util.SparkUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
@@ -39,8 +38,6 @@ import com.revrobotics.AbsoluteEncoder;
 import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
-import com.revrobotics.spark.SparkBase.PersistMode;
-import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.SparkMax;
@@ -163,12 +160,6 @@ public class ModuleIOSparkTalon implements ModuleIO {
         .appliedOutputPeriodMs(20)
         .busVoltagePeriodMs(20)
         .outputCurrentPeriodMs(20);
-    tryUntilOk(
-        turnSpark,
-        5,
-        () ->
-            turnSpark.configure(
-                turnConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters));
 
     // Create drive status signals
     drivePosition = driveTalon.getPosition();

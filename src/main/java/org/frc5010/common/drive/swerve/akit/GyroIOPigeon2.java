@@ -36,10 +36,11 @@ public class GyroIOPigeon2 implements GyroIO {
     yaw.setUpdateFrequency(config.ODOMETRY_FREQUENCY);
     yawVelocity.setUpdateFrequency(50.0);
     pigeon.optimizeBusUtilization();
-    yawTimestampQueue = OdometryThread.getInstance().makeTimestampQueue();
+    yawTimestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();
     var yawClone = yaw.clone(); // Status signals are not thread-safe
     yawPositionQueue =
-        OdometryThread.getInstance().registerSignal(() -> yawClone.refresh().getValueAsDouble());
+        PhoenixOdometryThread.getInstance()
+            .registerSignal(() -> yawClone.refresh().getValueAsDouble());
   }
 
   @Override

@@ -1,0 +1,7 @@
+{
+  "devices": {
+    "intake": "intake/intake.json",
+    "winch": "intake/winch.json"
+  },
+  "display": true
+}

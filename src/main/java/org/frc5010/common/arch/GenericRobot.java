@@ -195,8 +195,8 @@ public abstract class GenericRobot extends GenericMechanism implements GenericDe
 
   /**
    * Sets up the default commands for the robot. If the robot is in teleoperated or autonomous mode,
-   * it will call {@link #setupDefaultCommands(Optional, Optional)}. If the robot is in test mode,
-   * it will call {@link #setupTestDefaultCommands(Optional, Optional)}
+   * it will call the setupDefaultCommands method. If the robot is in test mode, it will call the
+   * setupTestDefaultCommands method.
    */
   public void setupDefaultCommands() {
     if (DriverStation.isTeleop() || DriverStation.isAutonomous()) {

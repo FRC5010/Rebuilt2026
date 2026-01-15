@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
+import org.frc5010.common.drive.swerve.AkitSwerveConfig;
 import org.littletonrobotics.junction.Logger;
 
 public class Module {
@@ -70,10 +71,20 @@ public class Module {
     io.setTurnPosition(state.angle);
   }
 
-  /** Runs the module with the specified output while controlling to zero degrees. */
-  public void runCharacterization(double output) {
+  /** Runs the module with the specified output while controlling to rotation angles. */
+  public void runCharacterization(double output, AkitSwerveConfig config) {
     io.setDriveOpenLoop(output);
-    io.setTurnPosition(new Rotation2d());
+    io.setTurnPosition(
+        new Rotation2d(
+                config.getModuleConstants(index).LocationX,
+                config.getModuleConstants(index).LocationY)
+            .plus(Rotation2d.kCCW_Pi_2));
+  }
+
+  /** Runs the module with the specified output while controlling to zero degrees. */
+  public void runSteerCharacterization(double output) {
+    io.setDriveOpenLoop(0);
+    io.setTurnOpenLoop(output);
   }
 
   /** Disables all outputs to motors. */
@@ -123,7 +134,12 @@ public class Module {
   }
 
   /** Returns the module velocity in rad/sec. */
-  public double getFFCharacterizationVelocity() {
+  public double getDriveFFCharacterizationVelocity() {
     return inputs.driveVelocityRadPerSec;
+  }
+
+  /** Returns the module steer velocity in rad/sec. */
+  public double getSteerFFCharacterizationVelocity() {
+    return inputs.turnVelocityRadPerSec;
   }
 }

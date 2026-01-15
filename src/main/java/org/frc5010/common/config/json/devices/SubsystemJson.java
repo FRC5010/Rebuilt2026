@@ -9,8 +9,14 @@ import org.frc5010.common.arch.GenericSubsystem;
 
 /** The base JSON class for subsystem configurations */
 public class SubsystemJson {
+  public static class DeviceEntry {
+    public String device;
+    public String file;
+
+    public DeviceEntry() {}
+  }
   /** A map of device names and device configuration file names */
-  public Map<String, String> devices;
+  public Map<String, DeviceEntry> devices;
   /** Whether to display the subsystem in the dashboard */
   public boolean display = false;
   /** The logging level for the robot */
@@ -29,9 +35,9 @@ public class SubsystemJson {
   public void configureSubsystem(GenericSubsystem system, File directory)
       throws StreamReadException, DatabindException, IOException {
     for (String key : devices.keySet()) {
-      File deviceFile = new File(directory, devices.get(key));
+      File deviceFile = new File(directory, devices.get(key).file);
       assert deviceFile.exists();
-      DeviceConfigReader.readDeviceConfig(system, deviceFile, key);
+      DeviceConfigReader.readDeviceConfig(system, deviceFile, devices.get(key).device);
     }
   }
 }

@@ -27,6 +27,7 @@ public class SparkOdometryThread extends OdometryThread {
   private final List<SparkBase> sparks = new ArrayList<>();
   private final List<DoubleSupplier> sparkSignals = new ArrayList<>();
   private final List<Queue<Double>> sparkQueues = new ArrayList<>();
+  private static SparkOdometryThread instance;
 
   public static void createInstance() {
     if (instance == null) {
@@ -35,11 +36,12 @@ public class SparkOdometryThread extends OdometryThread {
   }
 
   public static SparkOdometryThread getInstance() {
-    return (SparkOdometryThread) instance;
+    return instance;
   }
 
   private SparkOdometryThread() {
     super("SparkOdometryThread");
+    commonInstance = this;
   }
 
   /** Registers a Spark signal to be read from the thread. */

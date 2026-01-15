@@ -65,7 +65,7 @@ public class DrivetrainConstantsJson {
     /** The motor setup for the steer motor */
     public MotorSetupJson steerMotorSetup = new MotorSetupJson();
     /** The encoder ID */
-    public int encoderId = 0;
+    public int encoderId = 2;
     /** The absolute encoder offset */
     public UnitValueJson absoluteOffset = new UnitValueJson(0, "degrees");
     /** Whether the encoder is inverted */

@@ -156,7 +156,6 @@ public class DeviceConfigReader {
    *
    * @param controller The type of motor controller, e.g. "spark", "talonfx", "nova", "thrifty",
    *     "thrifty_nova", or "thriftynova"
-   * @param type The type of motor, e.g. "neo", "neo550", "krakenx60", or "krakenx44"
    * @param id The CAN ID of the motor controller
    * @param canbus The CAN bus of the motor controller
    * @return The motor controller object
