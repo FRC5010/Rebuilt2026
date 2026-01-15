@@ -9,19 +9,13 @@
     "tigershark": {
       "id": "00:80:2F:38:90:61",
       "robotClass": "frc.robot.tigershark.TigerShark",
-      "simulate": false,
-      "competition": false
+      "simulate": true,
+      "competition": true
     },
     "alpha": {
       "id": "alpha",
       "robotClass": "frc.robot.alpha.Alpha",
       "simulate": false
-    },
-    "rebuilt_robot": {
-      "id": "rebuilt",
-      "robotClass": "frc.robot.rebuilt.Rebuilt",
-      "simulate": true,
-      "competition": false
     },
     "baby_swerve": {
       "id": "00:80:2F:24:6D:74",
