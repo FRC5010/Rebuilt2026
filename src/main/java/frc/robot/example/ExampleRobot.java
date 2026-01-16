@@ -51,6 +51,8 @@ public class ExampleRobot extends GenericRobot {
     launching.switchTo(idle).when(() -> !driver.RIGHT_BUMPER.getAsBoolean());
     prepping.switchTo(idle).when(() -> !driver.RIGHT_BUMPER.getAsBoolean());
 
+    // exampleSubsystem.setDefaultCommand(stateMachine);
+
     // driver.createYButton().onTrue(exampleSubsystem.setVelocityControlMotorReference(() -> 3500))
     //     .onFalse(exampleSubsystem.setVelocityControlMotorReference(() -> 0));
     // driver.createXButton().onTrue(exampleSubsystem.setVelocityControlMotorReference(() -> 2000))

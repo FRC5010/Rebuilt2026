@@ -39,6 +39,7 @@ import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.gamepieces.GamePieceProjectile;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.crescendo2024.NoteOnFly;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
+import yams.mechanisms.positional.Arm;
 import yams.mechanisms.velocity.FlyWheel;
 
 public class ExampleSubsystem extends GenericSubsystem {
@@ -52,12 +53,14 @@ public class ExampleSubsystem extends GenericSubsystem {
   protected int scoredNotes = 0;
   protected Rotation2d rotation = new Rotation2d(Degrees.of(180));
   protected FlyWheel shooter;
+  protected Arm arm;
 
   public ExampleSubsystem() {
     super("example.json");
     this.motor = (PercentControlMotor) devices.get("percent_motor");
     this.controlledMotor = (VelocityControlMotor) devices.get("velocity_motor");
     this.shooter = (FlyWheel) devices.get("Shooter");
+    this.arm = (Arm) devices.get("Arm");
 
     this.angularMotor = angularControlledMotor();
     // verticalMotor = verticalControlledMotor();
@@ -103,11 +106,11 @@ public class ExampleSubsystem extends GenericSubsystem {
   }
 
   public Command setVelocity(AngularVelocity speed) {
-    return shooter.setSpeed(speed);
+    return shooter.setSpeed(speed).alongWith(arm.setAngle(Degrees.of(30)).asProxy());
   }
 
   public Command setDutyCycle(double dutyCycle) {
-    return shooter.set(dutyCycle);
+    return shooter.set(dutyCycle).alongWith(arm.setAngle(Degrees.of(0)).asProxy());
   }
 
   public Command setVelocity(Supplier<AngularVelocity> speed) {
