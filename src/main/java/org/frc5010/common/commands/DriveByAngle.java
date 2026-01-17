@@ -14,7 +14,6 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 /** Drive the robot where the angle is given */
 public class DriveByAngle extends Command {
-  // TODO: Understand code
   /** The subsystem used by this command. */
   private final GenericDrivetrain drivetrainSubsystem;
 

@@ -4,7 +4,6 @@
 
 package org.frc5010.common.sensors.encoder;
 
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import edu.wpi.first.math.util.Units;
 import java.util.Optional;
@@ -21,7 +20,7 @@ public class CanCoderEncoder implements GenericEncoder {
    */
   public CanCoderEncoder(int CanID) {
     this.canCoder = new CANcoder(CanID);
-    CANcoderConfiguration config = new CANcoderConfiguration();
+    // CANcoderConfiguration config = new CANcoderConfiguration();
     // config.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
     // config.sensorCoefficient = 360.0 / 4096.0;
     // config.unitString = "degrees";

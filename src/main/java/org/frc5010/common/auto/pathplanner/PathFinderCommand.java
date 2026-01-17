@@ -50,7 +50,7 @@ public class PathFinderCommand extends Command {
   private final PathFollowingController controller;
   private final RobotConfig robotConfig;
   private final BooleanSupplier shouldFlipPath;
-  private boolean pregeneratedPath = false;
+  // private boolean pregeneratedPath = false;
 
   private static PathPlannerTrajectory trajPregen;
   private static PathPlannerPath pathPregen;
@@ -447,7 +447,7 @@ public class PathFinderCommand extends Command {
   @Override
   public void end(boolean interrupted) {
     CommandRunning = false;
-    pregeneratedPath = false;
+    // pregeneratedPath = false;
     timer.stop();
 
     // Only output 0 speeds when ending a path that is supposed to stop, this allows interrupting
