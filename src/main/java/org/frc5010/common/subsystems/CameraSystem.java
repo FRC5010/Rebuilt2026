@@ -87,6 +87,7 @@ public abstract class CameraSystem extends GenericSubsystem {
     List<Pose3d> gpas =
         SimulatedArena.getInstance().getGamePiecesByType(Constants.Simulation.gamePieceA).stream()
             .map(it -> it.getPose3d())
+            .limit(24)
             .collect(Collectors.toList());
     SimulatedCamera.visionSim.removeVisionTargets("GPA");
     for (Pose3d gpa : gpas) {
@@ -97,6 +98,7 @@ public abstract class CameraSystem extends GenericSubsystem {
     List<Pose3d> gpbs =
         SimulatedArena.getInstance().getGamePiecesByType(Constants.Simulation.gamePieceB).stream()
             .map(it -> it.getPose3d())
+            .limit(24)
             .collect(Collectors.toList());
     SimulatedCamera.visionSim.removeVisionTargets("GPB");
     for (Pose3d gpb : gpbs) {

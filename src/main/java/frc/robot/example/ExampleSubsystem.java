@@ -38,6 +38,7 @@ import swervelib.simulation.ironmaple.simulation.IntakeSimulation.IntakeSide;
 import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.gamepieces.GamePieceProjectile;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.crescendo2024.NoteOnFly;
+import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnFly;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.reefscape2025.ReefscapeAlgaeOnFly;
 import yams.mechanisms.positional.Arm;
 import yams.mechanisms.velocity.FlyWheel;
@@ -49,6 +50,7 @@ public class ExampleSubsystem extends GenericSubsystem {
   protected VerticalPositionControlMotor verticalMotor;
   protected IntakeSimulation intakeSimulation;
   protected NoteOnFly noteOnFly;
+  protected RebuiltFuelOnFly fuelOnFly;
   protected GamePieceProjectile gamePieceProjectile;
   protected int scoredNotes = 0;
   protected Rotation2d rotation = new Rotation2d(Degrees.of(180));

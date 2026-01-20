@@ -1,11 +1,11 @@
 {
-  "name": "intake_motor",
-  "type": "Neo",
+  "name": "spindexer",
   "controller": "spark",
-  "id": 11,
+  "type": "Neo",
+  "id": 10,
   "gearing": 1.0,
   "momentOfInertiaKgMSq": 1.0,
-  "x": 0.5,
+  "x": -0.05,
   "y": 0.0,
-  "z": 0.25
+  "z": 0.1
 }

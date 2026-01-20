@@ -11,7 +11,7 @@ public class LedDefaultCommand extends Command {
   /** Creates a new LedDefaultCommand. */
   LedSubsystem ledSubsystem;
 
-  private int currDelay = 200;
+  //private int currDelay = 200;
   private boolean lastState;
 
   public LedDefaultCommand(LedSubsystem ledSubsystem) {

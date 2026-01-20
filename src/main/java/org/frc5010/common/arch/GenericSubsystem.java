@@ -4,6 +4,7 @@
 
 package org.frc5010.common.arch;
 
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
@@ -171,5 +172,10 @@ public class GenericSubsystem extends SubsystemBase
    */
   public void setDisplay(boolean display) {
     if (display) DashBoard.makeDisplayed();
+  }
+
+  public static Object setHeight(Distance of) {
+    // TODO Auto-generated method stub
+    throw new UnsupportedOperationException("Unimplemented method 'setHeight'");
   }
 }

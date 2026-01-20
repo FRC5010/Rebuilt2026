@@ -2,15 +2,15 @@
   "type": "TalonFX",
   "constants": {
     "trackWidth": {
-      "val": 28,
+      "val": 22,
       "uom": "inches"
     },
     "wheelBase": {
-      "val": 28,
+      "val": 22,
       "uom": "inches"
     },
     "wheelDiameter": {
-      "val": 4,
+      "val": 3.955,
       "uom": "inches"
     },
     "maxDriveSpeed": {
@@ -18,30 +18,30 @@
       "uom": "m/sec"
     },
     "bumperFrameLength": {
-      "val": 38,
+      "val": 30,
       "uom": "inches"
     },
     "bumperFrameWidth": {
-      "val": 38,
+      "val": 30,
       "uom": "inches"
     },
     "gyro": {
       "type": "pigeon2",
-      "id": 13,
+      "id": 50,
       "inverted": false,
-      "canbus": "canivore"
+      "canbus": ""
     },
-    "driveGearRatio": "1:7.363636363636365",
-    "steerGearRatio": "1:15.42857142857143",
+    "driveGearRatio": "1:6.75",
+    "steerGearRatio": "1:25",
     "driveMotorControl": {
       "feedBack": {
-        "p": 0.1,
+        "p": 0.00001,
         "i": 0.0,
         "d": 0.0
       },
       "feedForward": {
-        "s": 0.2,
-        "v": 0.124,
+        "s": 0.0698163127444402,
+        "v": 0.11987949085405275,
         "a": 0.0
       }
     },
@@ -52,8 +52,8 @@
         "d": 0.5
       },
       "feedForward": {
-        "s": 0.1,
-        "v": 1.91,
+        "s": 0.06242725612073021,
+        "v": 0.4513057312290134,
         "a": 0.0
       }
     },
@@ -63,15 +63,15 @@
           "name": "frontLeftDrive",
           "controllerType": "talonfx",
           "motorType": "KrakenX60",
-          "canId": 1
+          "canId": 4
         },
         "steerMotorSetup": {
           "name": "frontLeftSteer",
           "controllerType": "talonfx",
           "motorType": "Krakenx60",
-          "canId": 2
+          "canId": 3
         },
-        "encoderId": 0,
+        "encoderId": 13,
         "absoluteOffset": {
           "val": 0.15234375,
           "uom": "rotations"
@@ -83,15 +83,15 @@
           "name": "frontRightDrive",
           "controllerType": "talonfx",
           "motorType": "Krakenx60",
-          "canId": 3
+          "canId": 2
         },
         "steerMotorSetup": {
           "name": "frontRightSteer",
           "controllerType": "talonfx",
           "motorType": "Krakenx60",
-          "canId": 4
+          "canId": 1
         },
-        "encoderId": 1,
+        "encoderId": 16,
         "absoluteOffset": {
           "val": -0.4873046875,
           "uom": "rotations"
@@ -103,15 +103,15 @@
           "name": "backLeftDrive",
           "controllerType": "talonfx",
           "motorType": "Krakenx60",
-          "canId": 5
+          "canId": 6
         },
         "steerMotorSetup": {
           "name": "backLeftSteer",
           "controllerType": "talonfx",
           "motorType": "Krakenx60",
-          "canId": 6
+          "canId": 5
         },
-        "encoderId": 2,
+        "encoderId": 14,
         "absoluteOffset": {
           "val": -0.219482421875,
           "uom": "rotations"
@@ -123,15 +123,15 @@
           "name": "backRightDrive",
           "controllerType": "talonfx",
           "motorType": "Krakenx60",
-          "canId": 7
+          "canId": 8
         },
         "steerMotorSetup": {
           "name": "backRightSteer",
           "controllerType": "talonfx",
           "motorType": "Krakenx60",
-          "canId": 8
+          "canId": 7
         },
-        "encoderId": 3,
+        "encoderId": 15,
         "absoluteOffset": {
           "val": 0.17236328125,
           "uom": "rotations"
@@ -159,6 +159,6 @@
       "val": 120,
       "uom": "amps"
     },
-    "canbus": "canivore"
+    "canbus": ""
   }
 }

@@ -1,17 +1,10 @@
 {
-  "name": "feeder_motor",
+  "name": "feeder",
   "controller": "spark",
-  "type": "neo",
+  "type": "Neo",
   "id": 9,
   "gearing": 1.0,
-  "x": -0.25,
+  "x": -0.40,
   "y": 0.0,
-  "z": 0.25,
-  "kP": 0.1,
-  "kI": 0.0,
-  "kD": 0.01,
-  "iZone": 0.0,
-  "kS": 0.1,
-  "kV": 0.1,
-  "kA": 0.0
+  "z": 0.10
 }

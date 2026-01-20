@@ -15,7 +15,6 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 /** A default driving command */
 public class DefaultDriveCommand extends Command {
-  // TODO: Understand code
   private final GenericDrivetrain drivetrainSubsystem;
 
   private final DoubleSupplier m_translationXSupplier;

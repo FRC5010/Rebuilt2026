@@ -77,8 +77,8 @@ public class DriveToPoseSupplier extends GenericCommand {
   private Translation2d lastSetpointTranslation = Translation2d.kZero;
   private Rotation2d lastSetpointRotation = Rotation2d.kZero;
   private double lastTime = 0.0;
-  private double driveErrorAbs = 0.0;
-  private double thetaErrorAbs = 0.0;
+  // private double driveErrorAbs = 0.0;
+  // private double thetaErrorAbs = 0.0;
   private double speedTowardsTarget = 0.0;
   private Translation2d currentVelocity = new Translation2d();
   private double previousTime = 0.0, deltaTime = 0.0;
