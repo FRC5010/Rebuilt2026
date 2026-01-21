@@ -4,5 +4,6 @@
     "localization.json",
     "shooter.json",
     "quest.json"
-  ]
+  ],
+  "viewGamePieces": false
 }

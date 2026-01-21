@@ -24,15 +24,12 @@ import java.util.function.Supplier;
 import org.frc5010.common.vision.VisionConstants;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 import org.photonvision.targeting.PhotonPipelineResult;
 
 /** A camera using the PhotonVision library. */
 public class PhotonVisionPoseCamera extends PhotonVisionCamera implements FiducialTargetCamera {
   /** The pose estimator */
   protected PhotonPoseEstimator poseEstimator;
-  /** The pose strategy */
-  protected PoseStrategy strategy;
   /** The pose supplier */
   protected Supplier<Pose2d> poseSupplier;
   /** The current list of fiducial IDs */
@@ -52,37 +49,27 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
       String name,
       int colIndex,
       AprilTagFieldLayout fieldLayout,
-      PoseStrategy strategy,
       Transform3d cameraToRobot,
       Supplier<Pose2d> poseSupplier) {
     super(name, colIndex, cameraToRobot);
-    this.strategy = strategy;
     this.poseSupplier = poseSupplier;
     this.fieldLayout = fieldLayout;
-    poseEstimator = new PhotonPoseEstimator(fieldLayout, strategy, cameraToRobot);
-    poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
-    visionLayout.addString(
-        "Primary Strategy " + name, () -> poseEstimator.getPrimaryStrategy().name());
+    poseEstimator = new PhotonPoseEstimator(fieldLayout, cameraToRobot);
   }
 
   public PhotonVisionPoseCamera(
       String name,
       int colIndex,
       AprilTagFieldLayout fieldLayout,
-      PoseStrategy strategy,
       Transform3d cameraToRobot,
       Supplier<Pose2d> poseSupplier,
       List<Integer> fiducialIds) {
     super(name, colIndex, cameraToRobot);
-    this.strategy = strategy;
     this.poseSupplier = poseSupplier;
     this.fieldLayout = fieldLayout;
     this.fiducialIds = fiducialIds;
     visionLayout.addDouble("Observations", () -> input.poseObservations.length);
-    poseEstimator = new PhotonPoseEstimator(fieldLayout, strategy, cameraToRobot);
-    poseEstimator.setMultiTagFallbackStrategy(PoseStrategy.PNP_DISTANCE_TRIG_SOLVE);
-    visionLayout.addString(
-        "Primary Strategy " + name, () -> poseEstimator.getPrimaryStrategy().name());
+    poseEstimator = new PhotonPoseEstimator(fieldLayout, cameraToRobot);
   }
 
   /** Update the camera and target with the latest result */
@@ -96,8 +83,16 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
     Set<Short> tagIds = new HashSet<>();
 
     for (PhotonPipelineResult iCamResult : camResults) {
-      Optional<EstimatedRobotPose> estimate = poseEstimator.update(iCamResult);
+      Optional<EstimatedRobotPose> estimate = poseEstimator.estimateCoprocMultiTagPose(iCamResult);
+      if (estimate.isEmpty()) {
+        estimate = poseEstimator.estimateLowestAmbiguityPose(iCamResult);
+      }
       if (estimate.isPresent()) {
+        Optional<EstimatedRobotPose> finalEstimate =
+            poseEstimator.estimatePnpDistanceTrigSolvePose(iCamResult);
+        if (finalEstimate.isPresent()) {
+          estimate = finalEstimate;
+        }
         EstimatedRobotPose estimatedRobotPose = estimate.get();
         Pose3d robotPose = estimatedRobotPose.estimatedPose;
 

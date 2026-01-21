@@ -30,6 +30,8 @@ public abstract class GenericCamera implements PoseProvider {
   protected int colIndex;
   /** The name of the camera */
   protected String name;
+  /** Whether or not to view the game pieces in simulation */
+  protected boolean canViewGamePieces = true;
 
   /**
    * Create a new camera
@@ -146,6 +148,24 @@ public abstract class GenericCamera implements PoseProvider {
    * @return the area of the target
    */
   public abstract double getTargetArea();
+
+  /**
+   * Returns whether or not the camera can view game pieces in simulation mode.
+   *
+   * @return whether or not the camera can view game pieces in simulation mode
+   */
+  public boolean canViewGamePieces() {
+    return canViewGamePieces;
+  }
+
+  /**
+   * Sets whether or not the camera should view game pieces in simulation mode.
+   *
+   * @param canViewGamePieces whether or not the camera should view game pieces in simulation mode
+   */
+  public void setCanViewGamePieces(boolean canViewGamePieces) {
+    this.canViewGamePieces = canViewGamePieces;
+  }
 
   /**
    * A method to get the distance to the target.

@@ -102,11 +102,39 @@ public class CameraConfigurationJson {
   public double fov = 70;
   /** Optional height of the target in meters (used for target tracking mode) */
   public double targetHeight = 0;
+  /** Whether to view game pieces in simulation */
+  public boolean viewGamePieces = true;
   /**
    * Optional array of AprilTag fiducial IDs to track. If empty, all AprilTags may be detected
    * depending on the configuration strategy.
    */
   public int[] targetFiducialIds = new int[0];
+
+  /**
+   * Sets whether to view game pieces in simulation. If true, the camera system will simulate vision
+   * targets for game pieces in the arena. This can be useful for testing vision code without a real
+   * camera. If false, the camera system will only process vision information for real camera
+   * images.
+   *
+   * @param viewGamePieces whether to enable or disable viewing game pieces in simulation
+   */
+  public void setViewGamePieces(boolean viewGamePieces) {
+    this.viewGamePieces = viewGamePieces;
+  }
+
+  /**
+   * Returns whether the camera system can view game pieces in simulation mode.
+   *
+   * <p>This property is set by the {@link #setViewGamePieces(boolean)} method and controls whether
+   * the camera system will simulate vision targets for game pieces in the arena. If true, the
+   * camera system will simulate game pieces in simulation; otherwise, it will only process vision
+   * information for real camera images.
+   *
+   * @return whether the camera system can view game pieces in simulation mode
+   */
+  public boolean canViewGamePieces() {
+    return viewGamePieces;
+  }
 
   /**
    * Configures the camera system based on the provided robot and current configuration.
@@ -171,7 +199,6 @@ public class CameraConfigurationJson {
                         name,
                         column,
                         AprilTags.aprilTagFieldLayout,
-                        PoseStrategy.valueOf(strategy),
                         robotToCamera,
                         robot.getPoseSupplier(),
                         targetFiducialIdList);
@@ -181,7 +208,6 @@ public class CameraConfigurationJson {
                         name,
                         column,
                         AprilTags.aprilTagFieldLayout,
-                        PoseStrategy.valueOf(strategy),
                         robotToCamera,
                         robot.getPoseSupplier());
               }
@@ -195,7 +221,6 @@ public class CameraConfigurationJson {
                       name,
                       column,
                       AprilTags.aprilTagFieldLayout,
-                      PoseStrategy.valueOf(strategy),
                       robotToCamera,
                       robot.getPoseSupplier(),
                       targetFiducialIdList);
@@ -233,7 +258,6 @@ public class CameraConfigurationJson {
                   name,
                   column,
                   AprilTags.aprilTagFieldLayout,
-                  PoseStrategy.valueOf(strategy),
                   robotToCamera,
                   robot.getSimulatedPoseSupplier(),
                   width,
@@ -250,7 +274,6 @@ public class CameraConfigurationJson {
                 name,
                 column,
                 AprilTags.aprilTagFieldLayout,
-                PoseStrategy.LOWEST_AMBIGUITY,
                 robotToCamera,
                 robot.getSimulatedPoseSupplier(),
                 targetFiducialIdList,
@@ -263,7 +286,6 @@ public class CameraConfigurationJson {
                 name,
                 column,
                 AprilTags.aprilTagFieldLayout,
-                PoseStrategy.LOWEST_AMBIGUITY,
                 robotToCamera,
                 robot.getSimulatedPoseSupplier(),
                 width,
@@ -275,13 +297,15 @@ public class CameraConfigurationJson {
                 name,
                 column,
                 AprilTags.aprilTagFieldLayout,
-                PoseStrategy.LOWEST_AMBIGUITY,
                 robotToCamera,
                 robot.getSimulatedPoseSupplier(),
                 width,
                 height,
                 fov);
       }
+    }
+    if (null != camera) {
+      camera.setCanViewGamePieces(viewGamePieces);
     }
     switch (use) {
       case "target":

@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -264,8 +265,8 @@ public abstract class GenericDrivetrain extends GenericSubsystem {
     int count = 0;
     List<Pose3d> gpas =
         SimulatedArena.getInstance().getGamePiecesByType(Constants.Simulation.gamePieceA).stream()
+            .sorted(Comparator.comparingDouble(it -> it.getPose3d().getX() + it.getPose3d().getY()))
             .map(it -> it.getPose3d())
-            .limit(24)
             .collect(Collectors.toList());
     for (Pose3d gpa : gpas) {
       getField2d()
@@ -280,7 +281,6 @@ public abstract class GenericDrivetrain extends GenericSubsystem {
     List<Pose3d> gpbs =
         SimulatedArena.getInstance().getGamePiecesByType(Constants.Simulation.gamePieceB).stream()
             .map(it -> it.getPose3d())
-            .limit(24)
             .collect(Collectors.toList());
     for (Pose3d gpb : gpbs) {
       getField2d()
@@ -302,8 +302,9 @@ public abstract class GenericDrivetrain extends GenericSubsystem {
       int count = 0;
       for (Pose3d gpa :
           SimulatedArena.getInstance().getGamePiecesByType(Constants.Simulation.gamePieceA).stream()
+              .sorted(
+                  Comparator.comparingDouble(it -> it.getPose3d().getX() + it.getPose3d().getY()))
               .map(it -> it.getPose3d())
-              .limit(24)
               .collect(Collectors.toList())) {
         getField2d()
             .getObject("CARPET" + count)
@@ -317,7 +318,6 @@ public abstract class GenericDrivetrain extends GenericSubsystem {
       for (Pose3d gpb :
           SimulatedArena.getInstance().getGamePiecesByType(Constants.Simulation.gamePieceB).stream()
               .map(it -> it.getPose3d())
-              .limit(24)
               .collect(Collectors.toList())) {
         getField2d()
             .getObject("CARPET" + count)

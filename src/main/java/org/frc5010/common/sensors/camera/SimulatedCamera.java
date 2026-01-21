@@ -48,13 +48,12 @@ public class SimulatedCamera extends PhotonVisionPoseCamera {
       String name,
       int colIndex,
       AprilTagFieldLayout fieldLayout,
-      PoseStrategy strategy,
       Transform3d cameraToRobot,
       Supplier<Pose2d> poseSupplier,
       int width,
       int height,
       double fov) {
-    super(name, colIndex, fieldLayout, strategy, cameraToRobot, poseSupplier);
+    super(name, colIndex, fieldLayout, cameraToRobot, poseSupplier);
     if (!tagsLoaded) {
       visionSim.addAprilTags(fieldLayout);
       tagsLoaded = true;
@@ -131,7 +130,7 @@ public class SimulatedCamera extends PhotonVisionPoseCamera {
       PoseStrategy strategy,
       Transform3d cameraToRobot,
       Supplier<Pose2d> poseSupplier) {
-    this(name, colIndex, fieldLayout, strategy, cameraToRobot, poseSupplier, 640, 480, 70.0);
+    this(name, colIndex, fieldLayout, cameraToRobot, poseSupplier, 640, 480, 70.0);
   }
 
   /** Update the simulated camera */

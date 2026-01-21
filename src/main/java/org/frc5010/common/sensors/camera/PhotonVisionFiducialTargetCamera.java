@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 /** A camera using the PhotonVision library. */
 public class PhotonVisionFiducialTargetCamera extends PhotonVisionPoseCamera {
@@ -32,11 +31,10 @@ public class PhotonVisionFiducialTargetCamera extends PhotonVisionPoseCamera {
       String name,
       int colIndex,
       AprilTagFieldLayout fieldLayout,
-      PoseStrategy strategy,
       Transform3d cameraToRobot,
       Supplier<Pose2d> poseSupplier,
       List<Integer> fiducialIds) {
-    super(name, colIndex, fieldLayout, strategy, cameraToRobot, poseSupplier, fiducialIds);
+    super(name, colIndex, fieldLayout, cameraToRobot, poseSupplier, fiducialIds);
     this.fieldLayout = fieldLayout;
     targetFiducialIds = fiducialIds;
   }

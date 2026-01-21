@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Transform3d;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
-import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 /** A simulated camera using the PhotonVision library. */
 public class SimulatedFiducialTargetCamera extends SimulatedCamera {
@@ -37,14 +36,13 @@ public class SimulatedFiducialTargetCamera extends SimulatedCamera {
       String name,
       int colIndex,
       AprilTagFieldLayout fieldLayout,
-      PoseStrategy strategy,
       Transform3d cameraToRobot,
       Supplier<Pose2d> poseSupplier,
       List<Integer> fiducialIds,
       int width,
       int height,
       double fov) {
-    super(name, colIndex, fieldLayout, strategy, cameraToRobot, poseSupplier, width, height, fov);
+    super(name, colIndex, fieldLayout, cameraToRobot, poseSupplier, width, height, fov);
     targetFiducialIds = fiducialIds;
     visionLayout.addDouble("Target ID", () -> target.map(it -> it.getFiducialId()).orElse(-1));
   }

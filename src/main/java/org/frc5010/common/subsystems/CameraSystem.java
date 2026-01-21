@@ -52,6 +52,8 @@ public abstract class CameraSystem extends GenericSubsystem {
   protected DisplayBoolean HAS_VALID_TARGET;
   /** Target model used for vision simulation (default: 12-inch diameter circle at ~0.3556m) */
   protected TargetModel targetModel = new TargetModel(0.3556);
+  /** Whether to view game pieces in simulation */
+  protected boolean viewGamePieces = true;
 
   /**
    * Creates a new CameraSystem with the specified camera.
@@ -83,11 +85,13 @@ public abstract class CameraSystem extends GenericSubsystem {
 
   @Override
   public void simulationPeriodic() {
+    if (!camera.canViewGamePieces()) {
+      return;
+    }
     // Update game piece A targets in simulation
     List<Pose3d> gpas =
         SimulatedArena.getInstance().getGamePiecesByType(Constants.Simulation.gamePieceA).stream()
             .map(it -> it.getPose3d())
-            .limit(24)
             .collect(Collectors.toList());
     SimulatedCamera.visionSim.removeVisionTargets("GPA");
     for (Pose3d gpa : gpas) {
@@ -98,13 +102,24 @@ public abstract class CameraSystem extends GenericSubsystem {
     List<Pose3d> gpbs =
         SimulatedArena.getInstance().getGamePiecesByType(Constants.Simulation.gamePieceB).stream()
             .map(it -> it.getPose3d())
-            .limit(24)
             .collect(Collectors.toList());
     SimulatedCamera.visionSim.removeVisionTargets("GPB");
     for (Pose3d gpb : gpbs) {
       VisionTargetSim simTarget = new VisionTargetSim(gpb, targetModel);
       SimulatedCamera.visionSim.addVisionTargets("GPB", simTarget);
     }
+  }
+
+  /**
+   * Enables or disables the camera from viewing game pieces in simulation. When enabled, the camera
+   * will simulate vision targets for game pieces in the arena. This can be useful for testing
+   * vision code without a real camera. When disabled, the camera will only process vision
+   * information for real camera images.
+   *
+   * @param viewGamePieces whether to enable or disable viewing game pieces in simulation
+   */
+  public void setViewGamePieces(boolean viewGamePieces) {
+    this.viewGamePieces = viewGamePieces;
   }
 
   /**

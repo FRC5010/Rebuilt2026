@@ -25,6 +25,7 @@ public class VisionPropertiesJson {
   public String aprilTagLayout = "default";
   public String simulatedField = "default";
   public Map<String, String[]> gamePieces = new HashMap<>();
+  public boolean viewGamePieces = true;
 
   /**
    * Creates cameras for a given robot using the provided map of camera configurations.
@@ -103,6 +104,7 @@ public class VisionPropertiesJson {
       assert cameraFile.exists();
       CameraConfigurationJson camera =
           new ObjectMapper().readValue(cameraFile, CameraConfigurationJson.class);
+      camera.setViewGamePieces(viewGamePieces);
       camerasMap.put(camera.name, camera);
     }
     return camerasMap;
