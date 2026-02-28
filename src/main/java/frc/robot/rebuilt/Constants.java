@@ -7,11 +7,9 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
-import frc.robot.rebuilt.subsystems.Climb.Climb;
 
 public class Constants {
   public static final String INDEXER = Indexer.class.getSimpleName();
-  public static final String CLIMB = Climb.class.getSimpleName();
   public static final String INTAKE = Intake.class.getSimpleName();
   public static final String LAUNCHER = Launcher.class.getSimpleName();
   /** Defines the maxinum distance for the climb */
