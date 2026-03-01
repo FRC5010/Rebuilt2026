@@ -19,18 +19,12 @@ public class IntakeCommands {
   static Intake intake;
   Map<String, GenericSubsystem> subsystems;
   StateMachine intakeStateMachine = new StateMachine("IntakeStateMachine");
+
   /** Declaring states of the intake */
   State retracted = intakeStateMachine.addState("retracted", retractedCommand());
   State retracting = intakeStateMachine.addState("retracting", retractingCommand());
   State deploying = intakeStateMachine.addState("deploying", deployingCommand());
-  State deployed =
-      intakeStateMachine.addState(
-          "deployed",
-          Commands.run(
-              () -> {
-                intake.setCurrentState(IntakeState.DEPLOYED);
-                intake.runHopper(0);
-              }));
+  State deployed = intakeStateMachine.addState("deployed", deployedCommand());
   State outtaking;
   State intaking;
 
@@ -168,6 +162,13 @@ public class IntakeCommands {
   public static Command deployingCommand() {
     return Commands.runOnce(() -> intake.setCurrentState(IntakeState.DEPLOYING))
         .andThen(() -> intake.runHopper(Constants.Intake.HOPPER_GO_OUT));
+  }
+
+  public static Command deployedCommand() {
+    return Commands.run(() -> {
+                intake.setCurrentState(IntakeState.DEPLOYED);
+                intake.runHopper(0);
+              });
   }
 
   public static Command retractingCommand() {

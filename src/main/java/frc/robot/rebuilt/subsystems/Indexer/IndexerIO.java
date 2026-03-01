@@ -17,7 +17,5 @@ public interface IndexerIO {
 
   public void runTransferFront(double speed);
 
-  // public void runTransferBack(double speed);
-
   public default void updateInputs(IndexerIOInputs inputs) {}
 }
