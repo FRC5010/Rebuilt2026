@@ -1,4 +1,4 @@
-package frc.robot.rebuilt.subsystems.intake;
+package frc.robot.rebuilt.subsystems.Intake;
 
 import static edu.wpi.first.units.Units.Degrees;
 
@@ -20,7 +20,7 @@ public interface IntakeIO {
     public int simulatedGamepieces = 0;
   }
 
-  public void runSpintake(double speed);
+  public void runIntake(double speed);
 
   public void setHopperAngle(Angle angle);
 

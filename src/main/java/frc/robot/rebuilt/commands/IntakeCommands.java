@@ -6,7 +6,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.rebuilt.Constants;
-import frc.robot.rebuilt.subsystems.intake.Intake;
+import frc.robot.rebuilt.subsystems.Intake.Intake;
+
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 import org.frc5010.common.arch.GenericSubsystem;
@@ -147,7 +148,7 @@ public class IntakeCommands {
     return Commands.runOnce(() -> intake.setCurrentState(IntakeState.OUTTAKING))
         .andThen(Commands.runOnce(() -> intake.runHopper(0)))
         // .andThen(() -> intake.setHopperAngle(Degrees.of(0.0)))
-        .andThen(Commands.run(() -> intake.runSpintake(-speed.getAsDouble())));
+        .andThen(Commands.run(() -> intake.runIntake(-speed.getAsDouble())));
     // Math.max(
     //     Constants.Intake.INTAKE_MAX_OUT,
     //     Math.min(-speed.getAsDouble(), Constants.Intake.INTAKE_OUT)))));
@@ -158,7 +159,7 @@ public class IntakeCommands {
     return Commands.runOnce(() -> intake.setCurrentState(IntakeState.INTAKING))
         .andThen(Commands.runOnce(() -> intake.runHopper(0)))
         // .andThen(() -> intake.setHopperAngle(Degrees.of(0.0)))
-        .andThen(Commands.run(() -> intake.runSpintake(speed.getAsDouble())));
+        .andThen(Commands.run(() -> intake.runIntake(speed.getAsDouble())));
     // Math.min(
     //     Constants.Intake.INTAKE_MAX_IN,
     //     Math.max(speed.getAsDouble(), Constants.Intake.INTAKE_IN)))));
@@ -177,14 +178,14 @@ public class IntakeCommands {
             })
         // .andThen(() -> intake.setHopperAngle(Degrees.of(130)))
         .andThen(() -> intake.runHopper(Constants.Intake.HOPPER_GO_IN))
-        .andThen(() -> intake.runSpintake(0));
+        .andThen(() -> intake.runIntake(0));
   }
 
   public static Command retractedCommand() {
     return Commands.runOnce(() -> intake.setCurrentState(IntakeState.RETRACTED))
         .andThen(() -> intake.runHopper(0))
         // .andThen(() -> intake.setHopperAngle(Degrees.of(130.0)))
-        .andThen(() -> intake.runSpintake(0));
+        .andThen(() -> intake.runIntake(0));
   }
 
   public static Command shouldOuttaking() {

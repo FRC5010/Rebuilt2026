@@ -1,4 +1,4 @@
-package frc.robot.rebuilt.subsystems.intake;
+package frc.robot.rebuilt.subsystems.Intake;
 
 import static edu.wpi.first.units.Units.Inches;
 
@@ -31,8 +31,8 @@ public class IntakeIOSim extends IntakeIOReal {
   }
   /** Runs the intake motor and updates the state of the intake simulation */
   @Override
-  public void runSpintake(double speed) {
-    super.runSpintake(speed);
+  public void runIntake(double speed) {
+    super.runIntake(speed);
     if (speed > 0) {
       intakeSimulation.startIntake();
     } else {

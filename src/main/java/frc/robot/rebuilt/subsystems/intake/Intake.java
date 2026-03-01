@@ -31,18 +31,18 @@ public class Intake extends GenericSubsystem {
     }
   }
 
-  public void runSpintake(double speed) {
-    io.runSpintake(speed);
+  public void runIntake(double speed) {
+    io.runIntake(speed);
   }
-  /** Creates a command that runs the spintake at the given speed and stops when done */
-  public Command spintakeCommand(double speed) {
+  /** Creates a command that runs the intake at the given speed and stops when done */
+  public Command intakeCommand(double speed) {
     return Commands.run(
             () -> {
-              runSpintake(speed);
+              runIntake(speed);
             })
         .finallyDo(
             () -> {
-              runSpintake(0);
+              runIntake(0);
             });
   }
 
@@ -63,7 +63,7 @@ public class Intake extends GenericSubsystem {
   }
   /** Configures test controller bindings for the spintake, hopper control, and sysid */
   public void configTestController(Controller controller) {
-    controller.createRightBumper().whileTrue(spintakeCommand(0.5));
+    controller.createRightBumper().whileTrue(intakeCommand(0.5));
     controller.createYButton().whileTrue(getHopperSysIdCommand());
     controller.setRightYAxis(controller.createRightYAxis());
     Trigger rightYAxis = new Trigger(() -> controller.getRightYAxis() > 0.01);

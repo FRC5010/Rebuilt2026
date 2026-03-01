@@ -1,4 +1,4 @@
-package frc.robot.rebuilt.subsystems.intake;
+package frc.robot.rebuilt.subsystems.Intake;
 
 import static edu.wpi.first.units.Units.Amps;
 import static edu.wpi.first.units.Units.Degrees;
@@ -18,25 +18,23 @@ import yams.mechanisms.positional.Arm;
 
 public class IntakeIOReal implements IntakeIO {
   protected Map<String, Object> devices;
-  // private FlyWheel spintakeLead;
-  private PercentControlMotor spintakeLead;
-  private PercentControlMotor spinTakeFollow;
+  private PercentControlMotor intakeLead;
+  private PercentControlMotor intakeFollow;
   private Arm intakeHopper;
-  /** initializes the spintake and hopper */
+
+  /** initializes the intake and hopper */
   public IntakeIOReal(Map<String, Object> devices) {
     this.devices = devices;
-    // spintakeLead = (FlyWheel) devices.get("spintake");
-    spintakeLead = (PercentControlMotor) devices.get("spintakeLead");
-    spinTakeFollow = (PercentControlMotor) devices.get("spintakeFollow");
-    spintakeLead.invert(true);
-    spinTakeFollow.setFollow(spintakeLead, false);
+    intakeLead = (PercentControlMotor) devices.get("intakeLead");
+    intakeFollow = (PercentControlMotor) devices.get("intakeFollow");
+    intakeLead.invert(true);
+    intakeFollow.setFollow(intakeLead, false);
     intakeHopper = (Arm) devices.get("hopper");
   }
 
   @Override
-  public void runSpintake(double speed) {
-    // spintakeLead.getMotor().setDutyCycle(speed);
-    spintakeLead.set(speed);
+  public void runIntake(double speed) {
+    intakeLead.set(speed);
   }
 
   public void setHopperAngle(Angle angle) {
@@ -104,11 +102,10 @@ public class IntakeIOReal implements IntakeIO {
     Logger.recordOutput(
         "Hopper Velocity",
         intakeHopper.getMotorController().getMechanismVelocity().in(Degrees.per(Second)));
-    Logger.recordOutput("Hopper MOving", isHopperMoving());
+    Logger.recordOutput("Hopper Moving", isHopperMoving());
     inputs.hopperAngle = intakeHopper.getMotorController().getMechanismPosition();
     inputs.hopperAngleDouble = inputs.hopperAngle.in(Degrees);
-    inputs.speed = spintakeLead.get();
+    inputs.speed = intakeLead.get();
     inputs.hopperAmps = intakeHopper.getMotor().getStatorCurrent().in(Amps);
-    // inputs.speed = spintakeLead.getMotor().getDutyCycle();
   }
 }

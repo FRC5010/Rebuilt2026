@@ -16,7 +16,8 @@ import frc.robot.rebuilt.FieldConstants;
 import frc.robot.rebuilt.Rebuilt;
 import frc.robot.rebuilt.commands.IndexerCommands.IndexerState;
 import frc.robot.rebuilt.subsystems.Indexer.Indexer;
-import frc.robot.rebuilt.subsystems.intake.IntakeIOSim;
+import frc.robot.rebuilt.subsystems.Intake.IntakeIOSim;
+
 import java.util.Map;
 import org.frc5010.common.arch.GenericSubsystem;
 import org.littletonrobotics.junction.Logger;
