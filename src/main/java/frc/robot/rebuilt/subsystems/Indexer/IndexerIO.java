@@ -4,6 +4,7 @@ import frc.robot.rebuilt.commands.IndexerCommands;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IndexerIO {
+
   @AutoLog
   public static class IndexerIOInputs {
     public double spindexerSpeed = 0;

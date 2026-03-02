@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.rebuilt.Constants;
 import frc.robot.rebuilt.subsystems.Intake.Intake;
-
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 import org.frc5010.common.arch.GenericSubsystem;
@@ -22,6 +21,7 @@ public class IntakeCommands {
 
   /** Declaring states of the intake */
   State retracted = intakeStateMachine.addState("retracted", retractedCommand());
+
   State retracting = intakeStateMachine.addState("retracting", retractingCommand());
   State deploying = intakeStateMachine.addState("deploying", deployingCommand());
   State deployed = intakeStateMachine.addState("deployed", deployedCommand());
@@ -165,10 +165,11 @@ public class IntakeCommands {
   }
 
   public static Command deployedCommand() {
-    return Commands.run(() -> {
-                intake.setCurrentState(IntakeState.DEPLOYED);
-                intake.runHopper(0);
-              });
+    return Commands.run(
+        () -> {
+          intake.setCurrentState(IntakeState.DEPLOYED);
+          intake.runHopper(0);
+        });
   }
 
   public static Command retractingCommand() {

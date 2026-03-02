@@ -22,13 +22,13 @@ public class IndexerIOReal implements IndexerIO {
     inputs.spindexerSpeed = spindexer.get();
     inputs.transferFrontSpeed = transferFront.getMotor().getDutyCycle();
   }
-  
+
   /** Sets the spindexer motor speed */
   @Override
   public void runSpindexer(double speed) {
     spindexer.set(speed);
   }
-  
+
   /** Sets the front transfer motor speed */
   @Override
   public void runTransferFront(double speed) {

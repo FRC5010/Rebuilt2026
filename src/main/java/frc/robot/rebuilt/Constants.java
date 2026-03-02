@@ -37,18 +37,31 @@ public class Constants {
   }
 
   public static class Indexer {
-    public static final double SPINDEXER_SPEED = 0.5; // This is the speed at which the spindexer will run
-    public static final double TRANSFER_SPEED = 0.6; // This is the speed at which the transfer will run
-    public static final double TRANSFER_CHURN = 0.25; // This is the speed at which the ___ will run in reverse after shooting to prevent jamming
+    public static final double SPINDEXER_SPEED =
+        0.5; // This is the speed at which the spindexer will run
+    public static final double TRANSFER_SPEED =
+        0.6; // This is the speed at which the transfer will run
+    public static final double TRANSFER_CHURN =
+        0.25; // This is the speed at which the ___ will run in reverse after shooting to prevent
+    // jamming
   }
 
   public static class Intake {
-    public static final double HOPPER_GO_OUT = -0.3; // This is the speed at which the hopper will extend out
-    public static final double HOPPER_GO_IN = 0.1; // This is the speed at which the hopper will run come back in
-    public static final double HOPPER_OUT = 0.00; // This is the speed at which the hopper motor would run to keep the hopper extended
-    public static final double INTAKE_IN = 0.0; // This is the minimum speed at which the intake will run to pull balls into the robot
-    public static final double INTAKE_OUT = -0.0; // This is the minimum speed at which the intake will run to push balls out of the robot, probably not needed but just in case
-    public static final double INTAKE_MAX_IN = 0.8; // This is the maximum speed at which the intake will run to pull balls into the robot
-    public static final double INTAKE_MAX_OUT = -0.8; // This is the maximum speed at which the intake will run to push balls out of the robot, probably not needed but just in case
+    public static final double HOPPER_GO_OUT =
+        -0.3; // This is the speed at which the hopper will extend out
+    public static final double HOPPER_GO_IN =
+        0.1; // This is the speed at which the hopper will run come back in
+    public static final double HOPPER_OUT =
+        0.00; // This is the speed at which the hopper motor would run to keep the hopper extended
+    public static final double INTAKE_IN =
+        0.0; // This is the minimum speed at which the intake will run to pull balls into the robot
+    public static final double INTAKE_OUT =
+        -0.0; // This is the minimum speed at which the intake will run to push balls out of the
+    // robot, probably not needed but just in case
+    public static final double INTAKE_MAX_IN =
+        0.8; // This is the maximum speed at which the intake will run to pull balls into the robot
+    public static final double INTAKE_MAX_OUT =
+        -0.8; // This is the maximum speed at which the intake will run to push balls out of the
+    // robot, probably not needed but just in case
   }
 }

@@ -32,27 +32,24 @@ public class Indexer extends GenericSubsystem {
     io.runSpindexer(speed);
   }
 
-  public void runFeeder(double speed) {
-    io.runTransferFront(speed);
-  }
-
-  public void runTransferFront(double speed) {
+  public void runTransfer(double speed) {
     io.runTransferFront(speed);
   }
 
   public void configTestControls(Controller controller) {
     controller.createLeftBumper().whileTrue((spindexerCommand(.25)).alongWith(feederCommand(0.25)));
   }
+
   /** Command that runs the feeder at a given speed and stops when done */
   public Command feederCommand(double speed) {
     return Commands.run(
             () -> {
-              runFeeder(0.25);
+              runTransfer(speed);
             },
             this)
         .finallyDo(
             () -> {
-              runFeeder(0);
+              runTransfer(0);
             });
   }
   /** returns a command that runs the spindexer at a set speed and stops when done */

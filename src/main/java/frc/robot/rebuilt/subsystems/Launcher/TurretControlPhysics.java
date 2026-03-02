@@ -122,7 +122,9 @@ public class TurretControlPhysics {
 
     if (localHeadingRadians < minLimitRadians || localHeadingRadians > maxLimitRadians) {
       status = AimingStatus.IN_DEADZONE;
-/** If the angle is outside limits, then it clamps to a valid limit based on motion direction */
+      /**
+       * If the angle is outside limits, then it clamps to a valid limit based on motion direction
+       */
       if (feedforwardRadPerSec > 0.1) {
         localHeading = minTurretAngle;
       } else if (feedforwardRadPerSec < -0.1) {
@@ -183,7 +185,7 @@ public class TurretControlPhysics {
 
     double timeFlightGuess = 0.5;
     SolverState bestState = null;
-/** Computes the solver state for the current guess for the current time of flight guess */
+    /** Computes the solver state for the current guess for the current time of flight guess */
     for (int i = 0; i < MAX_SOLVER_ITERATIONS; i++) {
       SolverState stateCurrent =
           computePhysicsState(timeFlightGuess, targetFieldPos, currentTurretAngle, predictor);
@@ -294,7 +296,10 @@ public class TurretControlPhysics {
             -robotAlpha * turretOffsetRotated.getY(), robotAlpha * turretOffsetRotated.getX());
 
     Translation2d accelCentripetal = turretOffsetRotated.times(-(robotOmega * robotOmega));
-/** Converts the robot's linear acceleration into a 2D vector and defaults it to 0 if no data is available*/
+    /**
+     * Converts the robot's linear acceleration into a 2D vector and defaults it to 0 if no data is
+     * available
+     */
     Translation2d accelRobotLinear =
         robotState.acceleration() != null
             ? new Translation2d(

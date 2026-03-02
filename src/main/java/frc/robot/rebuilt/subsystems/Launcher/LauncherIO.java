@@ -23,31 +23,43 @@ public interface LauncherIO {
   public static class LauncherIOInputs {
     /** Initializes the requested and current launcher states to idle */
     public LauncherCommands.LauncherState stateRequested = LauncherCommands.LauncherState.IDLE;
+
     public LauncherCommands.LauncherState stateCurrent = LauncherCommands.LauncherState.IDLE;
-    /** Intializes the distance to the virtual target and desired flywheel speed to start at 0 and calculation validity to false */
+    /**
+     * Intializes the distance to the virtual target and desired flywheel speed to start at 0 and
+     * calculation validity to false
+     */
     public boolean isValidCalculation = false;
+
     public Distance distanceToVirtualTarget = Meters.of(0.0);
     public AngularVelocity flyWheelSpeedDesired = RPM.of(0.0);
-    /** Intializes calculated and desired angles to 0 degrees and calculated flywheel speed to 0 RPS */
+    /**
+     * Intializes calculated and desired angles to 0 degrees and calculated flywheel speed to 0 RPS
+     */
     public AngularVelocity flyWheelSpeedCalculated = RotationsPerSecond.of(0.0);
+
     public Angle hoodAngleCalculated = Degrees.of(0.0);
     public Angle turretAngleCalculated = Degrees.of(0.0);
     public Angle hoodAngleDesired = Degrees.of(0.0);
     public Angle turretAngleDesired = Degrees.of(0.0);
     /** Initializes actual flywheel speed to 0 RPM and actual hood and turret angles to 0 degrees */
     public AngularVelocity flyWheelSpeedActual = RPM.of(0.0);
+
     public Angle hoodAngleActual = Degrees.of(0.0);
     public Angle turretAngleActual = Degrees.of(0.0);
     /** Decides whether the flywheel speed and turret and hood angle have reached their goals */
     public boolean flyWheelSpeedAtGoal = false;
+
     public boolean hoodAngleAtGoal = false;
     public boolean turretAngleAtGoal = false;
     /** Initializes the hood and turret angle errors to 0 and the flywheel speed error to 0 RPM */
     public AngularVelocity flyWheelSpeedError = RPM.of(0.0);
+
     public double hoodAngleError = 0.0;
     public double turretAngleError = 0.0;
-/** Intiializes the hood and turret velocities to 0 and the flywheel motor output to 0 */
+    /** Intiializes the hood and turret velocities to 0 and the flywheel motor output to 0 */
     public double hoodVelocity = 0.0;
+
     public double turretVelocity = 0.0;
     public double flyWheelMotorOutput = 0.0;
 
