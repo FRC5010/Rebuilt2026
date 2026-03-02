@@ -44,6 +44,8 @@ public class Constants {
     public static final double TRANSFER_CHURN =
         0.25; // This is the speed at which the ___ will run in reverse after shooting to prevent
     // jamming
+    public static final double SPINDEXER_CHURN =
+        -0.1; // This is the speed at which the spindexer will run in reverse
   }
 
   public static class Intake {

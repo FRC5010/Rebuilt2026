@@ -110,33 +110,35 @@ public class IndexerCommands {
     indexer.setDefaultCommands(stateMachine);
   }
 
-  /** defines command behavio for the force state stops the indexer and runs the transfer at 50% */
+  /** When the CHRUN trigger is activated, execute a command to run the spindexer and the transfer at predefined speeds
+   * For details on the speeds, see the Constants class in the rebuilt package
+   */
   public static Command forceStateCommand() {
     return Commands.runOnce(
         () -> {
           indexer.setCurrentState(IndexerState.FORCE);
           indexer.runSpindexer(Constants.Indexer.SPINDEXER_SPEED);
           indexer.runTransfer(Constants.Indexer.TRANSFER_SPEED);
-          //          indexer.runTransferBack(0.50);
         },
         indexer);
   }
 
-  /** defines command behavior for the churn state stops the indexer and runs the transfer at 25% */
+  /** When the CHRUN trigger is activated, execute a command to run the spindexer in reverse and the transfer at predefined speeds
+   * For details on the speeds, see the Constants class in the rebuilt package
+   */
   private static Command churnStateCommand() {
     return Commands.runOnce(
         () -> {
           indexer.setCurrentState(IndexerState.CHURN);
-          indexer.runSpindexer(-0.1);
+          indexer.runSpindexer(Constants.Indexer.SPINDEXER_CHURN);
           indexer.runTransfer(Constants.Indexer.TRANSFER_CHURN);
-          //          indexer.runTransferBack(0.25);
         },
         indexer);
   }
 
-  /**
-   * defines command behavior for the idle state stops all motors and sets the LED patters to
-   * rainbow
+  /** When the IDLE trigger is activated, execute a command to stop the spindexer and the transfer
+   * and set the LED pattern to a rainbow pattern with a speed of 0%
+   * For details on the speeds, see the Constants class in the rebuilt package
    */
   private static Command idleStateCommand() {
     return Commands.runOnce(
@@ -144,14 +146,15 @@ public class IndexerCommands {
           indexer.setCurrentState(IndexerState.IDLE);
           indexer.runSpindexer(0);
           indexer.runTransfer(0);
-          //          indexer.runTransferBack(0);
           LEDStrip.changeSegmentPattern(ConfigConstants.ALL_LEDS, LEDStrip.getRainbowPattern(0));
         },
         indexer);
   }
 
-  // run feed command when Launcher State is idle and Operator Right Bumper is
-  // pressed
+  /** When the FEED trigger is activated, execute a command to run the spindexer and the transfer at predefined speeds
+   * and set the LED pattern to a rainbow pattern with a speed of 25%
+   * For details on the speeds, see the Constants class in the rebuilt package
+   */
   private static Command feedStateCommand() {
     return Commands.parallel(
         Commands.runOnce(
@@ -159,25 +162,25 @@ public class IndexerCommands {
               indexer.setCurrentState(IndexerState.FEED);
               indexer.runSpindexer(Constants.Indexer.SPINDEXER_SPEED);
               indexer.runTransfer(Constants.Indexer.TRANSFER_SPEED);
-              //              indexer.runTransferBack(1);
               LEDStrip.changeSegmentPattern(
                   ConfigConstants.ALL_LEDS, LEDStrip.getRainbowPattern(25));
             },
             indexer));
   }
-  /** Requests the indexer to enter the idle state */
+  /** Sets the requested state of the Indexer to be IDLE, causing the idle Trigger */
   public static Command shouldIdleCommand() {
     return Commands.runOnce(() -> indexer.setRequestedState(IndexerState.IDLE));
   }
-  /** Requests the indexer to enter the churn state */
+  /** Sets the requested state of the Indexer to be CHURN, causing the churn Trigger */
   public static Command shouldChurnCommand() {
     return Commands.runOnce(() -> indexer.setRequestedState(IndexerState.CHURN));
   }
-  /** Requests the indexer to enter the feed state */
+  /** Sets the requested state of the Indexer to be FEED, causing the feed Trigger */
   public static Command shouldFeedCommand() {
     return Commands.runOnce(() -> indexer.setRequestedState(IndexerState.FEED));
   }
 
+  /** Sets the requested state of the Indexer to be FORCE, causing the force Trigger */
   public static Command shouldForceCommand() {
     return Commands.runOnce(
         () -> {
@@ -185,6 +188,7 @@ public class IndexerCommands {
         });
   }
 
+  /** Toggles the requested state of the Indexer to be FEED or CHURN, causing the respective Trigger to activate */
   public static Command toggleForceFeed() {
     return Commands.runOnce(
         () -> {
