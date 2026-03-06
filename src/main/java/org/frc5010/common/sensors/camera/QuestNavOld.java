@@ -189,6 +189,7 @@ public class QuestNavOld implements PoseProvider {
               0,
               0,
               0,
+              0.0, // effectiveSpan (N/A for Quest)
               PoseObservationType.ENVIRONMENT_BASED,
               ProviderType.ENVIRONMENT_BASED));
     }

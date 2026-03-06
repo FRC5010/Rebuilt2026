@@ -13,21 +13,32 @@ public class VisionConstants {
   public static double maxAmbiguity = 0.15;
   public static double maxZError = 1;
 
-  // Standard deviation baselines, for 1 meter distance and 1 tag
-  // (Adjusted automatically based on distance and # of tags)
-  public static double linearStdDevBaseline = 0.02; // Meters
+  public static double linearStdDevBaseline = 0.05; // Meters
   public static double angularStdDevBaseline = 0.06; // Radians
 
-  // Standard deviation multipliers for each camera
-  // (Adjust to trust some cameras more than others)
+  // Camera intrinsics
+  public static double cameraFocalLength = 900.0; // pixels
+
+  // FRC 2026 AprilTag side length in meters (6.5 inches = 165.1 mm)
+  public static double aprilTagSideLength = 0.1651; // meters
+
+  public static double pixelNoiseStdDev = 0.5; // pixels
+
+  public static double distanceExponent = 1.5;
+
+  
+  public static double maxLinearStdDev = 50.0; // meters
+  public static double maxAngularStdDev = 50.0; // radians
+
+
   public static double[] cameraStdDevFactors =
       new double[] {
-        1.0, // Camera 0
-        1.0 // Camera 1
+        1.0,
+        1.0 
       };
 
-  // Multipliers to apply for MegaTag 2 observations
+  // Multipliers to apply for MegaTag 2 observations (Limelight)
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor =
-      Double.POSITIVE_INFINITY; // No rotation data availableF
+      Double.POSITIVE_INFINITY; // No rotation data available
 }

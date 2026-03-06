@@ -35,6 +35,8 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
   protected Supplier<Pose2d> poseSupplier;
   /** The current list of fiducial IDs */
   protected List<Integer> fiducialIds = new ArrayList<>();
+  
+  private final int cameraStdDevIndex;
 
   /**
    * Constructor
@@ -55,6 +57,7 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
     super(name, colIndex, cameraToRobot);
     this.poseSupplier = poseSupplier;
     this.fieldLayout = fieldLayout;
+    this.cameraStdDevIndex = colIndex;
     poseEstimator = new PhotonPoseEstimator(fieldLayout, cameraToRobot);
   }
 
@@ -69,6 +72,7 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
     this.poseSupplier = poseSupplier;
     this.fieldLayout = fieldLayout;
     this.fiducialIds = fiducialIds;
+    this.cameraStdDevIndex = colIndex;
     visionLayout.addDouble("Observations", () -> input.poseObservations.length);
     poseEstimator = new PhotonPoseEstimator(fieldLayout, cameraToRobot);
   }
@@ -86,16 +90,11 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
 
     for (PhotonPipelineResult iCamResult : camResults) {
       SmartDashboard.putBoolean("Camera/" + name() + "/resuls", iCamResult.hasTargets());
+      if (!iCamResult.hasTargets()) continue;
+
       Optional<EstimatedRobotPose> estimate = poseEstimator.estimateCoprocMultiTagPose(iCamResult);
 
       if (estimate.isPresent()) {
-        if (!DriverStation.isDisabled()) {
-          Optional<EstimatedRobotPose> finalEstimate =
-              poseEstimator.estimatePnpDistanceTrigSolvePose(iCamResult);
-          if (finalEstimate.isPresent()) {
-            estimate = finalEstimate;
-          }
-        }
         EstimatedRobotPose estimatedRobotPose = estimate.get();
         Pose3d robotPose = estimatedRobotPose.estimatedPose;
 
@@ -126,55 +125,107 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
               robotPose.getRotation().toRotation2d().getDegrees()
             });
 
+        // Compute effective tag cluster span (S_eff)
+        double effectiveSpan = VisionConstants.aprilTagSideLength * Math.sqrt(2.0);
+        if (tagCount > 1) {
+          double maxDist = 0.0;
+          var targets = iCamResult.targets;
+          for (int j = 0; j < targets.size(); j++) {
+            for (int k = j + 1; k < targets.size(); k++) {
+              double dist = targets.get(j).bestCameraToTarget.getTranslation()
+                  .getDistance(targets.get(k).bestCameraToTarget.getTranslation());
+              if (dist > maxDist) maxDist = dist;
+            }
+          }
+          effectiveSpan = maxDist + VisionConstants.aprilTagSideLength;
+        }
+
         observations.add(
             new PoseObservation(
-                iCamResult.getTimestampSeconds(), // Timestamp
-                // 3D pose estimate
+                iCamResult.getTimestampSeconds(), 
+        
                 robotPose,
                 iCamResult.getBestTarget().poseAmbiguity,
                 tagCount,
                 averageDistance,
+                effectiveSpan,
                 PoseObservationType.PHOTONVISION,
                 ProviderType.FIELD_BASED));
       }
+    }
 
-      // Save pose observations to inputs object
-      input.poseObservations = new PoseObservation[observations.size()];
-      for (int i = 0; i < observations.size(); i++) {
-        input.poseObservations[i] = observations.get(i);
-      }
-      // Save tag IDs to inputs objects
-      input.tagIds = new int[tagIds.size()];
-      int i = 0;
-      for (int id : tagIds) {
-        input.tagIds[i++] = id;
-      }
+    
+    input.poseObservations = new PoseObservation[observations.size()];
+    for (int i = 0; i < observations.size(); i++) {
+      input.poseObservations[i] = observations.get(i);
+    }
+    input.tagIds = new int[tagIds.size()];
+    int i = 0;
+    for (int id : tagIds) {
+      input.tagIds[i++] = id;
     }
   }
 
   @Override
   public Matrix<N3, N1> getStdDeviations(PoseObservation observation) {
-    double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
-    double linearStdDev = VisionConstants.linearStdDevBaseline * stdDevFactor;
+    // Clamp inputs to avoid degenerate values
+    double d = Math.max(observation.averageTagDistance(), 0.01); // meters
+    int N = Math.max(observation.tagCount(), 1);
+    double sqrtN = Math.sqrt(N);
+    double sEff = observation.effectiveSpan();
 
-    double angularStdDev = VisionConstants.angularStdDevBaseline * stdDevFactor;
-    if (camResult.multitagResult.isEmpty()) {
-      angularStdDev = 1.0;
-    }
-    // double rotStdDev = 0.3;
+    // Camera intrinsics and noise constants from VisionConstants
+    double f = VisionConstants.cameraFocalLength; // pixels
+    double sigPx = VisionConstants.pixelNoiseStdDev; // pixels (RMS corner noise)
+    double exp = VisionConstants.distanceExponent;
+    double linBase = VisionConstants.linearStdDevBaseline;
 
-    // If really close, disregard angle measurement
-    if (observation.averageTagDistance() < 0.3
-        || (observation.averageTagDistance() > 2 && RobotState.isEnabled())) {
-      angularStdDev = 1000.0;
+    // Penalty for single-tag ambiguity
+    double penalty = 1.0;
+    if (N == 1) {
+        double a = Math.min(observation.ambiguity(), 0.99);
+        penalty = Math.pow(1.0 / (1.0 - a), 3);
     }
 
-    if ((observation.averageTagDistance() > 2.5
-        && RobotState.isEnabled()
-        && observation.tagCount() < 2)) {
-      linearStdDev = 100.0;
+
+    double baseErr = (linBase * sigPx * Math.pow(d, exp - 1.0) / f);
+    
+    double stdX = baseErr * d;
+    double vX = stdX * stdX;
+    
+    double stdZ = (1.0 / sqrtN) * baseErr * (d * d / sEff) * penalty;
+    double vZ = stdZ * stdZ;
+    
+    double vTheta = vZ / (sEff * sEff);
+    if (N == 1) {
+        vTheta = 1e6; 
     }
-    return VecBuilder.fill(linearStdDev, linearStdDev, angularStdDev);
+
+   
+    double factor = (cameraStdDevIndex < VisionConstants.cameraStdDevFactors.length)
+            ? VisionConstants.cameraStdDevFactors[cameraStdDevIndex] : 1.0;
+    double factorSq = factor * factor;
+    
+    vX = Math.min(vX * factorSq, 2500.0);
+    vZ = Math.min(vZ * factorSq, 2500.0);
+    if (N >= 2) {
+        vTheta = Math.min(vTheta * factorSq, 2500.0);
+    }
+
+   
+    double robotHeading = observation.pose().getRotation().getZ();
+    double camYaw = robotToCamera.getRotation().getZ();
+    double gamma = robotHeading + camYaw;
+    
+    double cosG = Math.cos(gamma);
+    double sinG = Math.sin(gamma);
+    
+
+    double sigmaFieldX = Math.sqrt(vZ * (cosG * cosG) + vX * (sinG * sinG));
+    double sigmaFieldY = Math.sqrt(vZ * (sinG * sinG) + vX * (cosG * cosG));
+    double sigmaFieldTheta = Math.sqrt(vTheta);
+
+    return VecBuilder.fill(sigmaFieldX, sigmaFieldY, sigmaFieldTheta);
   }
 
   /**

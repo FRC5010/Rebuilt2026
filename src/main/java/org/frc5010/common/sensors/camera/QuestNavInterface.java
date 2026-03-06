@@ -13,6 +13,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -108,10 +109,16 @@ public class QuestNavInterface implements PoseProvider {
 
   private void updateObservations() {
     PoseFrame[] unreadQuestFrames = questNav.getAllUnreadPoseFrames();
-    if (unreadQuestFrames.length > 0) {
-      latestPoseFrame = unreadQuestFrames[unreadQuestFrames.length - 1];
+
+    // Guard against empty frame array — an empty result (e.g. transient tracking loss)
+    // previously caused an ArrayIndexOutOfBoundsException that silenced ALL providers.
+    if (unreadQuestFrames.length == 0) {
+      input.connected = false;
+      input.poseObservations = new PoseObservation[0];
+      return;
     }
 
+    latestPoseFrame = unreadQuestFrames[unreadQuestFrames.length - 1];
     List<PoseObservation> observations = new ArrayList<>();
 
     for (PoseFrame frame : unreadQuestFrames) {
@@ -125,6 +132,7 @@ public class QuestNavInterface implements PoseProvider {
               0,
               0,
               0,
+              0.0, // effectiveSpan (N/A for Quest)
               PoseObservationType.ENVIRONMENT_BASED,
               ProviderType.ENVIRONMENT_BASED));
     }
@@ -139,10 +147,13 @@ public class QuestNavInterface implements PoseProvider {
   @Override
   public Matrix<N3, N1> getStdDeviations(PoseObservation observation) {
     double calib = getConfidence();
+
+    // While disabled, give Quest a much higher std dev so that AprilTag cameras
+    // (FIELD_BASED) can dominate the estimator and properly initialize the pose
+    // for autonomous. Without this, Quest's 0.05 std dev drowns out AprilTag readings.
     if (DriverStation.isDisabled()) {
-      calib = 1000;
-    }
-    if (null != robotVelocity) {
+      calib = 2.0;
+    } else if (null != robotVelocity) {
       Translation2d questVelVector =
           new Translation2d(getVelocity().vxMetersPerSecond, getVelocity().vyMetersPerSecond);
       Translation2d robotVelVector =

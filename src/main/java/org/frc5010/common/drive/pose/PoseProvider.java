@@ -60,6 +60,7 @@ public interface PoseProvider {
       double ambiguity,
       int tagCount,
       double averageTagDistance,
+      double effectiveSpan,
       PoseObservationType type,
       ProviderType provider) {}
 

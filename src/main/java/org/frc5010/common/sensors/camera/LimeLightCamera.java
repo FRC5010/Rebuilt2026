@@ -182,6 +182,7 @@ public class LimeLightCamera extends GenericCamera {
               determineConfidence(poseEstimate.get()),
               poseEstimate.map(it -> it.tagCount).orElse(0),
               poseEstimate.map(it -> it.avgTagDist).orElse(0.0),
+              0.0, // Limelight does not expose target 3D corners for S_eff calculation
               PoseObservationType.PHOTONVISION,
               ProviderType.FIELD_BASED));
 

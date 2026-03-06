@@ -70,7 +70,7 @@ public class DrivePoseEstimator extends GenericSubsystem {
     }
   }
 
-  private static State state = State.DISABLED_FIELD;
+  private State state = State.DISABLED_FIELD;
 
   /**
    * Build a DrivePoseEstimator
@@ -119,7 +119,8 @@ public class DrivePoseEstimator extends GenericSubsystem {
     }
 
     new Trigger(() -> DriverStation.isDisabled())
-        .onFalse(Commands.runOnce(() -> setState(State.ALL)));
+        .onFalse(Commands.runOnce(() -> setState(State.ALL)))
+        .onTrue(Commands.runOnce(() -> setState(State.DISABLED_FIELD)));
   }
 
   public Function<Integer, Color8Bit> displayProviderStatuses(int length) {
@@ -212,7 +213,19 @@ public class DrivePoseEstimator extends GenericSubsystem {
 
   @Override
   public void periodic() {
-    poseProviders.forEach(it -> it.update());
+    // Update each provider individually so a crash in one (e.g. Quest empty-frame NPE)
+    // does not prevent other providers (AprilTag cameras) from updating.
+    for (PoseProvider provider : poseProviders) {
+      try {
+        provider.update();
+      } catch (Exception e) {
+        System.err.println(
+            "[DrivePoseEstimator] Provider update threw exception ("
+                + provider.getClass().getSimpleName()
+                + "): "
+                + e.getMessage());
+      }
+    }
     updatePoseObservationFromProviders();
     field2d.setRobotPose(getCurrentPose());
   }
