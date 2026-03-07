@@ -102,6 +102,26 @@ public class CameraConfigurationJson {
   public double fov = 70;
   /** Optional height of the target in meters (used for target tracking mode) */
   public double targetHeight = 0;
+  /**
+   * Camera exposure time in milliseconds. 0 means "use camera default / auto-exposure. Only applied
+   * to PhotonVision cameras.
+   */
+  public double exposureTimeMs = 0;
+  /**
+   * Camera focal length along the horizontal (X) axis in pixels, from calibration. If 0, the global
+   * {@link org.frc5010.common.vision.VisionConstants#cameraFocalLength} is used.
+   */
+  public double focalLengthX = 0;
+  /**
+   * Camera focal length along the vertical (Y) axis in pixels, from calibration. If 0, {@link
+   * #focalLengthX} is used as the fallback (square-pixel assumption).
+   */
+  public double focalLengthY = 0;
+  /**
+   * Mean pixel reprojection error reported by the camera calibration (pixels). Used to scale
+   * per-camera noise estimates. 0 means "use the global default".
+   */
+  public double meanReprojectionError = 0;
   /** Whether to view game pieces in simulation */
   public boolean viewGamePieces = true;
   /**
@@ -306,6 +326,11 @@ public class CameraConfigurationJson {
     }
     if (null != camera) {
       camera.setCanViewGamePieces(viewGamePieces);
+      if (camera instanceof PhotonVisionCamera) {
+        ((PhotonVisionCamera) camera)
+            .setCalibrationParams(
+                exposureTimeMs, focalLengthX, focalLengthY, meanReprojectionError);
+      }
     }
     switch (use) {
       case "target":
@@ -320,6 +345,10 @@ public class CameraConfigurationJson {
       case "apriltag":
         {
           if (drivetrain != null) {
+            if (camera instanceof PhotonVisionPoseCamera) {
+              ((PhotonVisionPoseCamera) camera)
+                  .withRobotVelocitySupplier(drivetrain::getFieldVelocity);
+            }
             drivetrain.getPoseEstimator().registerPoseProvider(camera);
           }
           // if (targetFiducialIds.length > 0) {

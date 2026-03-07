@@ -82,6 +82,30 @@
       "description": "Vertical resolution of the camera in pixels",
       "default": 600,
       "minimum": 1
+    },
+    "exposureTimeMs": {
+      "type": "number",
+      "description": "Camera exposure time in milliseconds. 0 means use the camera default / auto-exposure. Only applied to PhotonVision cameras.",
+      "default": 0,
+      "minimum": 0
+    },
+    "focalLengthX": {
+      "type": "number",
+      "description": "Horizontal (X-axis) focal length in pixels from camera calibration. 0 means use the global VisionConstants default.",
+      "default": 0,
+      "minimum": 0
+    },
+    "focalLengthY": {
+      "type": "number",
+      "description": "Vertical (Y-axis) focal length in pixels from camera calibration. 0 falls back to focalLengthX (square-pixel assumption).",
+      "default": 0,
+      "minimum": 0
+    },
+    "meanReprojectionError": {
+      "type": "number",
+      "description": "Mean pixel reprojection error reported by the camera calibration (pixels). 0 means use the global VisionConstants default.",
+      "default": 0,
+      "minimum": 0
     }
   }
 }

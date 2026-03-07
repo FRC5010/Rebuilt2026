@@ -13,7 +13,6 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -134,7 +133,8 @@ public class QuestNavInterface implements PoseProvider {
               0,
               0.0, // effectiveSpan (N/A for Quest)
               PoseObservationType.ENVIRONMENT_BASED,
-              ProviderType.ENVIRONMENT_BASED));
+              ProviderType.ENVIRONMENT_BASED,
+              PnpMethod.VISUAL_ODOMETRY));
     }
     input.connected = isActive();
     // Save pose observations to inputs object

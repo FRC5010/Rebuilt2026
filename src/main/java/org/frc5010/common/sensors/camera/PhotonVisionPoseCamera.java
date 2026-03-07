@@ -10,10 +10,9 @@ import edu.wpi.first.math.VecBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
@@ -35,7 +34,13 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
   protected Supplier<Pose2d> poseSupplier;
   /** The current list of fiducial IDs */
   protected List<Integer> fiducialIds = new ArrayList<>();
-  
+
+  /**
+   * Optional supplier of the robot's current field-relative velocity. When provided, std devs are
+   * scaled up proportionally during fast motion to trust vision less while the robot is moving.
+   */
+  protected Optional<Supplier<ChassisSpeeds>> robotVelocitySupplier = Optional.empty();
+
   private final int cameraStdDevIndex;
 
   /**
@@ -58,6 +63,7 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
     this.poseSupplier = poseSupplier;
     this.fieldLayout = fieldLayout;
     this.cameraStdDevIndex = colIndex;
+
     poseEstimator = new PhotonPoseEstimator(fieldLayout, cameraToRobot);
   }
 
@@ -77,6 +83,20 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
     poseEstimator = new PhotonPoseEstimator(fieldLayout, cameraToRobot);
   }
 
+  /**
+   * Sets an optional supplier of the robot's current field-relative velocity. When provided, std
+   * devs are scaled up during fast motion so vision measurements are trusted less while the robot
+   * is moving quickly.
+   *
+   * @param velocitySupplier supplier returning a {@link ChassisSpeeds} in field-relative frame
+   * @return this camera instance for fluent chaining
+   */
+  public PhotonVisionPoseCamera withRobotVelocitySupplier(
+      Supplier<ChassisSpeeds> velocitySupplier) {
+    this.robotVelocitySupplier = Optional.of(velocitySupplier);
+    return this;
+  }
+
   /** Update the camera and target with the latest result */
   @Override
   public void updateCameraInfo() {
@@ -93,6 +113,12 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
       if (!iCamResult.hasTargets()) continue;
 
       Optional<EstimatedRobotPose> estimate = poseEstimator.estimateCoprocMultiTagPose(iCamResult);
+      PnpMethod pnpMethod = PnpMethod.MULTI_TAG_PNP;
+
+      if (estimate.isEmpty()) {
+        estimate = poseEstimator.estimatePnpDistanceTrigSolvePose(iCamResult);
+        pnpMethod = PnpMethod.TRIG_PNP;
+      }
 
       if (estimate.isPresent()) {
         EstimatedRobotPose estimatedRobotPose = estimate.get();
@@ -132,8 +158,12 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
           var targets = iCamResult.targets;
           for (int j = 0; j < targets.size(); j++) {
             for (int k = j + 1; k < targets.size(); k++) {
-              double dist = targets.get(j).bestCameraToTarget.getTranslation()
-                  .getDistance(targets.get(k).bestCameraToTarget.getTranslation());
+              double dist =
+                  targets
+                      .get(j)
+                      .bestCameraToTarget
+                      .getTranslation()
+                      .getDistance(targets.get(k).bestCameraToTarget.getTranslation());
               if (dist > maxDist) maxDist = dist;
             }
           }
@@ -142,19 +172,18 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
 
         observations.add(
             new PoseObservation(
-                iCamResult.getTimestampSeconds(), 
-        
+                iCamResult.getTimestampSeconds(),
                 robotPose,
                 iCamResult.getBestTarget().poseAmbiguity,
                 tagCount,
                 averageDistance,
                 effectiveSpan,
                 PoseObservationType.PHOTONVISION,
-                ProviderType.FIELD_BASED));
+                ProviderType.FIELD_BASED,
+                pnpMethod));
       }
     }
 
-    
     input.poseObservations = new PoseObservation[observations.size()];
     for (int i = 0; i < observations.size(); i++) {
       input.poseObservations[i] = observations.get(i);
@@ -168,62 +197,93 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
 
   @Override
   public Matrix<N3, N1> getStdDeviations(PoseObservation observation) {
-    // Clamp inputs to avoid degenerate values
-    double d = Math.max(observation.averageTagDistance(), 0.01); // meters
-    int N = Math.max(observation.tagCount(), 1);
-    double sqrtN = Math.sqrt(N);
-    double sEff = observation.effectiveSpan();
+    double meanReprojectionError = getMeanReprojectionError(); // sigma_p
+    double fx = getFocalLengthX();
+    double fy = getFocalLengthY();
+    double f_avg = (fx + fy) / 2.0;
 
-    // Camera intrinsics and noise constants from VisionConstants
-    double f = VisionConstants.cameraFocalLength; // pixels
-    double sigPx = VisionConstants.pixelNoiseStdDev; // pixels (RMS corner noise)
-    double exp = VisionConstants.distanceExponent;
-    double linBase = VisionConstants.linearStdDevBaseline;
+    double d = observation.averageTagDistance();
+    double s_eff = observation.effectiveSpan();
+    int n = observation.tagCount();
+    double a = observation.ambiguity();
 
-    // Penalty for single-tag ambiguity
-    double penalty = 1.0;
-    if (N == 1) {
-        double a = Math.min(observation.ambiguity(), 0.99);
-        penalty = Math.pow(1.0 / (1.0 - a), 3);
+    if (n == 1 && (a > 0.15 || d > 4.0)) {
+      return VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
     }
 
+    double rx = robotToCamera.getTranslation().getX();
+    double ry = robotToCamera.getTranslation().getY();
+    double pitch = robotToCamera.getRotation().getY();
+    double mountYaw = robotToCamera.getRotation().getZ();
+    double robotYaw = observation.pose().getRotation().getZ();
+    double gamma = robotYaw + mountYaw; // Absolute yaw of the camera lens
 
-    double baseErr = (linBase * sigPx * Math.pow(d, exp - 1.0) / f);
-    
-    double stdX = baseErr * d;
-    double vX = stdX * stdX;
-    
-    double stdZ = (1.0 / sqrtN) * baseErr * (d * d / sEff) * penalty;
-    double vZ = stdZ * stdZ;
-    
-    double vTheta = vZ / (sEff * sEff);
-    if (N == 1) {
-        vTheta = 1e6; 
+    double cosGamma = Math.cos(gamma);
+    double sinGamma = Math.sin(gamma);
+    double cosPitch = Math.cos(pitch);
+    double sinPitch = Math.sin(pitch);
+
+    if (robotVelocitySupplier.isPresent()) {
+      ChassisSpeeds speeds = robotVelocitySupplier.get().get();
+      // Assuming supplier provides Field-Relative speeds
+      double vxField = speeds.vxMetersPerSecond;
+      double vyField = speeds.vyMetersPerSecond;
+      double omega = speeds.omegaRadiansPerSecond;
+
+      double cosRobot = Math.cos(robotYaw);
+      double sinRobot = Math.sin(robotYaw);
+
+      double vRotRobotX = -omega * ry;
+      double vRotRobotY = omega * rx;
+
+      double vRotFieldX = vRotRobotX * cosRobot - vRotRobotY * sinRobot;
+      double vRotFieldY = vRotRobotX * sinRobot + vRotRobotY * cosRobot;
+
+      double vCamX = vxField + vRotFieldX;
+      double vCamY = vyField + vRotFieldY;
+
+      double vt = Math.abs(vCamX * sinGamma - vCamY * cosGamma);
+
+      // Apply blur to reprojection error
+      double exposureSec = exposureTimeMs / 1000.0;
+      double blurPixels = vt * exposureSec * (f_avg / d);
+      meanReprojectionError += blurPixels;
     }
 
-   
-    double factor = (cameraStdDevIndex < VisionConstants.cameraStdDevFactors.length)
-            ? VisionConstants.cameraStdDevFactors[cameraStdDevIndex] : 1.0;
-    double factorSq = factor * factor;
-    
-    vX = Math.min(vX * factorSq, 2500.0);
-    vZ = Math.min(vZ * factorSq, 2500.0);
-    if (N >= 2) {
-        vTheta = Math.min(vTheta * factorSq, 2500.0);
+    double p = (n > 1) ? 1.0 : Math.pow(1.0 / (1.0 - a), 3);
+
+    double sigmaFieldX = 0.0;
+    double sigmaFieldY = 0.0;
+    double sigmaFieldTheta = 0.0;
+
+    PnpMethod method = observation.pnpMethod();
+
+    if (method == PnpMethod.MULTI_TAG_PNP) {
+      double vx = Math.pow(meanReprojectionError * d / fx, 2);
+      double vy = Math.pow(meanReprojectionError * d / fy, 2);
+      double vz =
+          Math.pow((1.0 / Math.sqrt(n)) * meanReprojectionError * (d * d) / (f_avg * s_eff) * p, 2);
+
+      double pitchProjY = vz * (cosPitch * cosPitch) + vy * (sinPitch * sinPitch);
+      double vFieldX = vx * (sinGamma * sinGamma) + pitchProjY * (cosGamma * cosGamma);
+      double vFieldY = vx * (cosGamma * cosGamma) + pitchProjY * (sinGamma * sinGamma);
+
+      sigmaFieldX = Math.sqrt(vFieldX);
+      sigmaFieldY = Math.sqrt(vFieldY);
+      sigmaFieldTheta = Math.sqrt(vz) / s_eff;
+
+    } else if (method == PnpMethod.TRIG_PNP) {
+
+      double vd = Math.pow(meanReprojectionError * (d * d) / (f_avg * 0.233) * p, 2);
+      double va = Math.pow(meanReprojectionError / fx, 2);
+
+      double vFieldX = vd * (cosGamma * cosGamma) + (d * d) * va * (sinGamma * sinGamma);
+      double vFieldY = vd * (sinGamma * sinGamma) + (d * d) * va * (cosGamma * cosGamma);
+
+      sigmaFieldX = Math.sqrt(vFieldX);
+      sigmaFieldY = Math.sqrt(vFieldY);
+      sigmaFieldTheta = Double.MAX_VALUE;
     }
-
-   
-    double robotHeading = observation.pose().getRotation().getZ();
-    double camYaw = robotToCamera.getRotation().getZ();
-    double gamma = robotHeading + camYaw;
-    
-    double cosG = Math.cos(gamma);
-    double sinG = Math.sin(gamma);
-    
-
-    double sigmaFieldX = Math.sqrt(vZ * (cosG * cosG) + vX * (sinG * sinG));
-    double sigmaFieldY = Math.sqrt(vZ * (sinG * sinG) + vX * (cosG * cosG));
-    double sigmaFieldTheta = Math.sqrt(vTheta);
 
     return VecBuilder.fill(sigmaFieldX, sigmaFieldY, sigmaFieldTheta);
   }

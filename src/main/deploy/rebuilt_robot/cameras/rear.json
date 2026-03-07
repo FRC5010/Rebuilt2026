@@ -9,5 +9,9 @@
   "z": 0.2368,
   "roll": 0,
   "pitch": 30,
-  "yaw": 175
+  "yaw": 175,
+  "exposureTimeMs": 3.0,
+  "focalLengthX": 957.77,
+  "focalLengthY": 956.6,
+  "meanReprojectionError": 0.77
 }

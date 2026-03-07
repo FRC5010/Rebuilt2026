@@ -66,6 +66,10 @@ All JSON schemas are stored in: `src/main/java/org/frc5010/common/config/schemas
 - `x`, `y`, `z` - Position offsets from robot center (meters)
 - `roll`, `pitch`, `yaw` - Rotation angles (degrees)
 - `width`, `height` - Camera resolution (pixels)
+- `exposureTimeMs` - Exposure time in milliseconds; 0 = camera default / auto-exposure (PhotonVision only)
+- `focalLengthX` - Horizontal focal length (fx) in pixels from calibration; 0 = use global `VisionConstants` default
+- `focalLengthY` - Vertical focal length (fy) in pixels from calibration; 0 = fall back to `focalLengthX`
+- `meanReprojectionError` - Mean pixel reprojection error from calibration (pixels); 0 = use global default
 
 ---
 

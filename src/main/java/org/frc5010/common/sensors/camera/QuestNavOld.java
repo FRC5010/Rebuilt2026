@@ -191,7 +191,8 @@ public class QuestNavOld implements PoseProvider {
               0,
               0.0, // effectiveSpan (N/A for Quest)
               PoseObservationType.ENVIRONMENT_BASED,
-              ProviderType.ENVIRONMENT_BASED));
+              ProviderType.ENVIRONMENT_BASED,
+              PnpMethod.VISUAL_ODOMETRY));
     }
     // Save pose observations to inputs object
     input.poseObservations = new PoseObservation[observations.size()];

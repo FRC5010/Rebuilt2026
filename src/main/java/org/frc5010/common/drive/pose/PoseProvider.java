@@ -39,6 +39,34 @@ public interface PoseProvider {
     ENVIRONMENT_BASED,
   }
 
+  /**
+   * The algorithm used to compute a pose estimate from one or more fiducial targets.
+   *
+   * <p>PhotonVision-specific values ({@link #MULTI_TAG_PNP}, {@link #SINGLE_TAG_PNP}, {@link
+   * #TRIG_PNP}) are set directly from the pipeline result. {@link #UNKNOWN} is used for providers
+   * (Limelight, QuestNav) that do not expose this information.
+   */
+  public enum PnpMethod {
+    /** Multi-tag solve on the coprocessor (PhotonVision MULTI_TAG_PNP_ON_COPROCESSOR). */
+    MULTI_TAG_PNP,
+    /** Single-tag full PnP solve (SQP / iterative). */
+    SINGLE_TAG_PNP,
+    /**
+     * Trigonometric / distance-trig solve — PhotonVision's {@code
+     * estimatePnpDistanceTrigSolvePose}: uses known tag size and pixel measurements to recover
+     * distance without a full PnP solve.
+     */
+    TRIG_PNP,
+    /** Limelight MegaTag 1 (3-DOF on-device solve). */
+    MEGATAG_1,
+    /** Limelight MegaTag 2 (heading-constrained on-device solve). */
+    MEGATAG_2,
+    /** Visual-odometry / SLAM (e.g., QuestNav). */
+    VISUAL_ODOMETRY,
+    /** Method not exposed by this provider. */
+    UNKNOWN,
+  }
+
   @AutoLog
   public static class VisionIOInputs {
     public boolean connected = false;
@@ -62,7 +90,8 @@ public interface PoseProvider {
       double averageTagDistance,
       double effectiveSpan,
       PoseObservationType type,
-      ProviderType provider) {}
+      ProviderType provider,
+      PnpMethod pnpMethod) {}
 
   /*
    * Returns the current observations of the robot.

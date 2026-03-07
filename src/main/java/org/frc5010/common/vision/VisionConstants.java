@@ -26,16 +26,10 @@ public class VisionConstants {
 
   public static double distanceExponent = 1.5;
 
-  
   public static double maxLinearStdDev = 50.0; // meters
   public static double maxAngularStdDev = 50.0; // radians
 
-
-  public static double[] cameraStdDevFactors =
-      new double[] {
-        1.0,
-        1.0 
-      };
+  public static double[] cameraStdDevFactors = new double[] {1.0, 1.0};
 
   // Multipliers to apply for MegaTag 2 observations (Limelight)
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
