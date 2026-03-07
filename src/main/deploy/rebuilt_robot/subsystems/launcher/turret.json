@@ -5,7 +5,7 @@
     "motorType": "KrakenX44",
     "canId": 18,
     "inverted": true,
-    "logLevel": "HIGH",
+    "logLevel": "LOW",
     "canBus": "canivore",
     "robotToMotor": {
       "x": {

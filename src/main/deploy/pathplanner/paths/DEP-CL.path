@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 0.5742424242424249,
-        "y": 5.764255050505051
+        "x": 0.8302710413694718,
+        "y": 5.969329529243937
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.7767045454545465,
-        "y": 6.245239898989899
+        "x": 2.032733162581594,
+        "y": 6.450314377728785
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "TL-DEP-END"
     },
     {
       "anchor": {
@@ -48,7 +48,7 @@
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -89.23610153906999
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

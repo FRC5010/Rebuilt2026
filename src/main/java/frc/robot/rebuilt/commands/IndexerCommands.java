@@ -79,6 +79,7 @@ public class IndexerCommands {
   // TODO: Adjust Button Inputs
   public void configureButtonBindings(Controller driver, Controller operator) {
     driver.createLeftBumper().onTrue(toggleForceFeed());
+    // driver.createLeftBumper().whileTrue(shouldForceCommand()).onFalse(shouldChurnCommand());
     operator.createLeftBumper().onTrue(shouldForceCommand()).onFalse(shouldChurnCommand());
     operator.createRightBumper().onTrue(shouldHardChurnCommand()).onFalse(shouldChurnCommand());
   }

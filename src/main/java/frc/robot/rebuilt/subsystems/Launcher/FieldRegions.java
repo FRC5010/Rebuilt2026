@@ -146,9 +146,9 @@ public class FieldRegions {
     } else if (inLowerMidField) {
       return Optional.of(FieldConstants.Tower.rightUpright);
     } else if (inOppUpperField) {
-      return Optional.of(FieldConstants.Tower.leftUpright);
+      return Optional.of(FieldConstants.Tower.leftUpright.plus(new Translation2d(1, 0)));
     } else if (inOppLowerField) {
-      return Optional.of(FieldConstants.Tower.rightUpright);
+      return Optional.of(FieldConstants.Tower.rightUpright.plus(new Translation2d(1, 0)));
     } else {
       return Optional.empty();
     }

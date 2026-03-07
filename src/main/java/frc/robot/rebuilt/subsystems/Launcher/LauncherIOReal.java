@@ -223,7 +223,7 @@ public class LauncherIOReal implements LauncherIO {
         inputs.isValidCalculation = params.isValid();
         inputs.hoodAngleCalculated = Radian.of(params.hoodAngle());
         inputs.turretAngleCalculated = params.turretAngle().getMeasure();
-        inputs.flyWheelSpeedCalculated = RPM.of(params.flywheelSpeed() * 0.44);
+        inputs.flyWheelSpeedCalculated = RPM.of(params.flywheelSpeed() * 0.43);
         inputs.distanceToVirtualTarget = params.distanceToVirtualTarget();
       }
       inputs.robotToTarget = LauncherCommands.getRobotToTarget(targetPose.get());
