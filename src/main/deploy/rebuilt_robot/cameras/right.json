@@ -10,6 +10,10 @@
   "roll": 0,
   "pitch": 30,
   "yaw": -81,
+  "exposureTimeMs": 3.0,
+  "focalLengthX": 960.03,
+  "focalLengthY": 959.77,
+  "meanReprojectionError": 0.76,
   "targetFiducialIds": [
     1,
     2,
