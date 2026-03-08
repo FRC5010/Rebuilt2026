@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.032733162581594,
-        "y": 6.450314377728785
+        "x": 1.9653444444444448,
+        "y": 5.974144444444444
       },
       "isLocked": false,
       "linkedName": "TL-DEP-END"
     },
     {
       "anchor": {
-        "x": 2.5439898989898997,
-        "y": 4.699217171717173
+        "x": 2.384355555555556,
+        "y": 5.969329529243937
       },
       "prevControl": {
-        "x": 2.097361111111112,
-        "y": 4.974065656565657
+        "x": 1.8776444444444444,
+        "y": 5.9643999999999995
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -1.397181027296406
+    "rotation": -41.86283060446468
   },
   "reversed": false,
   "folder": null,

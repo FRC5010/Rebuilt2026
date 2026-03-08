@@ -4,6 +4,7 @@
 
 package org.frc5010.common.sensors.camera;
 
+import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -77,6 +78,7 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
     super(name, colIndex, cameraToRobot);
     this.poseSupplier = poseSupplier;
     this.fieldLayout = fieldLayout;
+
     this.fiducialIds = fiducialIds;
     this.cameraStdDevIndex = colIndex;
     visionLayout.addDouble("Observations", () -> input.poseObservations.length);

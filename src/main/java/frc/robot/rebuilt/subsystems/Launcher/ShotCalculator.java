@@ -84,6 +84,7 @@ public class ShotCalculator {
 
   // Cache parameters
   private ShootingParameters latestParameters = null;
+  public static double flywheelMultiplier = 0.45;
 
   private static double minDistance;
   private static double maxDistance;
@@ -112,6 +113,14 @@ public class ShotCalculator {
           maxDistanceMeters,
           newPhaseDelaySeconds);
     }
+  }
+
+  public static void incrementFlywheelMultiplier(double amount) {
+    ShotCalculator.flywheelMultiplier += amount;
+  }
+
+  public static double getFlywheelMultiplier() {
+    return ShotCalculator.flywheelMultiplier;
   }
   /** Stores configuration values for generating ballistic shot tables */
   public record BallisticConfig(

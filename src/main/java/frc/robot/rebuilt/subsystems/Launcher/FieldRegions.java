@@ -4,6 +4,8 @@
 
 package frc.robot.rebuilt.subsystems.Launcher;
 
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -128,6 +130,9 @@ public class FieldRegions {
     return nearAllianceTop || nearOppAllianceTop || nearAllianceBottom || nearOppAllianceBottom;
   }
 
+  static Translation2d leftAdjustment = new Translation2d(Meters.of(1), Meters.of(1));
+  static Translation2d rightAdjustment = new Translation2d(Meters.of(1), Meters.of(-1));
+
   public static Optional<Translation2d> determineTargetPose(Pose2d currentPose) {
     Boolean inAllianceField = allianceField.contains(currentPose.getTranslation());
     Boolean inUpperMidField = upperMidField.contains(currentPose.getTranslation());
@@ -142,13 +147,13 @@ public class FieldRegions {
     if (inAllianceField) {
       return Optional.of(FieldConstants.Hub.topCenterPoint.toTranslation2d());
     } else if (inUpperMidField) {
-      return Optional.of(FieldConstants.Tower.leftUpright);
+      return Optional.of(FieldConstants.Tower.leftUpright.plus(leftAdjustment));
     } else if (inLowerMidField) {
-      return Optional.of(FieldConstants.Tower.rightUpright);
+      return Optional.of(FieldConstants.Tower.rightUpright.plus(rightAdjustment));
     } else if (inOppUpperField) {
-      return Optional.of(FieldConstants.Tower.leftUpright.plus(new Translation2d(1, 0)));
+      return Optional.of(FieldConstants.Tower.leftUpright.plus(leftAdjustment));
     } else if (inOppLowerField) {
-      return Optional.of(FieldConstants.Tower.rightUpright.plus(new Translation2d(1, 0)));
+      return Optional.of(FieldConstants.Tower.rightUpright.plus(rightAdjustment));
     } else {
       return Optional.empty();
     }
