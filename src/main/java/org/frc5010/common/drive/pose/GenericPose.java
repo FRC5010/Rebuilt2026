@@ -82,7 +82,7 @@ public abstract class GenericPose {
    * @return the current acceleration in the X direction
    */
   public double getAccelX() {
-    return 0;
+    return gyro.getAccelX();
   }
 
   /**
@@ -91,7 +91,7 @@ public abstract class GenericPose {
    * @return the current acceleration in the Y direction
    */
   public double getAccelY() {
-    return 0;
+    return gyro.getAccelY();
   }
 
   /**
@@ -100,7 +100,7 @@ public abstract class GenericPose {
    * @return the current acceleration in the Z direction
    */
   public double getAccelZ() {
-    return 0;
+    return gyro.getAccelZ();
   }
 
   /**

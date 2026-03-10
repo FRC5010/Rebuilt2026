@@ -50,4 +50,34 @@ public interface GenericGyro {
    * @param angle the angle
    */
   void setAngle(double angle);
+
+  /**
+   * Get the linear acceleration in the X direction, in g's. Default implementation returns 0.0 for
+   * gyros that do not support acceleration measurement.
+   *
+   * @return the acceleration in g's
+   */
+  default double getAccelX() {
+    return 0.0;
+  }
+
+  /**
+   * Get the linear acceleration in the Y direction, in g's. Default implementation returns 0.0 for
+   * gyros that do not support acceleration measurement.
+   *
+   * @return the acceleration in g's
+   */
+  default double getAccelY() {
+    return 0.0;
+  }
+
+  /**
+   * Get the linear acceleration in the Z direction, in g's. Default implementation returns 0.0 for
+   * gyros that do not support acceleration measurement.
+   *
+   * @return the acceleration in g's
+   */
+  default double getAccelZ() {
+    return 0.0;
+  }
 }

@@ -282,6 +282,42 @@ public class DrivePoseEstimator extends GenericSubsystem {
                   || observation.pose().getY() < 0.0
                   || observation.pose().getY() > AprilTags.aprilTagFieldLayout.getFieldWidth();
 
+          // Mahalanobis Distance Gate
+          if (!rejectPose) {
+            double lateralAccelMagnitude =
+                Math.hypot(poseTracker.getAccelX(), poseTracker.getAccelY());
+            double stateMultiplier =
+                (lateralAccelMagnitude > VisionConstants.collisionAccelThreshold)
+                    ? VisionConstants.collisionStateMultiplier
+                    : 1.0;
+            double stateStdDevTranslation =
+                VisionConstants.baseStateStdDevTranslation * stateMultiplier;
+            double stateStdDevRotation =
+                VisionConstants.baseStateStdDevRotation * stateMultiplier;
+
+            Pose3d currentPose = getCurrentPose3d();
+            Matrix<N3, N1> measurementStdDevs = provider.getStdDeviations(observation);
+            double dx = observation.pose().getX() - currentPose.getX();
+            double dy = observation.pose().getY() - currentPose.getY();
+            double dTheta =
+                observation.pose().getRotation().getZ() - currentPose.getRotation().getZ();
+
+            double rxVariance = Math.pow(measurementStdDevs.get(0, 0), 2);
+            double ryVariance = Math.pow(measurementStdDevs.get(1, 0), 2);
+            double rThetaVariance = Math.pow(measurementStdDevs.get(2, 0), 2);
+
+            // Combined variance = state variance + measurement variance (independent noise sources)
+            double mahalanobisDistanceSq =
+                (dx * dx) / (stateStdDevTranslation * stateStdDevTranslation + rxVariance)
+                    + (dy * dy) / (stateStdDevTranslation * stateStdDevTranslation + ryVariance)
+                    + (dTheta * dTheta)
+                        / (stateStdDevRotation * stateStdDevRotation + rThetaVariance);
+
+            if (mahalanobisDistanceSq > VisionConstants.maxMahalanobisDistanceSq) {
+              rejectPose = true;
+            }
+          }
+
           Pose3d robotPose = observation.pose();
           if (!rejectPose) {
             visionUpdated |= true;

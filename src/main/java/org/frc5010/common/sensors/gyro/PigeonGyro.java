@@ -53,5 +53,20 @@ public class PigeonGyro implements GenericGyro {
   public void setAngle(double angle) {
     pigeon2.setYaw(angle);
   }
+
+  @Override
+  public double getAccelX() {
+    return pigeon2.getAccelerationX().getValue().magnitude();
+  }
+
+  @Override
+  public double getAccelY() {
+    return pigeon2.getAccelerationY().getValue().magnitude();
+  }
+
+  @Override
+  public double getAccelZ() {
+    return pigeon2.getAccelerationZ().getValue().magnitude();
+  }
   // big kahunas
 }

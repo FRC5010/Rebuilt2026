@@ -75,4 +75,19 @@ public class NavXGyro implements GenericGyro {
   public AHRS getRawGyro() {
     return gyro;
   }
+
+  @Override
+  public double getAccelX() {
+    return gyro.getWorldLinearAccelX();
+  }
+
+  @Override
+  public double getAccelY() {
+    return gyro.getWorldLinearAccelY();
+  }
+
+  @Override
+  public double getAccelZ() {
+    return gyro.getWorldLinearAccelZ();
+  }
 }

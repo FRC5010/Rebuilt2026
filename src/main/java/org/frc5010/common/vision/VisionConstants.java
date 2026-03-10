@@ -42,4 +42,18 @@ public class VisionConstants {
   public static double linearStdDevMegatag2Factor = 0.5; // More stable than full 3D solve
   public static double angularStdDevMegatag2Factor =
       Double.POSITIVE_INFINITY; // No rotation data available
+
+  // Lateral acceleration magnitude (in g's) above which the robot is considered to be in collision
+  public static double collisionAccelThreshold = 1; // g's
+
+  // Baseline 1-σ position uncertainty of the onboard state estimate under normal
+  public static double baseStateStdDevTranslation = 0.3; // metres
+
+
+  public static double baseStateStdDevRotation = 0.1; // radians
+
+  // Multiplier applied to both state standard deviations during a collision 
+  public static double collisionStateMultiplier = 10.0;
+
+  public static double maxMahalanobisDistanceSq = 7.815;
 }
