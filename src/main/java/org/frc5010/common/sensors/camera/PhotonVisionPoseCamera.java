@@ -271,7 +271,7 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
       // Apply blur to reprojection error
       double exposureSec = exposureTimeMs / 1000.0;
       double blurPixels = vt * exposureSec * (f_avg / tagDistance);
-      meanReprojectionError += blurPixels;
+      meanReprojectionError = Math.hypot(meanReprojectionError, blurPixels);
     }
 
     double ambiguityPenalty = (tagCount > 1) ? 1.0 : Math.pow(1.0 / (1.0 - ambiguity), 3);
