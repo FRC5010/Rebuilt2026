@@ -6,6 +6,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.rebuilt.Constants;
+import frc.robot.rebuilt.commands.IndexerCommands.IndexerState;
+import frc.robot.rebuilt.subsystems.Indexer.Indexer;
 import frc.robot.rebuilt.subsystems.intake.Intake;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
@@ -16,13 +18,14 @@ import org.frc5010.common.sensors.Controller;
 
 public class IntakeCommands {
   static Intake intake;
+  static Indexer indexer;
   Map<String, GenericSubsystem> subsystems;
   StateMachine intakeStateMachine = new StateMachine("IntakeStateMachine");
   /** Declaring states of the intake */
   State unknown = intakeStateMachine.addState("unknown", unknownStateCommand());
 
   State retracted = intakeStateMachine.addState("retracted", retractedCommand());
-
+  State angled = intakeStateMachine.addState("angled", angledCommand());
   State retracting = intakeStateMachine.addState("retracting", retractingCommand());
   State deploying = intakeStateMachine.addState("deploying", deployingCommand());
   State deployed =
@@ -33,18 +36,16 @@ public class IntakeCommands {
                 intake.setCurrentState(IntakeState.DEPLOYED);
                 intake.runHopper(0);
               }));
-  State outtaking;
   State intaking;
   DoubleSupplier intakeSpeedSupplier = () -> 0.5;
-  DoubleSupplier outtakeSpeedSupplier = () -> -0.5;
 
   public static enum IntakeState {
     UNKNOWN,
     RETRACTED,
     RETRACTING,
+    ANGLED,
     DEPLOYING,
     INTAKING,
-    OUTTAKING,
     DEPLOYED;
   }
 
@@ -52,8 +53,16 @@ public class IntakeCommands {
     this.subsystems = subsystems;
 
     intake = (Intake) subsystems.get(Constants.INTAKE);
-
+    indexer = (Indexer) subsystems.get(Constants.INDEXER);
     setupStateMachine();
+  }
+
+  private Command angledCommand() {
+    return Commands.run(
+        () -> {
+          intake.setCurrentState(IntakeState.ANGLED);
+          intake.setDesiredHopperAngle(Degrees.of(45));
+        });
   }
 
   public void setupDefaultCommands() {
@@ -62,8 +71,6 @@ public class IntakeCommands {
 
   private void setupStateMachine() {
     // For auto - these get replaced with versions that take controller input instead of constants
-    outtaking = intakeStateMachine.addState("outtaking", outtakingCommand(outtakeSpeedSupplier));
-
     intaking = intakeStateMachine.addState("intaking", intakingCommand(intakeSpeedSupplier));
 
     // Not moving trigger senses if the hopper has hit the bumper hard stop for 0.5 sec
@@ -83,10 +90,8 @@ public class IntakeCommands {
 
     // Get out of the unknown state when we deploy so it hits the hardstop
     unknown.switchTo(deploying).when(() -> intake.isRequested(IntakeState.INTAKING));
-    unknown.switchTo(deploying).when(() -> intake.isRequested(IntakeState.OUTTAKING));
 
     deployed.switchTo(retracting).when(() -> intake.isRequested(IntakeState.RETRACTING));
-    deployed.switchTo(outtaking).when(() -> intake.isRequested(IntakeState.OUTTAKING));
     deployed.switchTo(intaking).when(() -> intake.isRequested(IntakeState.INTAKING));
 
     retracted.switchTo(deploying).when(() -> intake.isRequested(IntakeState.INTAKING));
@@ -95,27 +100,27 @@ public class IntakeCommands {
         .when(() -> hopperNotMoving.getAsBoolean() && intake.isRequested(IntakeState.INTAKING));
 
     retracting.switchTo(deploying).when(() -> intake.isRequested(IntakeState.INTAKING));
-    retracting.switchTo(deploying).when(() -> intake.isRequested(IntakeState.OUTTAKING));
 
     intaking.switchTo(retracting).when(() -> intake.isRequested(IntakeState.RETRACTING));
-    intaking.switchTo(outtaking).when(() -> intake.isRequested(IntakeState.OUTTAKING));
-
-    outtaking.switchTo(retracting).when(() -> intake.isRequested(IntakeState.RETRACTING));
-    outtaking.switchTo(intaking).when(() -> intake.isRequested(IntakeState.INTAKING));
-
-    retracted.switchTo(deploying).when(() -> intake.isRequested(IntakeState.OUTTAKING));
-    deploying
-        .switchTo(outtaking)
-        .when(() -> hopperNotMoving.getAsBoolean() && intake.isRequested(IntakeState.OUTTAKING));
 
     retracting.switchTo(retracted).when(() -> intake.isRetracted());
     deployed.switchTo(retracted).when(() -> intake.isRetracted());
 
     deploying.switchTo(deployed).when(() -> intake.isRequested(IntakeState.DEPLOYED));
-    outtaking.switchTo(deployed).when(() -> intake.isRequested(IntakeState.DEPLOYED));
     intaking.switchTo(deployed).when(() -> intake.isRequested(IntakeState.DEPLOYED));
     retracted.switchTo(deployed).when(() -> intake.isRequested(IntakeState.DEPLOYED));
     retracting.switchTo(deployed).when(() -> intake.isRequested(IntakeState.DEPLOYED));
+
+    angled.switchTo(deploying).when(() -> intake.isRequested(IntakeState.DEPLOYING));
+    angled.switchTo(deploying).when(() -> intake.isRequested(IntakeState.INTAKING));
+    angled.switchTo(retracting).when(() -> intake.isRequested(IntakeState.RETRACTING));
+    angled.switchTo(deploying).when(() -> intake.isRequested(IntakeState.DEPLOYING));
+
+    retracted.switchTo(angled).when(() -> intake.isRequested(IntakeState.ANGLED));
+    deployed.switchTo(angled).when(() -> intake.isRequested(IntakeState.ANGLED));
+    deploying.switchTo(angled).when(() -> intake.isRequested(IntakeState.ANGLED));
+    intaking.switchTo(angled).when(() -> intake.isRequested(IntakeState.ANGLED));
+    retracting.switchTo(angled).when(() -> intake.isRequested(IntakeState.ANGLED));
 
     intakeStateMachine.setInitialState(unknown);
     if (intake != null) {
@@ -133,28 +138,21 @@ public class IntakeCommands {
             .limit(Constants.Intake.INTAKE_MAX_IN)); // Axis are positive only hence IN
     Trigger leftTrigger = new Trigger(() -> controller.getLeftTrigger() > 0.25);
 
-    rightTrigger.whileTrue(shouldIntaking());
-    leftTrigger.whileTrue(shouldOuttaking());
+    rightTrigger.or(leftTrigger).whileTrue(shouldIntaking());
 
-    controller.createRightBumper().onTrue(shouldRetracting()).onFalse(shouldRetracted());
+    controller
+        .createRightBumper()
+        .onTrue(
+            Commands.either(
+                shouldAngle(),
+                shouldRetracting(),
+                () ->
+                    indexer.isCurrent(IndexerState.FEED) || indexer.isCurrent(IndexerState.FORCE)));
 
     controller.createStartButton().onTrue(Commands.run(() -> intake.setHopperRetracted()));
     controller.createBackButton().onTrue(Commands.run(() -> intake.setHopperDeployed()));
 
-    outtakeSpeedSupplier = () -> controller.getLeftTrigger();
-
-    intakeSpeedSupplier = () -> controller.getRightTrigger();
-  }
-
-  public static Command outtakingCommand(DoubleSupplier speed) {
-    return Commands.runOnce(() -> intake.setCurrentState(IntakeState.OUTTAKING))
-        .andThen(Commands.runOnce(() -> intake.runHopper(0)))
-        // .andThen(() -> intake.setHopperAngle(Degrees.of(0.0)))
-        .andThen(Commands.run(() -> intake.runSpintake(-speed.getAsDouble())));
-    // Math.max(
-    //     Constants.Intake.INTAKE_MAX_OUT,
-    //     Math.min(-speed.getAsDouble(), Constants.Intake.INTAKE_OUT)))));
-    // assuming outtaking is just intaking but goes the other way
+    intakeSpeedSupplier = () -> controller.getRightTrigger() - controller.getLeftTrigger();
   }
 
   public static Command intakingCommand(DoubleSupplier speed) {
@@ -197,16 +195,16 @@ public class IntakeCommands {
         .andThen(() -> intake.runSpintake(0));
   }
 
-  public static Command shouldOuttaking() {
-    return Commands.runOnce(() -> intake.setRequestedState(IntakeState.OUTTAKING));
-  }
-
   public static Command shouldIntaking() {
     return Commands.runOnce(() -> intake.setRequestedState(IntakeState.INTAKING));
   }
 
   public static Command shouldRetracting() {
     return Commands.runOnce(() -> intake.setRequestedState(IntakeState.RETRACTING));
+  }
+
+  public static Command shouldAngle() {
+    return Commands.runOnce(() -> intake.setRequestedState(IntakeState.ANGLED));
   }
 
   public static Command shouldRetracted() {

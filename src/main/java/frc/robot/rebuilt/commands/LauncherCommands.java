@@ -5,9 +5,12 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -17,6 +20,7 @@ import frc.robot.rebuilt.FieldConstants;
 import frc.robot.rebuilt.subsystems.Launcher.Launcher;
 import frc.robot.rebuilt.subsystems.Launcher.ShotCalculator;
 import frc.robot.rebuilt.subsystems.Launcher.ShotCalculator.ShootingParameters;
+import frc.robot.rebuilt.subsystems.intake.Intake;
 import java.util.Map;
 import org.frc5010.common.arch.GenericSubsystem;
 import org.frc5010.common.arch.StateMachine;
@@ -39,6 +43,7 @@ public class LauncherCommands {
   private State escapeHammerTimeState;
   private static Launcher launcher;
   private static GenericDrivetrain drivetrain;
+  private static Intake intake;
   private Map<String, GenericSubsystem> subsystems;
   private static Translation2d hubTarget = FieldConstants.Hub.topCenterPoint.toTranslation2d();
   private static Translation2d allianceSideLeft = FieldConstants.Tower.leftUpright;
@@ -51,6 +56,17 @@ public class LauncherCommands {
       new Translation2d(Inches.of(13.5), Inches.of(0));
   private static Transform2d rearToCenter =
       new Transform2d(rearToCenterTranslation, Rotation2d.fromDegrees(0));
+
+  // Stored preset targets — written once when a preset command is activated
+  private static Angle presetHoodAngle = Constants.Launcher.LOW_HOOD_ANGLE;
+  private static Angle presetTurretAngle = Constants.Launcher.TURRET_FORWARD;
+  private static AngularVelocity presetFlywheelSpeed = RPM.of(0);
+
+  /**
+   * When true, the indexer will only churn once the flywheel has reached its goal speed. Set to
+   * false to allow churning at any time regardless of flywheel speed.
+   */
+  public static boolean requireFlywheelAtGoalForChurn = true;
 
   public static Translation2d getRobotToTarget(Translation2d target) {
     return target.minus(drivetrain.getPoseEstimator().getCurrentPose().getTranslation());
@@ -79,6 +95,7 @@ public class LauncherCommands {
     launcher.setRequestedState(LauncherState.IDLE);
 
     drivetrain = (GenericDrivetrain) this.subsystems.get(ConfigConstants.DRIVETRAIN);
+    intake = (Intake) this.subsystems.get(Constants.INTAKE);
     configureStateMachine();
   }
   /** sets the state machine as the default command of the launcher */
@@ -160,6 +177,17 @@ public class LauncherCommands {
         .onFalse(IndexerCommands.shouldIdleCommand());
   }
 
+  /**
+   * Returns true when it is safe to begin churning the indexer. When {@code
+   * requireFlywheelAtGoalForChurn} is {@code true} (default), churning is only permitted once the
+   * flywheel has reached its goal speed. Set the flag to {@code false} to allow churning at any
+   * time regardless of flywheel speed.
+   */
+  public static boolean isFlywheelReadyForChurn() {
+    return !requireFlywheelAtGoalForChurn
+        || (launcher != null && launcher.isFlywheelAtOrAboveGoal());
+  }
+
   public void configureButtonBindings(Controller driver, Controller operator) {
 
     // driver.createAButton().onTrue(shouldPrepCommand());
@@ -174,9 +202,15 @@ public class LauncherCommands {
         .whileTrue(towerPresetStateCommand())
         .onFalse(shouldHammerTimeCommand());
 
-    operator.createBButton().onTrue(shouldLowCommand()).onFalse(shouldHammerTimeCommand());
+    operator
+        .createBButton()
+        .whileTrue(rightCornerPresetStateCommandr())
+        .onFalse(shouldHammerTimeCommand());
 
-    operator.createXButton().whileTrue(hubPresetStateCommand()).onFalse(shouldIdleCommand());
+    operator
+        .createXButton()
+        .whileTrue(leftCornerPresetStateCommand())
+        .onFalse(shouldHammerTimeCommand());
     operator
         .createYButton()
         .whileTrue(turretForwardPresetStateCommand())
@@ -234,7 +268,9 @@ public class LauncherCommands {
         Commands.runOnce(
             () -> {
               launcher.setCurrentState(LauncherState.PRESET);
-            }));
+            }),
+        Commands.run(
+            () -> launcher.usePresets(presetHoodAngle, presetTurretAngle, presetFlywheelSpeed)));
   }
 
   public static Command shouldIdleCommand() {
@@ -278,19 +314,43 @@ public class LauncherCommands {
 
   // Order is Hood Angle, Turret Angle, Flywheel Speed
   // Values are placeholders and need to be tuned
-  public static Command hubPresetStateCommand() {
+  public static Command leftCornerPresetStateCommand() {
     return shouldPresetCommand()
         .andThen(
             Commands.runOnce(
                 () -> {
                   ShootingParameters params =
                       launcher.getShootingParameters(
-                          () -> FieldConstants.Hub.nearFace.plus(intakeToCenter),
+                          () ->
+                              new Pose2d(
+                                  new Translation2d(
+                                      Inches.of(25),
+                                      FieldConstants.FIELD_WIDTH.minus(Inches.of(17.25))),
+                                  new Rotation2d()),
                           () -> FieldConstants.Hub.topCenterPoint.toTranslation2d());
-                  launcher.usePresets(
-                      Radians.of(params.hoodAngle()),
-                      Constants.Launcher.TURRET_FORWARD,
-                      RPM.of(params.flywheelSpeed() * ShotCalculator.getFlywheelMultiplier()));
+                  presetHoodAngle = Radians.of(params.hoodAngle());
+                  presetTurretAngle = params.turretAngle().getMeasure();
+                  presetFlywheelSpeed =
+                      RPM.of(params.flywheelSpeed() * ShotCalculator.getFlywheelMultiplier());
+                }));
+  }
+
+  public static Command rightCornerPresetStateCommandr() {
+    return shouldPresetCommand()
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  ShootingParameters params =
+                      launcher.getShootingParameters(
+                          () ->
+                              new Pose2d(
+                                  new Translation2d(Inches.of(25), Inches.of(17.5)),
+                                  new Rotation2d()),
+                          () -> FieldConstants.Hub.topCenterPoint.toTranslation2d());
+                  presetHoodAngle = Radians.of(params.hoodAngle());
+                  presetTurretAngle = params.turretAngle().getMeasure();
+                  presetFlywheelSpeed =
+                      RPM.of(params.flywheelSpeed() * ShotCalculator.getFlywheelMultiplier());
                 }));
   }
 
@@ -303,10 +363,10 @@ public class LauncherCommands {
                       launcher.getShootingParameters(
                           () -> FieldConstants.Tower.face.plus(rearToCenter),
                           () -> FieldConstants.Hub.topCenterPoint.toTranslation2d());
-                  launcher.usePresets(
-                      Radians.of(params.hoodAngle()),
-                      Constants.Launcher.TURRET_FORWARD,
-                      RPM.of(params.flywheelSpeed() * ShotCalculator.flywheelMultiplier));
+                  presetHoodAngle = Radians.of(params.hoodAngle());
+                  presetTurretAngle = Constants.Launcher.TURRET_FORWARD;
+                  presetFlywheelSpeed =
+                      RPM.of(params.flywheelSpeed() * ShotCalculator.flywheelMultiplier);
                 }));
   }
 
@@ -314,11 +374,11 @@ public class LauncherCommands {
     return shouldPresetCommand()
         .andThen(
             Commands.runOnce(
-                () ->
-                    launcher.usePresets(
-                        Constants.Launcher.FWD_HOOD_ANGLE,
-                        Constants.Launcher.TURRET_FORWARD,
-                        Constants.Launcher.FWD_FLYWHEEL_RPM)));
+                () -> {
+                  presetHoodAngle = Constants.Launcher.FWD_HOOD_ANGLE;
+                  presetTurretAngle = Constants.Launcher.TURRET_FORWARD;
+                  presetFlywheelSpeed = Constants.Launcher.FWD_FLYWHEEL_RPM;
+                }));
   }
 
   public static Command hammerTimeStateCommand() {

@@ -176,7 +176,7 @@ public class Launcher extends GenericSubsystem {
         () -> {
           setTurretRotation(Degrees.of(0));
           setHoodAngle(Constants.Launcher.LOW_HOOD_ANGLE);
-          runShooter(0);
+          io.setFlyWheelVelocity(RPM.of(0));
         });
   }
 
@@ -294,6 +294,10 @@ public class Launcher extends GenericSubsystem {
   /** Whether the flywheel speed is within tolerance of the setpoint. */
   public boolean isFlywheelAtGoal() {
     return inputs.flyWheelSpeedAtGoal;
+  }
+
+  public boolean isFlywheelAtOrAboveGoal() {
+    return inputs.flyWheelSpeedAtGoal || inputs.flyWheelSpeedActual.gt(inputs.flyWheelSpeedDesired);
   }
 
   /** Whether the hood angle is within tolerance of the setpoint. */

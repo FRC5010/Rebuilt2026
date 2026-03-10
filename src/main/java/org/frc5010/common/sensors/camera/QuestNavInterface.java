@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import gg.questnav.questnav.PoseFrame;
 import gg.questnav.questnav.QuestNav;
 import java.util.ArrayList;
@@ -41,6 +42,9 @@ public class QuestNavInterface implements PoseProvider {
   private double previousTime;
   private static boolean hasHardReset = false;
   private static boolean initialReset = false;
+
+  // Soft reset state — applied in code without sending a command to the headset
+  private Transform3d softResetTransform = new Transform3d();
 
   // I guess this works
   private static Pose2d latestPoseState = null;
@@ -69,15 +73,19 @@ public class QuestNavInterface implements PoseProvider {
     return robotPose.transformBy(robotToQuest);
   }
 
-  private Pose3d getLatestQuestPose() {
-    if (latestPoseFrame == null) {
-      return null;
-    }
-    return latestPoseFrame.questPose3d();
-  }
-
   public void withRobotSpeedSupplier(Supplier<ChassisSpeeds> robotSpeed) {
     robotVelocity = robotSpeed;
+  }
+
+  /**
+   * Returns the robot pose as computed directly from the QuestNav headset plus the robotToQuest
+   * transform, with no soft-reset offset applied. This is the "hard-reset" pose layer.
+   */
+  private Pose3d getProcessedRobotPose() {
+    if (latestPoseFrame == null) {
+      return new Pose3d();
+    }
+    return getRobotPoseFromQuestPose(latestPoseFrame.questPose3d());
   }
 
   public Optional<Pose3d> getRobotPose() {
@@ -85,8 +93,7 @@ public class QuestNavInterface implements PoseProvider {
       if (latestPoseFrame == null) {
         return Optional.empty();
       }
-      Pose3d pose = getRobotPoseFromQuestPose(getLatestQuestPose());
-      return Optional.of(pose);
+      return Optional.of(getProcessedRobotPose().transformBy(softResetTransform));
     } else {
       return Optional.empty();
     }
@@ -96,14 +103,14 @@ public class QuestNavInterface implements PoseProvider {
     if (latestPoseFrame == null) {
       return new Rotation3d();
     }
-    return getRobotPoseFromQuestPose(getLatestQuestPose()).getRotation();
+    return getProcessedRobotPose().transformBy(softResetTransform).getRotation();
   }
 
   public Translation3d getPosition() {
     if (latestPoseFrame == null) {
       return new Translation3d();
     }
-    return getRobotPoseFromQuestPose(getLatestQuestPose()).getTranslation();
+    return getProcessedRobotPose().transformBy(softResetTransform).getTranslation();
   }
 
   private void updateObservations() {
@@ -135,7 +142,7 @@ public class QuestNavInterface implements PoseProvider {
               PoseObservationType.ENVIRONMENT_BASED,
               ProviderType.ENVIRONMENT_BASED,
               PnpMethod.VISUAL_ODOMETRY));
-    }
+
     input.connected = isActive();
     // Save pose observations to inputs object
     input.poseObservations = new PoseObservation[observations.size()];
@@ -153,7 +160,8 @@ public class QuestNavInterface implements PoseProvider {
     // for autonomous. Without this, Quest's 0.05 std dev drowns out AprilTag readings.
     if (DriverStation.isDisabled()) {
       calib = 2.0;
-    } else if (null != robotVelocity) {
+    }ß
+    if (null != robotVelocity) {
       Translation2d questVelVector =
           new Translation2d(getVelocity().vxMetersPerSecond, getVelocity().vyMetersPerSecond);
       Translation2d robotVelVector =
@@ -188,14 +196,48 @@ public class QuestNavInterface implements PoseProvider {
             && (questNav.getFrameCount().orElse(0) > 0 && !simulation)
             && questNav.isTracking();
 
-    return isActive;
+    return isActive && initializedPosition;
   }
 
-  public void resetPose(Pose3d pose) {
+  /**
+   * Performs a soft reset: recalculates the pose offset in code without sending any command to the
+   * Quest headset. This is instantaneous and avoids the delay of a hard reset command. The
+   * soft-reset transform is stored and applied on top of the raw headset pose in {@link
+   * #getRobotPose()}, {@link #getPosition()}, and {@link #getRotation()}.
+   */
+  public void softReset(Pose3d pose) {
+    // Transform3d(from, to) gives exactly the relative transform needed:
+    // processed.transformBy(softResetTransform) == pose
+    softResetTransform = new Transform3d(getProcessedRobotPose(), pose);
+    initializedPosition = true;
+  }
+
+  /**
+   * Performs a hard reset: sends {@code questNav.setPose()} to the headset so its internal
+   * coordinate origin is relocated. Intended to be called only once at the beginning of a match.
+   * Subsequent resets during the match should use {@link #softReset(Pose3d)}.
+   */
+  public void hardReset(Pose3d pose) {
     if (isConnected()) {
       Pose3d questPose = getQuestPoseFromRobotPose(pose);
       questNav.setPose(questPose);
+      // Clear any accumulated soft-reset so the hard reset is authoritative
+      softResetTransform = new Transform3d();
       initializedPosition = true;
+      hasHardReset = initialReset;
+      initialReset = true;
+    }
+  }
+
+  public static Trigger hasHardReset() {
+    return new Trigger(() -> hasHardReset);
+  }
+
+  @Override
+  public void resetPose(Pose3d pose) {
+    if (isConnected()) {
+      SmartDashboard.putBoolean(networkTableRoot + "/Reset Pose", true);
+      softReset(pose);
     }
   }
 

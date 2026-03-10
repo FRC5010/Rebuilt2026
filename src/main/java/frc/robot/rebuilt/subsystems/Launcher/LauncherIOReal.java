@@ -235,11 +235,11 @@ public class LauncherIOReal implements LauncherIO {
         inputs.flyWheelSpeedCalculated =
             RPM.of(params.flywheelSpeed() * ShotCalculator.getFlywheelMultiplier());
         inputs.distanceToVirtualTarget = params.distanceToVirtualTarget();
+        inputs.turretFeedforwardRadPerSec = params.solution().turretFeedforwardRadPerSec();
       }
       inputs.robotToTarget = LauncherCommands.getRobotToTarget(targetPose.get());
 
       inputs.targetDistance = Meters.of(inputs.robotToTarget.getDistance(new Translation2d()));
-      inputs.turretFeedforwardRadPerSec = params.solution().turretFeedforwardRadPerSec();
     }
     /** Reads the desired flywheel, hood, and turret setpoints */
     inputs.flyWheelSpeedDesired =
