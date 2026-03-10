@@ -4,6 +4,10 @@
 
 package org.frc5010.common.vision;
 
+import static edu.wpi.first.units.Units.Meters;
+
+import edu.wpi.first.units.measure.Distance;
+
 /** A place to define library vision constants */
 public class VisionConstants {
   public static final double CAMERA_CAL_DISTANCE = 120;
@@ -12,6 +16,9 @@ public class VisionConstants {
   // Basic filtering thresholds
   public static double maxAmbiguity = 0.15;
   public static double maxZError = 1;
+  public static Distance maxTagDistance = Meters.of(4.0);
+  public static Distance maxPoseJump = Meters.of(1.0);
+  public static int allowJumpThreshold = 5; // Minimum number of frames until accept a pose jump
 
   public static double linearStdDevBaseline = 0.05; // Meters
   public static double angularStdDevBaseline = 0.06; // Radians

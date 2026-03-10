@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.frc5010.common.vision.VisionConstants;
 import org.littletonrobotics.junction.AutoLog;
 import org.littletonrobotics.junction.Logger;
@@ -38,6 +39,32 @@ public interface PoseProvider {
     PHOTONVISION,
     ENVIRONMENT_BASED,
   }
+
+  /**
+   * Bundles all AprilTag-specific metadata for a pose observation.
+   *
+   * <p>Fiducial (AprilTag) providers should populate this record and wrap it in {@link
+   * Optional#of(Object)}. Non-fiducial providers (e.g. QuestNav) should pass {@link
+   * Optional#empty()} for the {@code aprilTagData} field of {@link PoseObservation}.
+   *
+   * @param ambiguity PnP pose ambiguity ratio (0 = unambiguous, 1 = fully ambiguous).
+   * @param tagCount Number of AprilTags used in the pose solve.
+   * @param averageTagDistance Mean camera-to-tag distance across all used tags, in metres.
+   * @param effectiveSpan Effective geometric span of the tag constellation, in metres.
+   * @param pnpMethod The PnP algorithm used to compute the pose estimate.
+   * @param minTilt Minimum tilt angle (radians) from the camera boresight to any used tag. Computed
+   *     as {@code acos(cos(yaw) * cos(pitch))} per target. A value close to zero indicates a
+   *     near-head-on view; larger values indicate oblique viewing angles.
+   * @param type The high-level observation type (MEGATAG_1, MEGATAG_2, PHOTONVISION, …).
+   */
+  public static record AprilTagData(
+      double ambiguity,
+      int tagCount,
+      double averageTagDistance,
+      double effectiveSpan,
+      PnpMethod pnpMethod,
+      double minTilt,
+      PoseObservationType type) {}
 
   /**
    * The algorithm used to compute a pose estimate from one or more fiducial targets.
@@ -83,15 +110,30 @@ public interface PoseProvider {
 
   /** Represents a robot pose sample used for pose estimation. */
   public static record PoseObservation(
-      double timestamp,
-      Pose3d pose,
-      double ambiguity,
-      int tagCount,
-      double averageTagDistance,
-      double effectiveSpan,
-      PoseObservationType type,
-      ProviderType provider,
-      PnpMethod pnpMethod) {}
+      double timestamp, Pose3d pose, ProviderType provider, Optional<AprilTagData> aprilTagData) {
+
+    /**
+     * Convenience factory for non-fiducial providers (e.g. visual-odometry / SLAM). Sets {@code
+     * aprilTagData} to {@link Optional#empty()}.
+     */
+    public static PoseObservation ofEnvironment(
+        double timestamp, Pose3d pose, ProviderType provider) {
+      return new PoseObservation(timestamp, pose, provider, Optional.empty());
+    }
+
+    /**
+     * Convenience factory for AprilTag-based providers.
+     *
+     * @param timestamp Capture timestamp (seconds, FPGA epoch).
+     * @param pose Estimated robot pose in field coordinates.
+     * @param provider The provider type that generated this observation.
+     * @param aprilTagData AprilTag-specific metadata.
+     */
+    public static PoseObservation ofAprilTag(
+        double timestamp, Pose3d pose, ProviderType provider, AprilTagData aprilTagData) {
+      return new PoseObservation(timestamp, pose, provider, Optional.of(aprilTagData));
+    }
+  }
 
   /*
    * Returns the current observations of the robot.
@@ -127,11 +169,17 @@ public interface PoseProvider {
   }
 
   public default Matrix<N3, N1> getStdDeviations(PoseObservation observation) {
+    // Only applicable for AprilTag observations; return max uncertainty for environment-based ones.
+    if (observation.aprilTagData().isEmpty()) {
+      return VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+    }
+    AprilTagData aprilTagData = observation.aprilTagData().get();
     // Calculate standard deviations
-    double stdDevFactor = Math.pow(observation.averageTagDistance(), 2.0) / observation.tagCount();
+    double stdDevFactor =
+        Math.pow(aprilTagData.averageTagDistance(), 2.0) / aprilTagData.tagCount();
     double linearStdDev = VisionConstants.linearStdDevBaseline * stdDevFactor;
     double angularStdDev = VisionConstants.angularStdDevBaseline * stdDevFactor;
-    if (observation.type() == PoseObservationType.MEGATAG_2) {
+    if (aprilTagData.type() == PoseObservationType.MEGATAG_2) {
       linearStdDev *= VisionConstants.linearStdDevMegatag2Factor;
       angularStdDev *= VisionConstants.angularStdDevMegatag2Factor;
     }

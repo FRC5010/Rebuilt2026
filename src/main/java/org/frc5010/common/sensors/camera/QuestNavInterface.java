@@ -132,22 +132,14 @@ public class QuestNavInterface implements PoseProvider {
       Pose3d robotPose = getRobotPoseFromQuestPose(questPose);
       double captureTime = frame.dataTimestamp();
       observations.add(
-          new PoseObservation(
-              captureTime,
-              robotPose,
-              0,
-              0,
-              0,
-              0.0, // effectiveSpan (N/A for Quest)
-              PoseObservationType.ENVIRONMENT_BASED,
-              ProviderType.ENVIRONMENT_BASED,
-              PnpMethod.VISUAL_ODOMETRY));
+          PoseObservation.ofEnvironment(captureTime, robotPose, ProviderType.ENVIRONMENT_BASED));
 
-    input.connected = isActive();
-    // Save pose observations to inputs object
-    input.poseObservations = new PoseObservation[observations.size()];
-    for (int i = 0; i < observations.size(); i++) {
-      input.poseObservations[i] = observations.get(i);
+      input.connected = isActive();
+      // Save pose observations to inputs object
+      input.poseObservations = new PoseObservation[observations.size()];
+      for (int i = 0; i < observations.size(); i++) {
+        input.poseObservations[i] = observations.get(i);
+      }
     }
   }
 
@@ -160,7 +152,7 @@ public class QuestNavInterface implements PoseProvider {
     // for autonomous. Without this, Quest's 0.05 std dev drowns out AprilTag readings.
     if (DriverStation.isDisabled()) {
       calib = 2.0;
-    }ß
+    }
     if (null != robotVelocity) {
       Translation2d questVelVector =
           new Translation2d(getVelocity().vxMetersPerSecond, getVelocity().vyMetersPerSecond);

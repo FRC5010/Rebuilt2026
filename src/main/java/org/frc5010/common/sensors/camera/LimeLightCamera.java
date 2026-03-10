@@ -175,19 +175,21 @@ public class LimeLightCamera extends GenericCamera {
       input.hasTarget = targetPose.isPresent();
 
       observations.add(
-          new PoseObservation(
+          PoseObservation.ofAprilTag(
               poseEstimate.map(it -> it.timestampSeconds).orElse(0.0),
               // 3D pose estimate
               poseEstimate.map(it -> new Pose3d(it.pose)).orElse(null),
-              determineConfidence(poseEstimate.get()),
-              poseEstimate.map(it -> it.tagCount).orElse(0),
-              poseEstimate.map(it -> it.avgTagDist).orElse(0.0),
-              0.0, // Limelight does not expose target 3D corners for S_eff calculation
-              megatagChooser.getAsBoolean()
-                  ? PoseObservationType.MEGATAG_1
-                  : PoseObservationType.MEGATAG_2,
               ProviderType.FIELD_BASED,
-              megatagChooser.getAsBoolean() ? PnpMethod.MEGATAG_1 : PnpMethod.MEGATAG_2));
+              new AprilTagData(
+                  determineConfidence(poseEstimate.get()),
+                  poseEstimate.map(it -> it.tagCount).orElse(0),
+                  poseEstimate.map(it -> it.avgTagDist).orElse(0.0),
+                  0.0, // Limelight does not expose target 3D corners for S_eff calculation
+                  megatagChooser.getAsBoolean() ? PnpMethod.MEGATAG_1 : PnpMethod.MEGATAG_2,
+                  0.0, // Limelight does not expose per-target tilt
+                  megatagChooser.getAsBoolean()
+                      ? PoseObservationType.MEGATAG_1
+                      : PoseObservationType.MEGATAG_2)));
 
       // Save pose observations to inputs object
       if (observations.size() != input.poseObservations.length) {

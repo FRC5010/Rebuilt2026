@@ -261,12 +261,18 @@ public class DrivePoseEstimator extends GenericSubsystem {
               .collect(Collectors.toList())) {
         List<PoseObservation> observations = provider.getObservations();
         for (PoseObservation observation : observations) {
+          var aprilTagData = observation.aprilTagData();
           boolean rejectPose =
               (provider.getType() != ProviderType.ENVIRONMENT_BASED)
-                      && observation.tagCount() == 0 // Must have at least one tag
-                  || (observation.tagCount() == 1
-                      && observation.ambiguity()
-                          > VisionConstants.maxAmbiguity) // Cannot be high ambiguity
+                      && aprilTagData
+                          .map(data -> data.tagCount() == 0)
+                          .orElse(false) // Must have at least one tag
+                  || aprilTagData
+                      .map(
+                          data ->
+                              data.tagCount() == 1
+                                  && data.ambiguity() > VisionConstants.maxAmbiguity)
+                      .orElse(false) // Cannot be high ambiguity
                   || Math.abs(observation.pose().getZ())
                       > VisionConstants.maxZError // Must have realistic Z coordinate
 
@@ -292,7 +298,9 @@ public class DrivePoseEstimator extends GenericSubsystem {
               activateAcceptorUpdates
                   && provider.getType() == ProviderType.FIELD_BASED
                   && (state == State.ENABLED_FIELD || state == State.ALL)
-                  && observation.ambiguity() < CONFIDENCE_RESET_THRESHOLD
+                  && aprilTagData
+                      .map(data -> data.ambiguity() < CONFIDENCE_RESET_THRESHOLD)
+                      .orElse(false)
                   && (DriverStation.isDisabled()
                       || (!DriverStation.isDisabled()
                           && robotPose

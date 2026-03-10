@@ -183,16 +183,10 @@ public class QuestNavOld implements PoseProvider {
     input.connected = isActive();
     if (isActive) {
       observations.add(
-          new PoseObservation(
+          PoseObservation.ofEnvironment(
               getCaptureTime(),
               new Pose3d(getPosition(), getRotation()),
-              0,
-              0,
-              0,
-              0.0, // effectiveSpan (N/A for Quest)
-              PoseObservationType.ENVIRONMENT_BASED,
-              ProviderType.ENVIRONMENT_BASED,
-              PnpMethod.VISUAL_ODOMETRY));
+              ProviderType.ENVIRONMENT_BASED));
     }
     // Save pose observations to inputs object
     input.poseObservations = new PoseObservation[observations.size()];

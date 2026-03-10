@@ -4,7 +4,8 @@
 
 package org.frc5010.common.sensors.camera;
 
-import edu.wpi.first.apriltag.AprilTag;
+import static edu.wpi.first.units.Units.Meters;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.math.Matrix;
 import edu.wpi.first.math.VecBuilder;
@@ -22,10 +23,16 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
+import org.frc5010.common.drive.pose.PoseProvider.AprilTagData;
+import org.frc5010.common.drive.pose.PoseProvider.PnpMethod;
+import org.frc5010.common.drive.pose.PoseProvider.PoseObservation;
+import org.frc5010.common.drive.pose.PoseProvider.PoseObservationType;
+import org.frc5010.common.drive.pose.PoseProvider.ProviderType;
 import org.frc5010.common.vision.VisionConstants;
 import org.photonvision.EstimatedRobotPose;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.targeting.PhotonPipelineResult;
+import org.photonvision.targeting.PhotonTrackedTarget;
 
 /** A camera using the PhotonVision library. */
 public class PhotonVisionPoseCamera extends PhotonVisionCamera implements FiducialTargetCamera {
@@ -125,47 +132,52 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
       if (estimate.isPresent()) {
         EstimatedRobotPose estimatedRobotPose = estimate.get();
         Pose3d robotPose = estimatedRobotPose.estimatedPose;
+        List<PhotonTrackedTarget> usedTargets = estimatedRobotPose.targetsUsed;
+        int tagCount = usedTargets.size();
 
         double totalTagDistance = 0.0;
-        for (var iTarget : iCamResult.targets) {
-          totalTagDistance += iTarget.bestCameraToTarget.getTranslation().getNorm();
-        }
-        // Compute the average tag distance
-        int tagCount = estimatedRobotPose.targetsUsed.size();
-        double averageDistance = 0.0;
-        if (!iCamResult.targets.isEmpty()) {
-          averageDistance = totalTagDistance / iCamResult.targets.size();
+        double minTiltRadians = Double.MAX_VALUE; // Start arbitrarily high
+
+        for (var target : usedTargets) {
+          totalTagDistance += target.bestCameraToTarget.getTranslation().getNorm();
+
+          var rot = target.bestCameraToTarget.getRotation();
+          double yaw = rot.getZ();
+          double pitch = rot.getY();
+          double tilt = Math.acos(Math.cos(yaw) * Math.cos(pitch));
+
+          if (tilt < minTiltRadians) {
+            minTiltRadians = tilt;
+          }
+
+          tagIds.add((short) target.getFiducialId());
         }
 
-        // Add tag IDs
-        iCamResult.multitagResult.map(it -> tagIds.addAll(it.fiducialIDsUsed));
+        double averageDistance = (tagCount > 0) ? totalTagDistance / tagCount : 0.0;
+        if (minTiltRadians == Double.MAX_VALUE) minTiltRadians = 0.0;
 
+        SmartDashboard.putNumber("Camera/" + name() + "/Total Distance To Tag", totalTagDistance);
         SmartDashboard.putNumber(
-            "Camera/" + name() + "/Total Distance To Tag " + name, totalTagDistance);
-        SmartDashboard.putNumber(
-            "Camera/" + name() + "/Photon Ambiguity " + name,
-            iCamResult.getBestTarget().poseAmbiguity);
+            "Camera/" + name() + "/Photon Ambiguity", iCamResult.getBestTarget().poseAmbiguity);
         SmartDashboard.putNumberArray(
-            "Camera/" + name() + "/Photon Camera " + name + " POSE",
+            "Camera/" + name() + "/POSE",
             new double[] {
               robotPose.getX(),
               robotPose.getY(),
               robotPose.getRotation().toRotation2d().getDegrees()
             });
 
-        // Compute effective tag cluster span (S_eff)
         double effectiveSpan = VisionConstants.aprilTagSideLength * Math.sqrt(2.0);
         if (tagCount > 1) {
           double maxDist = 0.0;
-          var targets = iCamResult.targets;
-          for (int j = 0; j < targets.size(); j++) {
-            for (int k = j + 1; k < targets.size(); k++) {
+          for (int j = 0; j < tagCount; j++) {
+            for (int k = j + 1; k < tagCount; k++) {
               double dist =
-                  targets
+                  usedTargets
                       .get(j)
                       .bestCameraToTarget
                       .getTranslation()
-                      .getDistance(targets.get(k).bestCameraToTarget.getTranslation());
+                      .getDistance(usedTargets.get(k).bestCameraToTarget.getTranslation());
               if (dist > maxDist) maxDist = dist;
             }
           }
@@ -173,16 +185,18 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
         }
 
         observations.add(
-            new PoseObservation(
+            PoseObservation.ofAprilTag(
                 iCamResult.getTimestampSeconds(),
                 robotPose,
-                iCamResult.getBestTarget().poseAmbiguity,
-                tagCount,
-                averageDistance,
-                effectiveSpan,
-                PoseObservationType.PHOTONVISION,
                 ProviderType.FIELD_BASED,
-                pnpMethod));
+                new AprilTagData(
+                    iCamResult.getBestTarget().poseAmbiguity,
+                    tagCount,
+                    averageDistance,
+                    effectiveSpan,
+                    pnpMethod,
+                    minTiltRadians,
+                    PoseObservationType.PHOTONVISION)));
       }
     }
 
@@ -199,17 +213,25 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
 
   @Override
   public Matrix<N3, N1> getStdDeviations(PoseObservation observation) {
-    double meanReprojectionError = getMeanReprojectionError(); // sigma_p
+    // Non-AprilTag observations get maximum uncertainty.
+    if (observation.aprilTagData().isEmpty()) {
+      return VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+    }
+    AprilTagData aprilTagData = observation.aprilTagData().get();
+
+    double meanReprojectionError = getMeanReprojectionError() * (1 / Math.max(Math.abs(Math.cos(aprilTagData.minTilt())), 0.01)); // sigma_p
     double fx = getFocalLengthX();
     double fy = getFocalLengthY();
     double f_avg = (fx + fy) / 2.0;
 
-    double d = observation.averageTagDistance();
-    double s_eff = observation.effectiveSpan();
-    int n = observation.tagCount();
-    double a = observation.ambiguity();
+    double tagDistance = aprilTagData.averageTagDistance();
+    double effectiveSpan = aprilTagData.effectiveSpan();
+    int tagCount = aprilTagData.tagCount();
+    double ambiguity = aprilTagData.ambiguity();
 
-    if (n == 1 && (a > 0.15 || d > 4.0)) {
+    if (tagCount == 1
+        && (ambiguity > VisionConstants.maxAmbiguity
+            || tagDistance > VisionConstants.maxTagDistance.in(Meters))) {
       return VecBuilder.fill(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
     }
 
@@ -248,23 +270,29 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
 
       // Apply blur to reprojection error
       double exposureSec = exposureTimeMs / 1000.0;
-      double blurPixels = vt * exposureSec * (f_avg / d);
+      double blurPixels = vt * exposureSec * (f_avg / tagDistance);
       meanReprojectionError += blurPixels;
     }
 
-    double p = (n > 1) ? 1.0 : Math.pow(1.0 / (1.0 - a), 3);
+    double ambiguityPenalty = (tagCount > 1) ? 1.0 : Math.pow(1.0 / (1.0 - ambiguity), 3);
 
     double sigmaFieldX = 0.0;
     double sigmaFieldY = 0.0;
     double sigmaFieldTheta = 0.0;
 
-    PnpMethod method = observation.pnpMethod();
+    PnpMethod pnpMethod = aprilTagData.pnpMethod();
 
-    if (method == PnpMethod.MULTI_TAG_PNP) {
-      double vx = Math.pow(meanReprojectionError * d / fx, 2);
-      double vy = Math.pow(meanReprojectionError * d / fy, 2);
+    if (pnpMethod == PnpMethod.MULTI_TAG_PNP) {
+      double vx = Math.pow(meanReprojectionError * tagDistance / fx, 2);
+      double vy = Math.pow(meanReprojectionError * tagDistance / fy, 2);
       double vz =
-          Math.pow((1.0 / Math.sqrt(n)) * meanReprojectionError * (d * d) / (f_avg * s_eff) * p, 2);
+          Math.pow(
+              (1.0 / Math.sqrt(tagCount))
+                  * meanReprojectionError
+                  * (tagDistance * tagDistance)
+                  / (f_avg * effectiveSpan)
+                  * ambiguityPenalty,
+              2);
 
       double pitchProjY = vz * (cosPitch * cosPitch) + vy * (sinPitch * sinPitch);
       double vFieldX = vx * (sinGamma * sinGamma) + pitchProjY * (cosGamma * cosGamma);
@@ -272,15 +300,23 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
 
       sigmaFieldX = Math.sqrt(vFieldX);
       sigmaFieldY = Math.sqrt(vFieldY);
-      sigmaFieldTheta = Math.sqrt(vz) / s_eff;
+      sigmaFieldTheta = Math.sqrt(vz) / effectiveSpan;
 
-    } else if (method == PnpMethod.TRIG_PNP) {
+    } else if (pnpMethod == PnpMethod.TRIG_PNP) {
 
-      double vd = Math.pow(meanReprojectionError * (d * d) / (f_avg * 0.233) * p, 2);
+      double vd =
+          Math.pow(
+              meanReprojectionError
+                  * (tagDistance * tagDistance)
+                  / (f_avg * VisionConstants.aprilTagSideLength * Math.sqrt(2))
+                  * ambiguityPenalty,
+              2);
       double va = Math.pow(meanReprojectionError / fx, 2);
 
-      double vFieldX = vd * (cosGamma * cosGamma) + (d * d) * va * (sinGamma * sinGamma);
-      double vFieldY = vd * (sinGamma * sinGamma) + (d * d) * va * (cosGamma * cosGamma);
+      double vFieldX =
+          vd * (cosGamma * cosGamma) + (tagDistance * tagDistance) * va * (sinGamma * sinGamma);
+      double vFieldY =
+          vd * (sinGamma * sinGamma) + (tagDistance * tagDistance) * va * (cosGamma * cosGamma);
 
       sigmaFieldX = Math.sqrt(vFieldX);
       sigmaFieldY = Math.sqrt(vFieldY);
