@@ -1,0 +1,12 @@
+
+BasedOnStyle: Google
+Language: Java
+
+AlignAfterOpenBracket: true
+AlignConsecutiveAssignments: true
+AlignConsecutiveBitFields: true
+AlignConsecutiveDeclarations: false
+AlignOperands: AlignAfterOperator
+BreakBeforeBraces: Allman
+IndentWidth: 4
+ColumnLimit: 100
