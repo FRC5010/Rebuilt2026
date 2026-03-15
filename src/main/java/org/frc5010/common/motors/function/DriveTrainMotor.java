@@ -7,24 +7,27 @@ package org.frc5010.common.motors.function;
 import org.frc5010.common.motors.GenericMotorController;
 
 /** A class for handling drive train motors */
-public class DriveTrainMotor extends GenericFunctionalMotor {
-  /**
-   * Creates a new DriveTrainMotor
-   *
-   * @param motor The motor to use
-   */
-  public DriveTrainMotor(GenericMotorController motor, String visualName) {
-    super(motor, visualName);
-  }
+public class DriveTrainMotor extends GenericFunctionalMotor
+{
+    /**
+     * Creates a new DriveTrainMotor
+     *
+     * @param motor The motor to use
+     */
+    public DriveTrainMotor(GenericMotorController motor, String visualName)
+    {
+        super(motor, visualName);
+    }
 
-  /**
-   * Creates a new DriveTrainMotor
-   *
-   * @param motor The motor to use
-   * @param slewRate The slew rate
-   */
-  public DriveTrainMotor(GenericMotorController motor, String visualName, double slewRate) {
-    super(motor, visualName);
-    _motor.setSlewRate(slewRate);
-  }
+    /**
+     * Creates a new DriveTrainMotor
+     *
+     * @param motor The motor to use
+     * @param slewRate The slew rate
+     */
+    public DriveTrainMotor(GenericMotorController motor, String visualName, double slewRate)
+    {
+        super(motor, visualName);
+        _motor.setSlewRate(slewRate);
+    }
 }

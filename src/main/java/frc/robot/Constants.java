@@ -14,37 +14,38 @@ import edu.wpi.first.wpilibj.RobotBase;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
-public final class Constants {
-  /**** The simulation mode to run - Uncomment the one you want to use *****/
-  public static final Mode SIM_MODE = Mode.SIM; // This is for running the Glass Simulator
-  // Mode.REPLAY; // This is for replaying from a log in Advantage Scope
-  /**** ------------------------------------------------------------- *****/
+public final class Constants
+{
+    /**** The simulation mode to run - Uncomment the one you want to use *****/
+    public static final Mode SIM_MODE = Mode.SIM; // This is for running the Glass Simulator
+    // Mode.REPLAY; // This is for replaying from a log in Advantage Scope
+    /**** ------------------------------------------------------------- *****/
 
-  public static final Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIM_MODE;
+    public static final Mode CURRENT_MODE = RobotBase.isReal() ? Mode.REAL : SIM_MODE;
 
-  public static enum Mode {
-    /** Running on a real robot. */
-    REAL,
+    public static enum Mode {
+        /** Running on a real robot. */
+        REAL,
 
-    /** Running a physics simulator. */
-    SIM,
+        /** Running a physics simulator. */
+        SIM,
 
-    /** Replaying from a log file. */
-    REPLAY
-  }
+        /** Replaying from a log file. */
+        REPLAY
+    }
 
-  public static final class DrivebaseConstants {
+    public static final class DrivebaseConstants
+    {
+        // Hold time on motor brakes when disabled
+        public static final double WHEEL_LOCK_TIME = 10; // seconds
+    }
 
-    // Hold time on motor brakes when disabled
-    public static final double WHEEL_LOCK_TIME = 10; // seconds
-  }
-
-  public static class OperatorConstants {
-
-    // Joystick Deadband
-    public static final double DEADBAND = 0.1;
-    public static final double LEFT_Y_DEADBAND = 0.1;
-    public static final double RIGHT_X_DEADBAND = 0.1;
-    public static final double TURN_CONSTANT = 6;
-  }
+    public static class OperatorConstants
+    {
+        // Joystick Deadband
+        public static final double DEADBAND         = 0.1;
+        public static final double LEFT_Y_DEADBAND  = 0.1;
+        public static final double RIGHT_X_DEADBAND = 0.1;
+        public static final double TURN_CONSTANT    = 6;
+    }
 }

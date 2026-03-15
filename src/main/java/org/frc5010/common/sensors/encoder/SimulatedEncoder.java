@@ -9,79 +9,82 @@ import edu.wpi.first.wpilibj.simulation.EncoderSim;
 import java.util.Optional;
 
 /** Add your docs here. */
-public class SimulatedEncoder implements GenericEncoder {
-  Encoder encoder;
-  EncoderSim encoderSim;
-  boolean inverted = false;
+public class SimulatedEncoder implements GenericEncoder
+{
+    Encoder encoder;
+    EncoderSim encoderSim;
+    boolean inverted = false;
 
-  public SimulatedEncoder(Encoder encoder) {
-    this.encoder = encoder;
-    init();
-  }
+    public SimulatedEncoder(Encoder encoder)
+    {
+        this.encoder = encoder;
+        init();
+    }
 
-  public SimulatedEncoder(int port1, int port2) {
-    this.encoder = new Encoder(port1, port2);
-    init();
-  }
+    public SimulatedEncoder(int port1, int port2)
+    {
+        this.encoder = new Encoder(port1, port2);
+        init();
+    }
 
-  private void init() {
-    encoderSim = new EncoderSim(encoder);
-  }
+    private void init()
+    {
+        encoderSim = new EncoderSim(encoder);
+    }
 
-  @Override
-  public double getPosition() {
-    return encoderSim.getDistance();
-  }
+    @Override public double getPosition()
+    {
+        return encoderSim.getDistance();
+    }
 
-  @Override
-  public double getVelocity() {
-    return encoderSim.getRate();
-  }
+    @Override public double getVelocity()
+    {
+        return encoderSim.getRate();
+    }
 
-  @Override
-  public void reset() {
-    encoder.reset();
-    encoderSim.resetData();
-  }
+    @Override public void reset()
+    {
+        encoder.reset();
+        encoderSim.resetData();
+    }
 
-  @Override
-  public void setPosition(double position) {
-    encoderSim.setDistance(position);
-  }
+    @Override public void setPosition(double position)
+    {
+        encoderSim.setDistance(position);
+    }
 
-  @Override
-  public void setRate(double rate) {
-    encoderSim.setRate(rate);
-  }
+    @Override public void setRate(double rate)
+    {
+        encoderSim.setRate(rate);
+    }
 
-  @Override
-  public void setPositionConversion(double conversion) {
-    encoder.setDistancePerPulse(conversion);
-    encoderSim.setDistancePerPulse(conversion);
-  }
+    @Override public void setPositionConversion(double conversion)
+    {
+        encoder.setDistancePerPulse(conversion);
+        encoderSim.setDistancePerPulse(conversion);
+    }
 
-  @Override
-  public void setVelocityConversion(double conversion) {
-    encoder.setDistancePerPulse(conversion);
-    encoderSim.setDistancePerPulse(conversion);
-  }
+    @Override public void setVelocityConversion(double conversion)
+    {
+        encoder.setDistancePerPulse(conversion);
+        encoderSim.setDistancePerPulse(conversion);
+    }
 
-  @Override
-  public void setInverted(boolean inverted) {
-    encoderSim.setDirection(inverted);
-    this.inverted = inverted;
-  }
+    @Override public void setInverted(boolean inverted)
+    {
+        encoderSim.setDirection(inverted);
+        this.inverted = inverted;
+    }
 
-  @Override
-  public double getPositionConversion() {
-    return encoder.getDistancePerPulse();
-  }
+    @Override public double getPositionConversion()
+    {
+        return encoder.getDistancePerPulse();
+    }
 
-  @Override
-  public double getVelocityConversion() {
-    return encoder.getDistancePerPulse();
-  }
+    @Override public double getVelocityConversion()
+    {
+        return encoder.getDistancePerPulse();
+    }
 
-  @Override
-  public void simulationUpdate(Optional<Double> position, Double velocity) {}
+    @Override public void simulationUpdate(Optional<Double> position, Double velocity) {}
 }

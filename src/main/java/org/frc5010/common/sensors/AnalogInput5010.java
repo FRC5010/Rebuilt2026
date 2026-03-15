@@ -10,63 +10,58 @@ import java.util.Optional;
 import org.frc5010.common.sensors.encoder.GenericEncoder;
 
 /** A class for supporting an analog input on the roboRIO */
-public class AnalogInput5010 implements GenericEncoder {
+public class AnalogInput5010 implements GenericEncoder
+{
+    private AnalogInput analogInput;
+    private boolean inverted;
 
-  private AnalogInput analogInput;
-  private boolean inverted;
+    /**
+     * AnalogInput5010: Creates a new AnalogInput5010
+     *
+     * @param port - The port of the analog input
+     */
+    public AnalogInput5010(int port)
+    {
+        this.analogInput = new AnalogInput(port);
+        this.inverted    = false;
+    }
 
-  /**
-   * AnalogInput5010: Creates a new AnalogInput5010
-   *
-   * @param port - The port of the analog input
-   */
-  public AnalogInput5010(int port) {
-    this.analogInput = new AnalogInput(port);
-    this.inverted = false;
-  }
+    @Override public double getPosition()
+    {
+        return (inverted ? -1.0 : 1.0)
+      * ((analogInput.getAverageVoltage() / RobotController.getVoltage5V()) * (Math.PI * 2)
+         - Math.PI);
+    }
 
-  @Override
-  public double getPosition() {
-    return (inverted ? -1.0 : 1.0)
-        * ((analogInput.getAverageVoltage() / RobotController.getVoltage5V()) * (Math.PI * 2)
-            - Math.PI);
-  }
+    @Override public double getVelocity()
+    {
+        return 0;
+    }
 
-  @Override
-  public double getVelocity() {
-    return 0;
-  }
+    @Override public void reset() {}
 
-  @Override
-  public void reset() {}
+    @Override public void setPositionConversion(double conversion) {}
 
-  @Override
-  public void setPositionConversion(double conversion) {}
+    @Override public void setVelocityConversion(double conversion) {}
 
-  @Override
-  public void setVelocityConversion(double conversion) {}
+    @Override public void setPosition(double position) {}
 
-  @Override
-  public void setPosition(double position) {}
+    @Override public void setRate(double rate) {}
 
-  @Override
-  public void setRate(double rate) {}
+    @Override public void setInverted(boolean inverted)
+    {
+        this.inverted = inverted;
+    }
 
-  @Override
-  public void setInverted(boolean inverted) {
-    this.inverted = inverted;
-  }
+    @Override public double getPositionConversion()
+    {
+        return 1;
+    }
 
-  @Override
-  public double getPositionConversion() {
-    return 1;
-  }
+    @Override public double getVelocityConversion()
+    {
+        return 1;
+    }
 
-  @Override
-  public double getVelocityConversion() {
-    return 1;
-  }
-
-  @Override
-  public void simulationUpdate(Optional<Double> position, Double velocity) {}
+    @Override public void simulationUpdate(Optional<Double> position, Double velocity) {}
 }

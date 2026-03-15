@@ -11,92 +11,99 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import java.util.Optional;
 
-public class RevEncoder implements GenericEncoder {
-  protected RelativeEncoder encoder;
-  /** The simulated instance of the motor */
-  protected SparkSim sparkMaxSim;
+public class RevEncoder implements GenericEncoder
+{
+    protected RelativeEncoder encoder;
+    /** The simulated instance of the motor */
+    protected SparkSim sparkMaxSim;
 
-  protected EncoderConfig config;
-  protected double positionConversion = 1.0;
-  protected double velocityConversion = 1.0;
+    protected EncoderConfig config;
+    protected double positionConversion = 1.0;
+    protected double velocityConversion = 1.0;
 
-  public RevEncoder(RelativeEncoder encoder) {
-    this.encoder = encoder;
-    config = new EncoderConfig();
-  }
-
-  public void setSimulation(SparkSim sparkMaxSim) {
-    this.sparkMaxSim = sparkMaxSim;
-  }
-
-  @Override
-  public double getPosition() {
-    if (RobotBase.isReal()) {
-      return encoder.getPosition();
-    } else {
-      return sparkMaxSim.getPosition();
+    public RevEncoder(RelativeEncoder encoder)
+    {
+        this.encoder = encoder;
+        config       = new EncoderConfig();
     }
-  }
 
-  @Override
-  public double getVelocity() {
-    if (RobotBase.isReal()) {
-      return encoder.getVelocity();
-    } else {
-      return sparkMaxSim.getVelocity();
+    public void setSimulation(SparkSim sparkMaxSim)
+    {
+        this.sparkMaxSim = sparkMaxSim;
     }
-  }
 
-  @Override
-  public void reset() {
-    setPosition(0);
-  }
+    @Override public double getPosition()
+    {
+        if (RobotBase.isReal())
+        {
+            return encoder.getPosition();
+        }
+        else
+        {
+            return sparkMaxSim.getPosition();
+        }
+    }
 
-  @Override
-  public void setPosition(double position) {
-    encoder.setPosition(position);
-    sparkMaxSim.getRelativeEncoderSim().setPosition(position);
-  }
+    @Override public double getVelocity()
+    {
+        if (RobotBase.isReal())
+        {
+            return encoder.getVelocity();
+        }
+        else
+        {
+            return sparkMaxSim.getVelocity();
+        }
+    }
 
-  @Override
-  public void setRate(double rate) {
-    sparkMaxSim.getRelativeEncoderSim().setVelocity(rate);
-  }
+    @Override public void reset()
+    {
+        setPosition(0);
+    }
 
-  @Override
-  public void setPositionConversion(double conversion) {
-    positionConversion = conversion;
-    config.positionConversionFactor(conversion);
-    // sparkMaxSim.getRelativeEncoderSim().setPositionConversionFactor(conversion);
+    @Override public void setPosition(double position)
+    {
+        encoder.setPosition(position);
+        sparkMaxSim.getRelativeEncoderSim().setPosition(position);
+    }
 
-  }
+    @Override public void setRate(double rate)
+    {
+        sparkMaxSim.getRelativeEncoderSim().setVelocity(rate);
+    }
 
-  @Override
-  public void setVelocityConversion(double conversion) {
-    velocityConversion = conversion;
-    config.velocityConversionFactor(conversion);
-    // sparkMaxSim.getRelativeEncoderSim().setVelocityConversionFactor(conversion);
+    @Override public void setPositionConversion(double conversion)
+    {
+        positionConversion = conversion;
+        config.positionConversionFactor(conversion);
+        // sparkMaxSim.getRelativeEncoderSim().setPositionConversionFactor(conversion);
+    }
 
-  }
+    @Override public void setVelocityConversion(double conversion)
+    {
+        velocityConversion = conversion;
+        config.velocityConversionFactor(conversion);
+        // sparkMaxSim.getRelativeEncoderSim().setVelocityConversionFactor(conversion);
+    }
 
-  @Override
-  public void setInverted(boolean inverted) {
-    sparkMaxSim.getRelativeEncoderSim().setInverted(inverted);
-    config.inverted(inverted);
-  }
+    @Override public void setInverted(boolean inverted)
+    {
+        sparkMaxSim.getRelativeEncoderSim().setInverted(inverted);
+        config.inverted(inverted);
+    }
 
-  @Override
-  public double getPositionConversion() {
-    return positionConversion;
-  }
+    @Override public double getPositionConversion()
+    {
+        return positionConversion;
+    }
 
-  @Override
-  public double getVelocityConversion() {
-    return velocityConversion;
-  }
+    @Override public double getVelocityConversion()
+    {
+        return velocityConversion;
+    }
 
-  @Override
-  public void simulationUpdate(Optional<Double> position, Double velocity) {
-    sparkMaxSim.iterate(velocity, RoboRioSim.getVInVoltage(), 0.02);
-  }
+    @Override public void simulationUpdate(Optional<Double> position, Double velocity)
+    {
+        sparkMaxSim.iterate(velocity, RoboRioSim.getVInVoltage(), 0.02);
+    }
 }

@@ -6,48 +6,48 @@ package org.frc5010.common.sensors.gyro;
 
 /** A generic interface for gyros */
 public interface GenericGyro {
-  /** Reset the gyro */
-  void reset();
+    /** Reset the gyro */
+    void reset();
 
-  /**
-   * Get the angle of the gyro
-   *
-   * @return the angle
-   */
-  double getAngle();
+    /**
+     * Get the angle of the gyro
+     *
+     * @return the angle
+     */
+    double getAngle();
 
-  /**
-   * Get the x-axis angle of the gyro
-   *
-   * @return the angle
-   */
-  double getAngleX();
+    /**
+     * Get the x-axis angle of the gyro
+     *
+     * @return the angle
+     */
+    double getAngleX();
 
-  /**
-   * Get the y-axis angle of the gyro
-   *
-   * @return the angle
-   */
-  double getAngleY();
+    /**
+     * Get the y-axis angle of the gyro
+     *
+     * @return the angle
+     */
+    double getAngleY();
 
-  /**
-   * Get the z-axis angle of the gyro
-   *
-   * @return the angle
-   */
-  double getAngleZ();
+    /**
+     * Get the z-axis angle of the gyro
+     *
+     * @return the angle
+     */
+    double getAngleZ();
 
-  /**
-   * Get the rate of the gyro
-   *
-   * @return the rate
-   */
-  double getRate();
+    /**
+     * Get the rate of the gyro
+     *
+     * @return the rate
+     */
+    double getRate();
 
-  /**
-   * Set the angle of the gyro
-   *
-   * @param angle the angle
-   */
-  void setAngle(double angle);
+    /**
+     * Set the angle of the gyro
+     *
+     * @param angle the angle
+     */
+    void setAngle(double angle);
 }

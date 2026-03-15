@@ -12,43 +12,53 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /** Add your docs here. */
-public class RobotIdentity {
-  public String robotClass = "default";
-  public String id = "default";
-  public boolean competition = false;
-  public boolean simulate = false;
+public class RobotIdentity
+{
+    public String robotClass   = "default";
+    public String id           = "default";
+    public boolean competition = false;
+    public boolean simulate    = false;
 
-  public static String MAC_Address = "MAC_Address";
+    public static String MAC_Address = "MAC_Address";
 
-  public static String whereAmI() {
-    try {
-      NetworkInterface myNI =
-          NetworkInterface.networkInterfaces()
-              .filter(
-                  it -> {
-                    try {
-                      byte[] MA = it.getHardwareAddress();
-                      return null != MA;
-                    } catch (SocketException e) {
-                      throw new RuntimeException(e);
-                    }
-                  })
-              .findFirst()
-              .orElse(NetworkInterface.networkInterfaces().findFirst().get());
-      byte[] MAC_ADDRESS = myNI.getHardwareAddress();
-      final List<Byte> macList = new ArrayList<>();
-      if (null != MAC_ADDRESS) {
-        for (byte b : MAC_ADDRESS) {
-          macList.add(b);
+    public static String whereAmI()
+    {
+        try
+        {
+            NetworkInterface myNI =
+                NetworkInterface.networkInterfaces()
+                    .filter(it -> {
+                        try
+                        {
+                            byte[] MA = it.getHardwareAddress();
+                            return null != MA;
+                        }
+                        catch (SocketException e)
+                        {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .findFirst()
+                    .orElse(NetworkInterface.networkInterfaces().findFirst().get());
+            byte[] MAC_ADDRESS       = myNI.getHardwareAddress();
+            final List<Byte> macList = new ArrayList<>();
+            if (null != MAC_ADDRESS)
+            {
+                for (byte b : MAC_ADDRESS)
+                {
+                    macList.add(b);
+                }
+            }
+            String whichRobot = macList.stream()
+                                    .map(it -> String.format("%02X", it))
+                                    .collect(Collectors.joining(":"));
+            MAC_Address = whichRobot;
+            SmartDashboard.putString("My ID", whichRobot);
+            return whichRobot;
         }
-      }
-      String whichRobot =
-          macList.stream().map(it -> String.format("%02X", it)).collect(Collectors.joining(":"));
-      MAC_Address = whichRobot;
-      SmartDashboard.putString("My ID", whichRobot);
-      return whichRobot;
-    } catch (SocketException e) {
-      throw new RuntimeException(e);
+        catch (SocketException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
-  }
 }

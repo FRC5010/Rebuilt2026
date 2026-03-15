@@ -34,125 +34,125 @@ import org.frc5010.common.sensors.gyro.GenericGyro;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 
 /** A class for differential drive. */
-public class DifferentialDrivetrain extends GenericDrivetrain {
-  private List<GenericMotorController> motorList;
-  private DifferentialDrive diffDrive;
-  private DifferentialDriveKinematics diffKinematics;
-  private List<DrivePorts> motorPorts;
-  private GenericMotorController left, right;
-  private GenericEncoder leftEncoder, rightEncoder;
-  private GenericGyro gyro;
-  private ChassisSpeeds chassisSpeeds;
+public class DifferentialDrivetrain extends GenericDrivetrain
+{
+    private List<GenericMotorController> motorList;
+    private DifferentialDrive diffDrive;
+    private DifferentialDriveKinematics diffKinematics;
+    private List<DrivePorts> motorPorts;
+    private GenericMotorController left, right;
+    private GenericEncoder leftEncoder, rightEncoder;
+    private GenericGyro gyro;
+    private ChassisSpeeds chassisSpeeds;
 
-  /**
-   * Creates a new SkidSteerDrivetrain.
-   *
-   * @param left - requires the left motor as a template for the others
-   * @param ports - a list of ports (assumes all ports are given)
-   * @param gyro - the gyroscope
-   * @param mechVisual - the visualizer
-   */
-  public DifferentialDrivetrain(
-      GenericMotorController left,
-      List<DrivePorts> ports,
-      GenericGyro gyro,
-      LoggedMechanism2d mechVisual) {
-    super(mechVisual);
-    assert (ports.size() == 4);
-    this.motorPorts = ports;
-    this.gyro = gyro;
+    /**
+     * Creates a new SkidSteerDrivetrain.
+     *
+     * @param left - requires the left motor as a template for the others
+     * @param ports - a list of ports (assumes all ports are given)
+     * @param gyro - the gyroscope
+     * @param mechVisual - the visualizer
+     */
+    public DifferentialDrivetrain(GenericMotorController left,
+                                  List<DrivePorts> ports,
+                                  GenericGyro gyro,
+                                  LoggedMechanism2d mechVisual)
+    {
+        super(mechVisual);
+        assert (ports.size() == 4);
+        this.motorPorts = ports;
+        this.gyro       = gyro;
 
-    motorList = new ArrayList<>();
-    this.left = left;
-    motorList.add(left);
-    GenericMotorController lMotor = left.duplicate(motorPorts.get(1).getDrivePort());
-    lMotor.setFollow(left);
-    motorList.add(lMotor);
+        motorList = new ArrayList<>();
+        this.left = left;
+        motorList.add(left);
+        GenericMotorController lMotor = left.duplicate(motorPorts.get(1).getDrivePort());
+        lMotor.setFollow(left);
+        motorList.add(lMotor);
 
-    this.right = left.duplicate(motorPorts.get(2).getDrivePort());
-    right.invert(true);
-    GenericMotorController rMotor = right.duplicate(motorPorts.get(3).getDrivePort());
-    rMotor.setFollow(right);
-    motorList.add(rMotor);
+        this.right = left.duplicate(motorPorts.get(2).getDrivePort());
+        right.invert(true);
+        GenericMotorController rMotor = right.duplicate(motorPorts.get(3).getDrivePort());
+        rMotor.setFollow(right);
+        motorList.add(rMotor);
 
-    leftEncoder = left.getMotorEncoder();
-    rightEncoder = right.getMotorEncoder();
+        leftEncoder  = left.getMotorEncoder();
+        rightEncoder = right.getMotorEncoder();
 
-    diffKinematics =
-        new DifferentialDriveKinematics(Persisted.doubleVal(DriveConstantsDef.TRACK_WIDTH));
+        diffKinematics =
+            new DifferentialDriveKinematics(Persisted.doubleVal(DriveConstantsDef.TRACK_WIDTH));
 
-    if (RobotBase.isSimulation()) {
-      initSimulation();
+        if (RobotBase.isSimulation())
+        {
+            initSimulation();
+        }
+
+        setDrivetrainPoseEstimator(new DrivePoseEstimator(
+            new DifferentialPose(diffKinematics, gyro, leftEncoder, rightEncoder)));
+        diffDrive = new DifferentialDrive(
+            (double speed) -> left.set(speed), (double speed) -> right.set(speed));
     }
 
-    setDrivetrainPoseEstimator(
-        new DrivePoseEstimator(
-            new DifferentialPose(diffKinematics, gyro, leftEncoder, rightEncoder)));
-    diffDrive =
-        new DifferentialDrive(
-            (double speed) -> left.set(speed), (double speed) -> right.set(speed));
-  }
+    /**
+     * Arcade drive with throttle and rotation
+     *
+     * @param throttle - forward/reverse value
+     * @param steer - rotational value
+     */
+    public void arcadeDrive(double throttle, double steer)
+    {
+        diffDrive.arcadeDrive(throttle, steer);
+    }
 
-  /**
-   * Arcade drive with throttle and rotation
-   *
-   * @param throttle - forward/reverse value
-   * @param steer - rotational value
-   */
-  public void arcadeDrive(double throttle, double steer) {
-    diffDrive.arcadeDrive(throttle, steer);
-  }
+    private Persisted<Double> maxChassisVelocity =
+        new Persisted<>(DriveConstantsDef.MAX_CHASSIS_VELOCITY, Double.class);
+    private Persisted<Double> maxChassisRotation =
+        new Persisted<>(DriveConstantsDef.MAX_CHASSIS_ROTATION, Double.class);
 
-  private Persisted<Double> maxChassisVelocity =
-      new Persisted<>(DriveConstantsDef.MAX_CHASSIS_VELOCITY, Double.class);
-  private Persisted<Double> maxChassisRotation =
-      new Persisted<>(DriveConstantsDef.MAX_CHASSIS_ROTATION, Double.class);
+    @Override
+    public void driveWithFeedforwards(ChassisSpeeds direction, DriveFeedforwards feedforwards)
+    {
+        chassisSpeeds = direction;
+        // WARNING: TODO: this may not be the 'best' way to convert chassis speeds to
+        // throttles
+        // For example - convert chassis speeds into left and right voltages based on
+        // SysID character
+        double throttle = Math.min(1, direction.vxMetersPerSecond / maxChassisVelocity.get());
+        double rotation =
+            Math.min(1, direction.omegaRadiansPerSecond / maxChassisRotation.getDouble());
+        arcadeDrive(throttle, rotation);
+    }
 
-  @Override
-  public void driveWithFeedforwards(ChassisSpeeds direction, DriveFeedforwards feedforwards) {
-    chassisSpeeds = direction;
-    // WARNING: TODO: this may not be the 'best' way to convert chassis speeds to
-    // throttles
-    // For example - convert chassis speeds into left and right voltages based on
-    // SysID character
-    double throttle = Math.min(1, direction.vxMetersPerSecond / maxChassisVelocity.get());
-    double rotation = Math.min(1, direction.omegaRadiansPerSecond / maxChassisRotation.getDouble());
-    arcadeDrive(throttle, rotation);
-  }
+    // Simulation
+    // Create our feedforward gain constants (from the identification tool)
+    private Persisted<Double> KvLinear;
+    private Persisted<Double> KaLinear;
+    private Persisted<Double> KvAngular;
+    private Persisted<Double> KaAngular;
+    private Persisted<Double> motorRotationsPerWheelRotation;
+    private Persisted<Double> kTrackwidthMeters;
 
-  // Simulation
-  // Create our feedforward gain constants (from the identification tool)
-  private Persisted<Double> KvLinear;
-  private Persisted<Double> KaLinear;
-  private Persisted<Double> KvAngular;
-  private Persisted<Double> KaAngular;
-  private Persisted<Double> motorRotationsPerWheelRotation;
-  private Persisted<Double> kTrackwidthMeters;
+    /** Create the simulation model of our drivetrain. */
+    protected static DifferentialDrivetrainSim driveSim;
 
-  /** Create the simulation model of our drivetrain. */
-  protected static DifferentialDrivetrainSim driveSim;
+    /** Initialize the simulation model of our drivetrain. */
+    public void initSimulation()
+    {
+        KvLinear = new Persisted<>(DriveConstantsDef.KV_DRIVE_LINEAR, 1.3984);
+        KaLinear = new Persisted<>(DriveConstantsDef.KA_DRIVE_LINEAR, 0.27137);
+        motorRotationsPerWheelRotation =
+            new Persisted<>(DriveConstantsDef.MOTOR_ROT_PER_WHEEL_ROT, 10.71);
 
-  /** Initialize the simulation model of our drivetrain. */
-  public void initSimulation() {
-    KvLinear = new Persisted<>(DriveConstantsDef.KV_DRIVE_LINEAR, 1.3984);
-    KaLinear = new Persisted<>(DriveConstantsDef.KA_DRIVE_LINEAR, 0.27137);
-    motorRotationsPerWheelRotation =
-        new Persisted<>(DriveConstantsDef.MOTOR_ROT_PER_WHEEL_ROT, 10.71);
+        KvAngular = new Persisted<>(DriveConstantsDef.KV_DRIVE_ANGULAR, 0.5 / 180);
+        KaAngular = new Persisted<>(DriveConstantsDef.KA_DRIVE_ANGULAR, 0.03);
+        motorRotationsPerWheelRotation =
+            new Persisted<>(DriveConstantsDef.MOTOR_ROT_PER_WHEEL_ROT, 10.71);
+        kTrackwidthMeters = new Persisted<>(DriveConstantsDef.TRACK_WIDTH, Double.class);
 
-    KvAngular = new Persisted<>(DriveConstantsDef.KV_DRIVE_ANGULAR, 0.5 / 180);
-    KaAngular = new Persisted<>(DriveConstantsDef.KA_DRIVE_ANGULAR, 0.03);
-    motorRotationsPerWheelRotation =
-        new Persisted<>(DriveConstantsDef.MOTOR_ROT_PER_WHEEL_ROT, 10.71);
-    kTrackwidthMeters = new Persisted<>(DriveConstantsDef.TRACK_WIDTH, Double.class);
-
-    driveSim =
-        new DifferentialDrivetrainSim(
+        driveSim = new DifferentialDrivetrainSim(
             // Create a linear system from our identification gains.
-            LinearSystemId.identifyDrivetrainSystem(
-                KvLinear.getDouble(),
-                KaLinear.getDouble(),
-                KvAngular.getDouble(),
-                KaAngular.getDouble()),
+            LinearSystemId.identifyDrivetrainSystem(KvLinear.getDouble(), KaLinear.getDouble(),
+                                                    KvAngular.getDouble(), KaAngular.getDouble()),
             DCMotor.getNEO(2), // 2 NEO motors on each side of the drivetrain.
             motorRotationsPerWheelRotation.getDouble(), // 10.71:1 gearing reduction.
             kTrackwidthMeters.getDouble(), // The track width is 0.616 meters.
@@ -165,81 +165,86 @@ public class DifferentialDrivetrain extends GenericDrivetrain {
             // l and r position: 0.005 m
             VecBuilder.fill(0.001, 0.001, 0.001, 0.1, 0.1, 0.005, 0.005));
 
-    leftEncoder = new SimulatedEncoder(10, 11);
-    rightEncoder = new SimulatedEncoder(12, 13);
-  }
+        leftEncoder  = new SimulatedEncoder(10, 11);
+        rightEncoder = new SimulatedEncoder(12, 13);
+    }
 
-  /**
-   * Get the chassis speeds.
-   *
-   * @return The chassis speeds
-   */
-  public ChassisSpeeds getChassisSpeeds() {
-    return chassisSpeeds;
-  }
+    /**
+     * Get the chassis speeds.
+     *
+     * @return The chassis speeds
+     */
+    public ChassisSpeeds getChassisSpeeds()
+    {
+        return chassisSpeeds;
+    }
 
-  /** Update our simulation. This should be run every robot loop in simulation. */
-  @Override
-  public void simulationPeriodic() {
-    // To update our simulation, we set motor voltage inputs, update the
-    // simulation, and write the simulated positions and velocities to our
-    // simulated encoder and gyro. We negate the right side so that positive
-    // voltages make the right side move forward.
-    driveSim.setInputs(
-        left.get() * RobotController.getInputVoltage(),
-        right.get() * RobotController.getInputVoltage());
-    driveSim.update(0.02);
+    /** Update our simulation. This should be run every robot loop in simulation. */
+    @Override public void simulationPeriodic()
+    {
+        // To update our simulation, we set motor voltage inputs, update the
+        // simulation, and write the simulated positions and velocities to our
+        // simulated encoder and gyro. We negate the right side so that positive
+        // voltages make the right side move forward.
+        driveSim.setInputs(left.get() * RobotController.getInputVoltage(),
+                           right.get() * RobotController.getInputVoltage());
+        driveSim.update(0.02);
 
-    leftEncoder.setPosition(driveSim.getLeftPositionMeters());
-    leftEncoder.setRate(driveSim.getLeftVelocityMetersPerSecond());
-    rightEncoder.setPosition(driveSim.getRightPositionMeters());
-    rightEncoder.setRate(driveSim.getRightVelocityMetersPerSecond());
-    gyro.setAngle(-driveSim.getHeading().getDegrees());
-  }
+        leftEncoder.setPosition(driveSim.getLeftPositionMeters());
+        leftEncoder.setRate(driveSim.getLeftVelocityMetersPerSecond());
+        rightEncoder.setPosition(driveSim.getRightPositionMeters());
+        rightEncoder.setRate(driveSim.getRightVelocityMetersPerSecond());
+        gyro.setAngle(-driveSim.getHeading().getDegrees());
+    }
 
-  @Override
-  public void setAutoBuilder() {
-    // Configure AutoBuilder last
-    AutoBuilder.configure(
-        () -> getPoseEstimator().getCurrentPose(), // Pose2d supplier
-        (Pose2d pose) ->
-            getPoseEstimator().resetToPose(pose), // Pose2d consumer, used to reset odometry at the
-        this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
-        this::drive,
-        new PPLTVController(0.02),
-        // PPLTVController is the built in path following controller for differential drive trains
-        ppRobotConfig, // The robot configuration
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    @Override public void setAutoBuilder()
+    {
+        // Configure AutoBuilder last
+        AutoBuilder.configure(
+            ()
+                -> getPoseEstimator().getCurrentPose(), // Pose2d supplier
+            (Pose2d pose)
+                -> getPoseEstimator().resetToPose(
+                    pose), // Pose2d consumer, used to reset odometry at the
+            this::getChassisSpeeds, // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
+            this::drive, new PPLTVController(0.02),
+            // PPLTVController is the built in path following controller for differential drive
+            // trains
+            ppRobotConfig, // The robot configuration
+            ()
+                -> {
+                // Boolean supplier that controls when the path will be mirrored for the red
+                // alliance
+                // This will flip the path being followed to the red side of the field.
+                // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
 
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
-        this // Reference to this subsystem to set requirements
+                var alliance = DriverStation.getAlliance();
+                if (alliance.isPresent())
+                {
+                    return alliance.get() == DriverStation.Alliance.Red;
+                }
+                return false;
+            },
+            this // Reference to this subsystem to set requirements
         );
-  }
+    }
 
-  @Override
-  public void drive(ChassisSpeeds direction) {
-    chassisSpeeds = direction;
-    // WARNING: TODO: this may not be the 'best' way to convert chassis speeds to
-    // throttles
-    // For example - convert chassis speeds into left and right voltages based on
-    // SysID character
-    double throttle = Math.min(1, direction.vxMetersPerSecond / maxChassisVelocity.get());
-    double rotation = Math.min(1, direction.omegaRadiansPerSecond / maxChassisRotation.getDouble());
-    arcadeDrive(throttle, rotation);
-  }
+    @Override public void drive(ChassisSpeeds direction)
+    {
+        chassisSpeeds = direction;
+        // WARNING: TODO: this may not be the 'best' way to convert chassis speeds to
+        // throttles
+        // For example - convert chassis speeds into left and right voltages based on
+        // SysID character
+        double throttle = Math.min(1, direction.vxMetersPerSecond / maxChassisVelocity.get());
+        double rotation =
+            Math.min(1, direction.omegaRadiansPerSecond / maxChassisRotation.getDouble());
+        arcadeDrive(throttle, rotation);
+    }
 
-  @Override
-  public Field2d getField2d() {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getField2d'");
-  }
+    @Override public Field2d getField2d()
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getField2d'");
+    }
 }

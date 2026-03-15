@@ -12,45 +12,46 @@ import swervelib.simulation.ironmaple.simulation.gamepieces.GamePieceOnFieldSimu
 import swervelib.simulation.ironmaple.simulation.seasonspecific.rebuilt2026.RebuiltFuelOnField;
 
 /** Simulates the implimentation of IntakeIO */
-public class IntakeIOSim extends IntakeIOReal {
-  public static IntakeSimulation intakeSimulation;
-  private AbstractDriveTrainSimulation driveTrainSimulation;
-  private GamePieceOnFieldSimulation gamePiece;
-  /** Initializes the mapleSim intake simulation */
-  public IntakeIOSim(Map<String, Object> devices) {
-    super(devices);
-    driveTrainSimulation = GenericDrivetrain.getMapleSimDrive().get();
-    intakeSimulation =
-        IntakeSimulation.OverTheBumperIntake(
-            "Fuel",
-            driveTrainSimulation,
-            Inches.of(27.25),
-            Inches.of(11.25),
-            IntakeSimulation.IntakeSide.FRONT,
-            80);
-  }
-  /** Runs the intake motor and updates the state of the intake simulation */
-  @Override
-  public void runSpintake(double speed) {
-    super.runSpintake(speed);
-    if (speed > 0) {
-      intakeSimulation.startIntake();
-    } else {
-      intakeSimulation.stopIntake();
+public class IntakeIOSim extends IntakeIOReal
+{
+    public static IntakeSimulation intakeSimulation;
+    private AbstractDriveTrainSimulation driveTrainSimulation;
+    private GamePieceOnFieldSimulation gamePiece;
+    /** Initializes the mapleSim intake simulation */
+    public IntakeIOSim(Map<String, Object> devices)
+    {
+        super(devices);
+        driveTrainSimulation = GenericDrivetrain.getMapleSimDrive().get();
+        intakeSimulation     = IntakeSimulation.OverTheBumperIntake(
+            "Fuel", driveTrainSimulation, Inches.of(27.25), Inches.of(11.25),
+            IntakeSimulation.IntakeSide.FRONT, 80);
     }
-  }
-  /** manages simulated collection of game pieces and updates intake inputs */
-  @Override
-  public void updateInputs(IntakeIOInputs inputs) {
-    super.updateInputs(inputs);
-    if (inputs.speed < 0) {
-      if (intakeSimulation.obtainGamePieceFromIntake()) {
-        gamePiece =
-            new RebuiltFuelOnField(
-                Rebuilt.drivetrain.getPoseEstimator().getCurrentPose().getTranslation());
-        SimulatedArena.getInstance().addGamePiece(gamePiece);
-      }
+    /** Runs the intake motor and updates the state of the intake simulation */
+    @Override public void runSpintake(double speed)
+    {
+        super.runSpintake(speed);
+        if (speed > 0)
+        {
+            intakeSimulation.startIntake();
+        }
+        else
+        {
+            intakeSimulation.stopIntake();
+        }
     }
-    inputs.simulatedGamepieces = intakeSimulation.getGamePiecesAmount();
-  }
+    /** manages simulated collection of game pieces and updates intake inputs */
+    @Override public void updateInputs(IntakeIOInputs inputs)
+    {
+        super.updateInputs(inputs);
+        if (inputs.speed < 0)
+        {
+            if (intakeSimulation.obtainGamePieceFromIntake())
+            {
+                gamePiece = new RebuiltFuelOnField(
+                    Rebuilt.drivetrain.getPoseEstimator().getCurrentPose().getTranslation());
+                SimulatedArena.getInstance().addGamePiece(gamePiece);
+            }
+        }
+        inputs.simulatedGamepieces = intakeSimulation.getGamePiecesAmount();
+    }
 }

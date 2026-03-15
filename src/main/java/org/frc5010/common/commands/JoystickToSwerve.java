@@ -15,121 +15,123 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.frc5010.common.drive.swerve.GenericSwerveDrivetrain;
 
-public class JoystickToSwerve extends Command {
-  /** Creates a new JoystickToSwerve. */
-  private GenericSwerveDrivetrain swerveDrive;
+public class JoystickToSwerve extends Command
+{
+    /** Creates a new JoystickToSwerve. */
+    private GenericSwerveDrivetrain swerveDrive;
 
-  private DoubleSupplier xSpdFunction, ySpdFunction, turnSpdFunction;
-  private BooleanSupplier fieldOrientedDrive;
-  private Supplier<Alliance> allianceSupplier;
-  private DoubleSupplier robotSpeedFactor = () -> 1.0;
+    private DoubleSupplier xSpdFunction, ySpdFunction, turnSpdFunction;
+    private BooleanSupplier fieldOrientedDrive;
+    private Supplier<Alliance> allianceSupplier;
+    private DoubleSupplier robotSpeedFactor = () -> 1.0;
 
-  public JoystickToSwerve(
-      GenericSwerveDrivetrain swerveSubsystem,
-      DoubleSupplier xSpdFunction,
-      DoubleSupplier ySpdFunction,
-      DoubleSupplier turnSpdFunction,
-      BooleanSupplier fieldOrientedDrive,
-      Supplier<Alliance> allianceSupplier) {
-    this.swerveDrive = swerveSubsystem;
-    this.xSpdFunction = xSpdFunction;
-    this.ySpdFunction = ySpdFunction;
-    this.turnSpdFunction = turnSpdFunction;
-    this.fieldOrientedDrive = fieldOrientedDrive;
-    this.allianceSupplier = allianceSupplier;
+    public JoystickToSwerve(GenericSwerveDrivetrain swerveSubsystem,
+                            DoubleSupplier xSpdFunction,
+                            DoubleSupplier ySpdFunction,
+                            DoubleSupplier turnSpdFunction,
+                            BooleanSupplier fieldOrientedDrive,
+                            Supplier<Alliance> allianceSupplier)
+    {
+        this.swerveDrive        = swerveSubsystem;
+        this.xSpdFunction       = xSpdFunction;
+        this.ySpdFunction       = ySpdFunction;
+        this.turnSpdFunction    = turnSpdFunction;
+        this.fieldOrientedDrive = fieldOrientedDrive;
+        this.allianceSupplier   = allianceSupplier;
 
-    addRequirements(this.swerveDrive);
-    // Use addRequirements() here to declare subsystem dependencies.
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {}
-
-  public void setTurnSpeedFunction(DoubleSupplier turnSpeedFunction) {
-    turnSpdFunction = turnSpeedFunction;
-  }
-
-  public void setXSpeedFunction(DoubleSupplier xSpeedFunction) {
-    xSpdFunction = xSpeedFunction;
-  }
-
-  public void setYSpeedFunction(DoubleSupplier ySpeedFunction) {
-    ySpdFunction = ySpeedFunction;
-  }
-
-  public void setRobotSpeedFactor(DoubleSupplier robotSpeedFactor) {
-    this.robotSpeedFactor = robotSpeedFactor;
-  }
-
-  public DoubleSupplier getTurnSpeedFunction() {
-    return turnSpdFunction;
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    // get values on sticks and deadzone them
-    double robotSpeedFactor = this.robotSpeedFactor.getAsDouble();
-    double xInput = (xSpdFunction.getAsDouble()) * robotSpeedFactor;
-    double yInput = (ySpdFunction.getAsDouble()) * robotSpeedFactor;
-
-    Translation2d inputTranslation = new Translation2d(xInput, yInput);
-    double magnitude = inputTranslation.getNorm();
-    Rotation2d angle = 0 != xInput || 0 != yInput ? inputTranslation.getAngle() : new Rotation2d();
-
-    double curvedMagnitude = Math.pow(magnitude, 3);
-
-    double turnSpeed = (turnSpdFunction.getAsDouble()) * robotSpeedFactor;
-
-    // limit power
-    double xSpeed =
-        curvedMagnitude
-            * angle.getCos()
-            * swerveDrive.getSwerveConstants().getkTeleDriveMaxSpeedMetersPerSecond();
-    double ySpeed =
-        curvedMagnitude
-            * angle.getSin()
-            * swerveDrive.getSwerveConstants().getkTeleDriveMaxSpeedMetersPerSecond();
-    turnSpeed =
-        turnSpeed * swerveDrive.getSwerveConstants().getkTeleDriveMaxAngularSpeedRadiansPerSecond();
-
-    // convert to chassis speed class
-    ChassisSpeeds chassisSpeeds;
-    //
-    // System.out.println(swerveDrive.getGyroRate());
-    double gyroRate = Units.degreesToRadians(swerveDrive.getGyroRate()) * 0.01;
-    Rotation2d correctedRotation = swerveDrive.getHeading().minus(new Rotation2d(gyroRate));
-
-    if (fieldOrientedDrive.getAsBoolean()) {
-      Alliance alliance = allianceSupplier.get();
-      chassisSpeeds =
-          ChassisSpeeds.fromFieldRelativeSpeeds(
-              alliance == Alliance.Red ? -xSpeed : xSpeed,
-              alliance == Alliance.Red ? -ySpeed : ySpeed,
-              turnSpeed,
-              correctedRotation);
-    } else {
-      chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turnSpeed);
+        addRequirements(this.swerveDrive);
+        // Use addRequirements() here to declare subsystem dependencies.
     }
 
-    // convert chassis speed into modules speeds
-    // SwerveModuleState[] moduleStates =
-    // SwerveDrivetrain.m_kinematics.toSwerveModuleStates(chassisSpeeds);
+    // Called when the command is initially scheduled.
+    @Override public void initialize() {}
 
-    // output each module speed into subsystem
-    swerveDrive.drive(chassisSpeeds);
-  }
+    public void setTurnSpeedFunction(DoubleSupplier turnSpeedFunction)
+    {
+        turnSpdFunction = turnSpeedFunction;
+    }
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    swerveDrive.stop();
-  }
+    public void setXSpeedFunction(DoubleSupplier xSpeedFunction)
+    {
+        xSpdFunction = xSpeedFunction;
+    }
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+    public void setYSpeedFunction(DoubleSupplier ySpeedFunction)
+    {
+        ySpdFunction = ySpeedFunction;
+    }
+
+    public void setRobotSpeedFactor(DoubleSupplier robotSpeedFactor)
+    {
+        this.robotSpeedFactor = robotSpeedFactor;
+    }
+
+    public DoubleSupplier getTurnSpeedFunction()
+    {
+        return turnSpdFunction;
+    }
+
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override public void execute()
+    {
+        // get values on sticks and deadzone them
+        double robotSpeedFactor = this.robotSpeedFactor.getAsDouble();
+        double xInput           = (xSpdFunction.getAsDouble()) * robotSpeedFactor;
+        double yInput           = (ySpdFunction.getAsDouble()) * robotSpeedFactor;
+
+        Translation2d inputTranslation = new Translation2d(xInput, yInput);
+        double magnitude               = inputTranslation.getNorm();
+        Rotation2d angle =
+            0 != xInput || 0 != yInput ? inputTranslation.getAngle() : new Rotation2d();
+
+        double curvedMagnitude = Math.pow(magnitude, 3);
+
+        double turnSpeed = (turnSpdFunction.getAsDouble()) * robotSpeedFactor;
+
+        // limit power
+        double xSpeed = curvedMagnitude * angle.getCos()
+                      * swerveDrive.getSwerveConstants().getkTeleDriveMaxSpeedMetersPerSecond();
+        double ySpeed = curvedMagnitude * angle.getSin()
+                      * swerveDrive.getSwerveConstants().getkTeleDriveMaxSpeedMetersPerSecond();
+        turnSpeed = turnSpeed
+                  * swerveDrive.getSwerveConstants().getkTeleDriveMaxAngularSpeedRadiansPerSecond();
+
+        // convert to chassis speed class
+        ChassisSpeeds chassisSpeeds;
+        //
+        // System.out.println(swerveDrive.getGyroRate());
+        double gyroRate              = Units.degreesToRadians(swerveDrive.getGyroRate()) * 0.01;
+        Rotation2d correctedRotation = swerveDrive.getHeading().minus(new Rotation2d(gyroRate));
+
+        if (fieldOrientedDrive.getAsBoolean())
+        {
+            Alliance alliance = allianceSupplier.get();
+            chassisSpeeds     = ChassisSpeeds.fromFieldRelativeSpeeds(
+                alliance == Alliance.Red ? -xSpeed : xSpeed,
+                alliance == Alliance.Red ? -ySpeed : ySpeed, turnSpeed, correctedRotation);
+        }
+        else
+        {
+            chassisSpeeds = new ChassisSpeeds(xSpeed, ySpeed, turnSpeed);
+        }
+
+        // convert chassis speed into modules speeds
+        // SwerveModuleState[] moduleStates =
+        // SwerveDrivetrain.m_kinematics.toSwerveModuleStates(chassisSpeeds);
+
+        // output each module speed into subsystem
+        swerveDrive.drive(chassisSpeeds);
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override public void end(boolean interrupted)
+    {
+        swerveDrive.stop();
+    }
+
+    // Returns true when the command should end.
+    @Override public boolean isFinished()
+    {
+        return false;
+    }
 }

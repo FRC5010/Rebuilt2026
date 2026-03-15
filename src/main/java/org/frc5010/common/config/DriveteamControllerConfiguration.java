@@ -18,52 +18,54 @@ import org.frc5010.common.sensors.Controller.Axis;
  *   <li><b>axes</b>: The axes of the controller.
  * </ul>
  */
-public class DriveteamControllerConfiguration {
-  /** The port number of the controller */
-  private int port;
-  /** The axes of the controller */
-  private List<DriveteamControllerAxisJson> axes = new ArrayList<>();
+public class DriveteamControllerConfiguration
+{
+    /** The port number of the controller */
+    private int port;
+    /** The axes of the controller */
+    private List<DriveteamControllerAxisJson> axes = new ArrayList<>();
 
-  /**
-   * Configures a new Controller object with the specified port and axes.
-   *
-   * @return a new Controller object configured with the specified port and axes
-   */
-  public Controller configureController() {
-    Controller controller = new Controller(port);
-    axes.forEach(
-        it -> {
-          Axis axis =
-              controller
-                  .createAxis(it.channel)
-                  .limit(it.limit)
-                  .scale(it.scale)
-                  .curvePower(it.curvePower);
-          if (it.rate != 0) {
-            axis = axis.rate(it.rate);
-          }
-          axis = axis.negate(it.invert).deadzone(it.deadband);
-          controller.setAxis(it.channel, axis);
+    /**
+     * Configures a new Controller object with the specified port and axes.
+     *
+     * @return a new Controller object configured with the specified port and axes
+     */
+    public Controller configureController()
+    {
+        Controller controller = new Controller(port);
+        axes.forEach(it -> {
+            Axis axis = controller.createAxis(it.channel)
+                            .limit(it.limit)
+                            .scale(it.scale)
+                            .curvePower(it.curvePower);
+            if (it.rate != 0)
+            {
+                axis = axis.rate(it.rate);
+            }
+            axis = axis.negate(it.invert).deadzone(it.deadband);
+            controller.setAxis(it.channel, axis);
         });
 
-    return controller;
-  }
+        return controller;
+    }
 
-  /**
-   * A method to set the port number of the controller.
-   *
-   * @param port the port number to be set
-   */
-  public void setPort(int port) {
-    this.port = port;
-  }
+    /**
+     * A method to set the port number of the controller.
+     *
+     * @param port the port number to be set
+     */
+    public void setPort(int port)
+    {
+        this.port = port;
+    }
 
-  /**
-   * Adds a DriveteamControllerAxisJson object to the list of axes.
-   *
-   * @param axis the DriveteamControllerAxisJson object to be added
-   */
-  public void addAxis(DriveteamControllerAxisJson axis) {
-    axes.add(axis);
-  }
+    /**
+     * Adds a DriveteamControllerAxisJson object to the list of axes.
+     *
+     * @param axis the DriveteamControllerAxisJson object to be added
+     */
+    public void addAxis(DriveteamControllerAxisJson axis)
+    {
+        axes.add(axis);
+    }
 }

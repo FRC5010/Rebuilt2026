@@ -26,134 +26,127 @@ import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
 import yams.motorcontrollers.SmartMotorFactory;
 
 /** Add your docs here. */
-public class YamsConfigCommon {
-  public static class PhysicalParameters {
-    public Voltage voltageCompensation;
-    public Mass mass;
-    public Distance length;
-    public MechanismGearing gearing;
+public class YamsConfigCommon
+{
+    public static class PhysicalParameters
+    {
+        public Voltage voltageCompensation;
+        public Mass mass;
+        public Distance length;
+        public MechanismGearing gearing;
 
-    public PhysicalParameters(
-        UnitValueJson voltageCompensation,
-        UnitValueJson mass,
-        UnitValueJson length,
-        double[] gearing,
-        String gearStages) {
-      this.voltageCompensation = UnitsParser.parseVolts(voltageCompensation);
-      this.mass = UnitsParser.parseMass(mass);
-      this.length = UnitsParser.parseDistance(length);
-      if (!gearStages.isEmpty()) {
-        this.gearing = new MechanismGearing(GearBox.fromStages(gearStages));
-      } else { // gearStages is empty, so use gearing array
-        this.gearing = new MechanismGearing(GearBox.fromReductionStages(gearing));
-      }
+        public PhysicalParameters(UnitValueJson voltageCompensation,
+                                  UnitValueJson mass,
+                                  UnitValueJson length,
+                                  double[] gearing,
+                                  String gearStages)
+        {
+            this.voltageCompensation = UnitsParser.parseVolts(voltageCompensation);
+            this.mass                = UnitsParser.parseMass(mass);
+            this.length              = UnitsParser.parseDistance(length);
+            if (!gearStages.isEmpty())
+            {
+                this.gearing = new MechanismGearing(GearBox.fromStages(gearStages));
+            }
+            else
+            { // gearStages is empty, so use gearing array
+                this.gearing = new MechanismGearing(GearBox.fromReductionStages(gearing));
+            }
+        }
     }
-  }
 
-  public static Optional<SmartMotorController> configureSmartMotorController(
-      MotorSetupJson motorSetup,
-      SmartMotorControllerConfig motorConfig,
-      ControlAlgorithm controlAlgorithm,
-      MotorSystemIdJson motorSystemId,
-      MotorSystemIdJson simSystemId,
-      PhysicalParameters physicalParams) {
-
-    MotorSetupJson.setupFollowers(motorConfig, motorSetup);
-    int numberOfMotors = motorConfig.getFollowers().map(it -> it.length + 1).orElse(1);
-    Object motorController =
-        DeviceConfigReader.getReflectedGenericMotor(
+    public static Optional<SmartMotorController> configureSmartMotorController(
+        MotorSetupJson motorSetup,
+        SmartMotorControllerConfig motorConfig,
+        ControlAlgorithm controlAlgorithm,
+        MotorSystemIdJson motorSystemId,
+        MotorSystemIdJson simSystemId,
+        PhysicalParameters physicalParams)
+    {
+        MotorSetupJson.setupFollowers(motorConfig, motorSetup);
+        int numberOfMotors     = motorConfig.getFollowers().map(it -> it.length + 1).orElse(1);
+        Object motorController = DeviceConfigReader.getReflectedGenericMotor(
             motorSetup.controllerType, motorSetup.canId, motorSetup.canBus);
-    DCMotor motorSim = DeviceConfigReader.getSimulatedMotor(motorSetup.motorType, numberOfMotors);
+        DCMotor motorSim =
+            DeviceConfigReader.getSimulatedMotor(motorSetup.motorType, numberOfMotors);
 
-    if (Robot.isSimulation() && !ControlAlgorithm.SIMPLE.equals(controlAlgorithm)) {
-      controlAlgorithm = ControlAlgorithm.SIMPLE;
-    }
-    switch (controlAlgorithm) {
-      case PROFILED:
+        if (Robot.isSimulation() && !ControlAlgorithm.SIMPLE.equals(controlAlgorithm))
         {
-          motorConfig
-              .withClosedLoopController(
-                  motorSystemId.feedBack.p,
-                  motorSystemId.feedBack.i,
-                  motorSystemId.feedBack.d,
-                  UnitsParser.parseAngularVelocity(motorSystemId.maxVelocity),
-                  UnitsParser.parseAngularAcceleration(motorSystemId.maxAcceleration))
-              .withSimClosedLoopController(
-                  simSystemId.feedBack.p,
-                  simSystemId.feedBack.i,
-                  simSystemId.feedBack.d,
-                  UnitsParser.parseAngularVelocity(simSystemId.maxVelocity),
-                  UnitsParser.parseAngularAcceleration(simSystemId.maxAcceleration));
-          break;
+            controlAlgorithm = ControlAlgorithm.SIMPLE;
         }
-      case EXPO:
-      case EXPO_ELEVATOR:
+        switch (controlAlgorithm)
         {
-          ExponentialProfile.Constraints constraints;
-          if (controlAlgorithm == ControlAlgorithm.EXPO_ELEVATOR) {
-            constraints =
-                ExponentialProfilePIDController.createElevatorConstraints(
-                    physicalParams.voltageCompensation,
-                    motorSim,
-                    physicalParams.mass,
-                    physicalParams.length,
-                    physicalParams.gearing);
-          } else {
-            constraints =
-                ExponentialProfilePIDController.createArmConstraints(
-                    physicalParams.voltageCompensation,
-                    motorSim,
-                    physicalParams.mass,
-                    physicalParams.length,
-                    physicalParams.gearing);
-          }
-          ExponentialProfilePIDController controller =
-              new ExponentialProfilePIDController(
-                  motorSystemId.feedBack.p,
-                  motorSystemId.feedBack.i,
-                  motorSystemId.feedBack.d,
-                  constraints);
-          ExponentialProfilePIDController simController =
-              new ExponentialProfilePIDController(
-                  simSystemId.feedBack.p,
-                  simSystemId.feedBack.i,
-                  simSystemId.feedBack.d,
-                  constraints);
-          motorConfig
-              .withClosedLoopController(controller)
-              .withSimClosedLoopController(simController);
-          break;
+            case PROFILED:
+            {
+                motorConfig
+                    .withClosedLoopController(
+                        motorSystemId.feedBack.p, motorSystemId.feedBack.i,
+                        motorSystemId.feedBack.d,
+                        UnitsParser.parseAngularVelocity(motorSystemId.maxVelocity),
+                        UnitsParser.parseAngularAcceleration(motorSystemId.maxAcceleration))
+                    .withSimClosedLoopController(
+                        simSystemId.feedBack.p, simSystemId.feedBack.i, simSystemId.feedBack.d,
+                        UnitsParser.parseAngularVelocity(simSystemId.maxVelocity),
+                        UnitsParser.parseAngularAcceleration(simSystemId.maxAcceleration));
+                break;
+            }
+            case EXPO:
+            case EXPO_ELEVATOR:
+            {
+                ExponentialProfile.Constraints constraints;
+                if (controlAlgorithm == ControlAlgorithm.EXPO_ELEVATOR)
+                {
+                    constraints = ExponentialProfilePIDController.createElevatorConstraints(
+                        physicalParams.voltageCompensation, motorSim, physicalParams.mass,
+                        physicalParams.length, physicalParams.gearing);
+                }
+                else
+                {
+                    constraints = ExponentialProfilePIDController.createArmConstraints(
+                        physicalParams.voltageCompensation, motorSim, physicalParams.mass,
+                        physicalParams.length, physicalParams.gearing);
+                }
+                ExponentialProfilePIDController controller = new ExponentialProfilePIDController(
+                    motorSystemId.feedBack.p, motorSystemId.feedBack.i, motorSystemId.feedBack.d,
+                    constraints);
+                ExponentialProfilePIDController simController = new ExponentialProfilePIDController(
+                    simSystemId.feedBack.p, simSystemId.feedBack.i, simSystemId.feedBack.d,
+                    constraints);
+                motorConfig.withClosedLoopController(controller)
+                    .withSimClosedLoopController(simController);
+                break;
+            }
+            case SIMPLE:
+            default:
+            {
+                motorConfig
+                    .withClosedLoopController(motorSystemId.feedBack.p, motorSystemId.feedBack.i,
+                                              motorSystemId.feedBack.d)
+                    .withSimClosedLoopController(simSystemId.feedBack.p, simSystemId.feedBack.i,
+                                                 simSystemId.feedBack.d);
+                break;
+            }
         }
-      case SIMPLE:
-      default:
-        {
-          motorConfig
-              .withClosedLoopController(
-                  motorSystemId.feedBack.p, motorSystemId.feedBack.i, motorSystemId.feedBack.d)
-              .withSimClosedLoopController(
-                  simSystemId.feedBack.p, simSystemId.feedBack.i, simSystemId.feedBack.d);
-          break;
-        }
-    }
-    motorConfig
-        .withGearing(physicalParams.gearing)
-        .withControlMode(ControlMode.valueOf(motorSystemId.controlMode))
-        .withClosedLoopRampRate(UnitsParser.parseTime(motorSystemId.closedLoopRamp))
-        .withIdleMode(MotorMode.valueOf(motorSetup.idleMode))
-        .withTelemetry(motorSetup.name + "Motor", TelemetryVerbosity.valueOf(motorSetup.logLevel))
-        .withStatorCurrentLimit(UnitsParser.parseAmps(motorSetup.currentLimit))
-        .withMotorInverted(motorSetup.inverted);
+        motorConfig.withGearing(physicalParams.gearing)
+            .withControlMode(ControlMode.valueOf(motorSystemId.controlMode))
+            .withClosedLoopRampRate(UnitsParser.parseTime(motorSystemId.closedLoopRamp))
+            .withIdleMode(MotorMode.valueOf(motorSetup.idleMode))
+            .withTelemetry(motorSetup.name + "Motor",
+                           TelemetryVerbosity.valueOf(motorSetup.logLevel))
+            .withStatorCurrentLimit(UnitsParser.parseAmps(motorSetup.currentLimit))
+            .withMotorInverted(motorSetup.inverted);
 
-    switch (motorSetup.controllerType.toLowerCase()) {
-      case "thrifty":
-      case "nova":
-      case "thriftynova":
-      case "thrifty_nova":
-      default:
-        motorConfig.withOpenLoopRampRate(UnitsParser.parseTime(motorSystemId.openLoopRamp));
-        break;
+        switch (motorSetup.controllerType.toLowerCase())
+        {
+            case "thrifty":
+            case "nova":
+            case "thriftynova":
+            case "thrifty_nova":
+            default:
+                motorConfig.withOpenLoopRampRate(UnitsParser.parseTime(motorSystemId.openLoopRamp));
+                break;
+        }
+        return SmartMotorFactory.create(((GenericMotorController) motorController).getMotor(),
+                                        motorSim, motorConfig);
     }
-    return SmartMotorFactory.create(
-        ((GenericMotorController) motorController).getMotor(), motorSim, motorConfig);
-  }
 }

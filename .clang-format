@@ -1,4 +1,6 @@
 
+# https://releases.llvm.org/12.0.0/tools/clang/docs/ClangFormatStyleOptions.html
+
 BasedOnStyle: Google
 Language: Java
 
@@ -7,6 +9,8 @@ AlignConsecutiveAssignments: true
 AlignConsecutiveBitFields: true
 AlignConsecutiveDeclarations: false
 AlignOperands: AlignAfterOperator
+AllowAllParametersOfDeclarationOnNextLine: false
 BreakBeforeBraces: Allman
+BinPackParameters: false
 IndentWidth: 4
 ColumnLimit: 100

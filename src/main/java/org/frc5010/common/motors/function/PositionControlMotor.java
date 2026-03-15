@@ -10,20 +10,23 @@ import org.frc5010.common.motors.GenericMotorController;
 import org.frc5010.common.telemetry.DisplayValuesHelper;
 
 /** Add your docs here. */
-public class PositionControlMotor extends GenericControlledMotor {
-  public PositionControlMotor(
-      GenericMotorController motor, String visualName, DisplayValuesHelper tab) {
-    super(motor, visualName, tab);
-  }
+public class PositionControlMotor extends GenericControlledMotor
+{
+    public PositionControlMotor(GenericMotorController motor,
+                                String visualName,
+                                DisplayValuesHelper tab)
+    {
+        super(motor, visualName, tab);
+    }
 
-  @Override
-  public double getEncoderFeedback() {
-    return 0;
-  }
+    @Override public double getEncoderFeedback()
+    {
+        return 0;
+    }
 
-  @Override
-  public Command getSysIdCommand(SubsystemBase subsystemBase) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getSysIdCommand'");
-  }
+    @Override public Command getSysIdCommand(SubsystemBase subsystemBase)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getSysIdCommand'");
+    }
 }

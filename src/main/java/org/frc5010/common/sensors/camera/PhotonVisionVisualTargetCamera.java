@@ -9,32 +9,34 @@ import edu.wpi.first.math.geometry.Transform3d;
 import java.util.Optional;
 
 /** A camera using the PhotonVision library. */
-public class PhotonVisionVisualTargetCamera extends PhotonVisionCamera {
-  /**
-   * Constructor
-   *
-   * @param name - the name of the camera
-   * @param colIndex - the column index for the dashboard
-   * @param cameraToRobot - the camera-to-robot transform
-   */
-  public PhotonVisionVisualTargetCamera(String name, int colIndex, Transform3d cameraToRobot) {
-    super(name, colIndex, cameraToRobot);
-  }
-
-  /** Update the camera and target with the latest result */
-  @Override
-  public void updateCameraInfo() {
-    super.updateCameraInfo();
-    if (camResult.hasTargets()) {
-      target = Optional.ofNullable(camResult.getBestTarget());
-      input.hasTarget = target.isPresent();
-      input.latestTargetRotation =
-          target
-              .map(
-                  it ->
-                      new TargetRotation(
-                          new Rotation3d(0, target.get().getPitch(), target.get().getYaw())))
-              .orElse(new TargetRotation(new Rotation3d()));
+public class PhotonVisionVisualTargetCamera extends PhotonVisionCamera
+{
+    /**
+     * Constructor
+     *
+     * @param name - the name of the camera
+     * @param colIndex - the column index for the dashboard
+     * @param cameraToRobot - the camera-to-robot transform
+     */
+    public PhotonVisionVisualTargetCamera(String name, int colIndex, Transform3d cameraToRobot)
+    {
+        super(name, colIndex, cameraToRobot);
     }
-  }
+
+    /** Update the camera and target with the latest result */
+    @Override public void updateCameraInfo()
+    {
+        super.updateCameraInfo();
+        if (camResult.hasTargets())
+        {
+            target          = Optional.ofNullable(camResult.getBestTarget());
+            input.hasTarget = target.isPresent();
+            input.latestTargetRotation =
+                target
+                    .map(it
+                         -> new TargetRotation(
+                             new Rotation3d(0, target.get().getPitch(), target.get().getYaw())))
+                    .orElse(new TargetRotation(new Rotation3d()));
+        }
+    }
 }

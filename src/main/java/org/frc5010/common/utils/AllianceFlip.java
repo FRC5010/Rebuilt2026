@@ -14,75 +14,91 @@ import java.util.function.BooleanSupplier;
 import org.frc5010.common.constants.FieldDimensions;
 
 /** Add your docs here. */
-public class AllianceFlip {
-  static BooleanSupplier flipPose =
-      () -> {
+public class AllianceFlip
+{
+    static BooleanSupplier flipPose = () ->
+    {
         Optional<Alliance> alliance = DriverStation.getAlliance();
-        if (alliance.isPresent()) {
-          return alliance.get() == Alliance.Red;
+        if (alliance.isPresent())
+        {
+            return alliance.get() == Alliance.Red;
         }
         return false;
-      };
-  private static Boolean xFlip = true;
-  private static Boolean yFlip = true;
-  private static Distance fieldWidth;
-  private static Distance fieldLength;
+    };
+    private static Boolean xFlip = true;
+    private static Boolean yFlip = true;
+    private static Distance fieldWidth;
+    private static Distance fieldLength;
 
-  private static Distance flipX(Distance x) {
-    return fieldLength.minus(x);
-  }
+    private static Distance flipX(Distance x)
+    {
+        return fieldLength.minus(x);
+    }
 
-  private static Distance flipY(Distance y) {
-    return fieldWidth.minus(y);
-  }
+    private static Distance flipY(Distance y)
+    {
+        return fieldWidth.minus(y);
+    }
 
-  private static Rotation2d flipRotation(Rotation2d rotation) {
-    return rotation.rotateBy(Rotation2d.fromDegrees(180));
-  }
+    private static Rotation2d flipRotation(Rotation2d rotation)
+    {
+        return rotation.rotateBy(Rotation2d.fromDegrees(180));
+    }
 
-  public static Pose2d flipPose(Pose2d pose) {
-    return new Pose2d(
-        xFlip ? flipX(pose.getMeasureX()) : pose.getMeasureX(),
-        yFlip ? flipY(pose.getMeasureY()) : pose.getMeasureY(),
-        flipRotation(pose.getRotation()));
-  }
+    public static Pose2d flipPose(Pose2d pose)
+    {
+        return new Pose2d(xFlip ? flipX(pose.getMeasureX()) : pose.getMeasureX(),
+                          yFlip ? flipY(pose.getMeasureY()) : pose.getMeasureY(),
+                          flipRotation(pose.getRotation()));
+    }
 
-  public static Pose2d apply(Pose2d pose) {
-    return flipPose.getAsBoolean() ? flipPose(pose) : pose;
-  }
+    public static Pose2d apply(Pose2d pose)
+    {
+        return flipPose.getAsBoolean() ? flipPose(pose) : pose;
+    }
 
-  public static void configure(
-      Distance width, Distance length, BooleanSupplier flip, Boolean flipX, Boolean flipY) {
-    setFieldDimensions(width, length);
-    setFlipSupplier(flip);
-    setFlipX(flipX);
-    setFlipY(flipY);
-  }
+    public static void configure(Distance width,
+                                 Distance length,
+                                 BooleanSupplier flip,
+                                 Boolean flipX,
+                                 Boolean flipY)
+    {
+        setFieldDimensions(width, length);
+        setFlipSupplier(flip);
+        setFlipX(flipX);
+        setFlipY(flipY);
+    }
 
-  public static void configure(FieldDimensions field, BooleanSupplier flip) {
-    configure(field.fieldWidth, field.fieldLength, flip, field.xFlip, field.yFlip);
-  }
+    public static void configure(FieldDimensions field, BooleanSupplier flip)
+    {
+        configure(field.fieldWidth, field.fieldLength, flip, field.xFlip, field.yFlip);
+    }
 
-  public static void configure(FieldDimensions field) {
-    setFieldDimensions(field.fieldWidth, field.fieldLength);
-    setFlipX(field.xFlip);
-    setFlipY(field.yFlip);
-  }
+    public static void configure(FieldDimensions field)
+    {
+        setFieldDimensions(field.fieldWidth, field.fieldLength);
+        setFlipX(field.xFlip);
+        setFlipY(field.yFlip);
+    }
 
-  public static void setFieldDimensions(Distance width, Distance length) {
-    fieldWidth = width;
-    fieldLength = length;
-  }
+    public static void setFieldDimensions(Distance width, Distance length)
+    {
+        fieldWidth  = width;
+        fieldLength = length;
+    }
 
-  public static void setFlipSupplier(BooleanSupplier flip) {
-    flipPose = flip;
-  }
+    public static void setFlipSupplier(BooleanSupplier flip)
+    {
+        flipPose = flip;
+    }
 
-  public static void setFlipX(Boolean flip) {
-    xFlip = flip;
-  }
+    public static void setFlipX(Boolean flip)
+    {
+        xFlip = flip;
+    }
 
-  public static void setFlipY(Boolean flip) {
-    yFlip = flip;
-  }
+    public static void setFlipY(Boolean flip)
+    {
+        yFlip = flip;
+    }
 }

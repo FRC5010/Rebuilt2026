@@ -66,31 +66,33 @@ import java.util.function.DoubleSupplier;
  * Module IO implementation for Spark Flex drive motor controller, Spark Max turn motor controller,
  * and duty cycle absolute encoder.
  */
-public class ModuleIOSpark implements ModuleIO {
-  private final Rotation2d zeroRotation;
+public class ModuleIOSpark implements ModuleIO
+{
+    private final Rotation2d zeroRotation;
 
-  // Hardware objects
-  private final SparkBase driveSpark;
-  private final SparkBase turnSpark;
-  private final RelativeEncoder driveEncoder;
-  private final AbsoluteEncoder turnEncoder;
+    // Hardware objects
+    private final SparkBase driveSpark;
+    private final SparkBase turnSpark;
+    private final RelativeEncoder driveEncoder;
+    private final AbsoluteEncoder turnEncoder;
 
-  // Closed loop controllers
-  private final SparkClosedLoopController driveController;
-  private final SparkClosedLoopController turnController;
+    // Closed loop controllers
+    private final SparkClosedLoopController driveController;
+    private final SparkClosedLoopController turnController;
 
-  // Queue inputs from odometry thread
-  private final Queue<Double> timestampQueue;
-  private final Queue<Double> drivePositionQueue;
-  private final Queue<Double> turnPositionQueue;
+    // Queue inputs from odometry thread
+    private final Queue<Double> timestampQueue;
+    private final Queue<Double> drivePositionQueue;
+    private final Queue<Double> turnPositionQueue;
 
-  // Connection debouncers
-  private final Debouncer driveConnectedDebounce = new Debouncer(0.5);
-  private final Debouncer turnConnectedDebounce = new Debouncer(0.5);
+    // Connection debouncers
+    private final Debouncer driveConnectedDebounce = new Debouncer(0.5);
+    private final Debouncer turnConnectedDebounce  = new Debouncer(0.5);
 
-  public ModuleIOSpark(int module) {
-    zeroRotation =
-        switch (module) {
+    public ModuleIOSpark(int module)
+    {
+        zeroRotation = switch (module)
+        {
           case 0 -> frontLeftZeroRotation;
           case 1 -> frontRightZeroRotation;
           case 2 -> backLeftZeroRotation;

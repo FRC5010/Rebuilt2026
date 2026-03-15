@@ -7,11 +7,12 @@ package frc.robot.rebuilt.subsystems.Climb;
 import java.util.Map;
 
 /** Add your docs here. */
-public class ClimbIOSim extends ClimbIOReal {
+public class ClimbIOSim extends ClimbIOReal
+{
+    protected Map<String, Object> devices;
 
-  protected Map<String, Object> devices;
-
-  public ClimbIOSim(Map<String, Object> devices) {
-    super(devices);
-  }
+    public ClimbIOSim(Map<String, Object> devices)
+    {
+        super(devices);
+    }
 }

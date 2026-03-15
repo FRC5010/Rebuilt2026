@@ -8,10 +8,12 @@ import edu.wpi.first.math.geometry.Translation3d;
 import org.frc5010.common.config.UnitsParser;
 
 /** A Unit aware 3D pose JSON object */
-public class Translation3dJson extends Pose3dJson {
-  // Note: yaw is inherited from Pose2dJson as "rotation"
-  public Translation3d getTranslation3d() {
-    return new Translation3d(
-        UnitsParser.parseDistance(x), UnitsParser.parseDistance(y), UnitsParser.parseDistance(z));
-  }
+public class Translation3dJson extends Pose3dJson
+{
+    // Note: yaw is inherited from Pose2dJson as "rotation"
+    public Translation3d getTranslation3d()
+    {
+        return new Translation3d(UnitsParser.parseDistance(x), UnitsParser.parseDistance(y),
+                                 UnitsParser.parseDistance(z));
+    }
 }

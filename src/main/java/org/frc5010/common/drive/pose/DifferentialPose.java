@@ -16,72 +16,74 @@ import org.frc5010.common.sensors.encoder.GenericEncoder;
 import org.frc5010.common.sensors.gyro.GenericGyro;
 
 /** A pose estimator for differential drive */
-public class DifferentialPose extends GenericPose {
-  private GenericEncoder leftEncoder;
-  private GenericEncoder rightEncoder;
-  private final DifferentialDrivePoseEstimator poseEstimator;
+public class DifferentialPose extends GenericPose
+{
+    private GenericEncoder leftEncoder;
+    private GenericEncoder rightEncoder;
+    private final DifferentialDrivePoseEstimator poseEstimator;
 
-  /**
-   * Create a pose estimator for differential drive
-   *
-   * @param kinematics differential drive kinematics
-   * @param gyro gyroscope
-   * @param leftEncoder left encoder
-   * @param rightEncoder right encoder
-   */
-  public DifferentialPose(
-      DifferentialDriveKinematics kinematics,
-      GenericGyro gyro,
-      GenericEncoder leftEncoder,
-      GenericEncoder rightEncoder) {
-    super(gyro);
-    this.leftEncoder = leftEncoder;
-    this.rightEncoder = rightEncoder;
-    poseEstimator =
-        new DifferentialDrivePoseEstimator(
-            kinematics,
-            getGyroRotation2d(),
-            leftEncoder.getPosition(),
-            rightEncoder.getPosition(),
-            new Pose2d(),
-            localMeasurementStdDevs,
-            visionMeasurementStdDevs);
-  }
+    /**
+     * Create a pose estimator for differential drive
+     *
+     * @param kinematics differential drive kinematics
+     * @param gyro gyroscope
+     * @param leftEncoder left encoder
+     * @param rightEncoder right encoder
+     */
+    public DifferentialPose(DifferentialDriveKinematics kinematics,
+                            GenericGyro gyro,
+                            GenericEncoder leftEncoder,
+                            GenericEncoder rightEncoder)
+    {
+        super(gyro);
+        this.leftEncoder  = leftEncoder;
+        this.rightEncoder = rightEncoder;
+        poseEstimator     = new DifferentialDrivePoseEstimator(
+            kinematics, getGyroRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition(),
+            new Pose2d(), localMeasurementStdDevs, visionMeasurementStdDevs);
+    }
 
-  @Override
-  public void resetEncoders() {
-    leftEncoder.reset();
-    rightEncoder.reset();
-  }
+    @Override public void resetEncoders()
+    {
+        leftEncoder.reset();
+        rightEncoder.reset();
+    }
 
-  public void updateVisionMeasurements(
-      Pose2d robotPose, double imageCaptureTime, Matrix<N3, N1> stdVector) {
-    // poseEstimator.resetPosition(robotPose, robotPose.getRotation());
-    // m_poseEstimator.addVisionMeasurement(robotPose, imageCaptureTime);
-  }
+    public void updateVisionMeasurements(Pose2d robotPose,
+                                         double imageCaptureTime,
+                                         Matrix<N3, N1> stdVector)
+    {
+        // poseEstimator.resetPosition(robotPose, robotPose.getRotation());
+        // m_poseEstimator.addVisionMeasurement(robotPose, imageCaptureTime);
+    }
 
-  public void updateLocalMeasurements() {
-    double leftDist = leftEncoder.getPosition();
-    double rightDist = rightEncoder.getPosition();
-    poseEstimator.updateWithTime(
-        Timer.getFPGATimestamp(), getGyroRotation2d(), leftDist, rightDist);
-  }
+    public void updateLocalMeasurements()
+    {
+        double leftDist  = leftEncoder.getPosition();
+        double rightDist = rightEncoder.getPosition();
+        poseEstimator.updateWithTime(Timer.getFPGATimestamp(), getGyroRotation2d(), leftDist,
+                                     rightDist);
+    }
 
-  public Pose2d getCurrentPose() {
-    return poseEstimator.getEstimatedPosition();
-  }
+    public Pose2d getCurrentPose()
+    {
+        return poseEstimator.getEstimatedPosition();
+    }
 
-  /**
-   * Returns the current wheel speeds of the robot.
-   *
-   * @return The current wheel speeds.
-   */
-  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(), rightEncoder.getVelocity());
-  }
+    /**
+     * Returns the current wheel speeds of the robot.
+     *
+     * @return The current wheel speeds.
+     */
+    public DifferentialDriveWheelSpeeds getWheelSpeeds()
+    {
+        return new DifferentialDriveWheelSpeeds(leftEncoder.getVelocity(),
+                                                rightEncoder.getVelocity());
+    }
 
-  public void resetToPose(Pose2d pose) {
-    poseEstimator.resetPosition(
-        getGyroRotation2d(), leftEncoder.getPosition(), rightEncoder.getPosition(), pose);
-  }
+    public void resetToPose(Pose2d pose)
+    {
+        poseEstimator.resetPosition(getGyroRotation2d(), leftEncoder.getPosition(),
+                                    rightEncoder.getPosition(), pose);
+    }
 }

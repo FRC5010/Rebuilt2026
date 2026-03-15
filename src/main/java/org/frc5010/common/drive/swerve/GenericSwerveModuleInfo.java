@@ -8,31 +8,24 @@ import org.frc5010.common.drive.swerve.akit.Module;
 import swervelib.SwerveModule;
 
 /** Add your docs here. */
-public record GenericSwerveModuleInfo(
-    double steerAbsoluteDegrees,
-    double steerRelativeDegrees,
-    double driveRelativePositionMeters,
-    double driveVelocityMetersPerSecond,
-    double steerVelocityDegreesPerSecond,
-    double expectedSteerDegrees) {
+public record GenericSwerveModuleInfo(double steerAbsoluteDegrees,
+                                      double steerRelativeDegrees,
+                                      double driveRelativePositionMeters,
+                                      double driveVelocityMetersPerSecond,
+                                      double steerVelocityDegreesPerSecond,
+                                      double expectedSteerDegrees)
+{
+    public GenericSwerveModuleInfo(SwerveModule module)
+    {
+        this(module.getAbsolutePosition(), module.getRelativePosition(),
+             module.getDriveMotor().getPosition(), module.getDriveMotor().getVelocity(),
+             module.getAngleMotor().getVelocity(), module.getState().angle.getDegrees());
+    }
 
-  public GenericSwerveModuleInfo(SwerveModule module) {
-    this(
-        module.getAbsolutePosition(),
-        module.getRelativePosition(),
-        module.getDriveMotor().getPosition(),
-        module.getDriveMotor().getVelocity(),
-        module.getAngleMotor().getVelocity(),
-        module.getState().angle.getDegrees());
-  }
-
-  public GenericSwerveModuleInfo(Module module) {
-    this(
-        module.getAngle().getDegrees(),
-        module.getAngle().getDegrees(),
-        module.getPosition().distanceMeters,
-        module.getVelocityMetersPerSec(),
-        0.0,
-        module.getAngle().getDegrees());
-  }
+    public GenericSwerveModuleInfo(Module module)
+    {
+        this(module.getAngle().getDegrees(), module.getAngle().getDegrees(),
+             module.getPosition().distanceMeters, module.getVelocityMetersPerSec(), 0.0,
+             module.getAngle().getDegrees());
+    }
 }

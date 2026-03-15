@@ -10,21 +10,21 @@ import org.frc5010.common.arch.GenericRobot;
 
 /** Interface for Drivetrain properties classes */
 public interface DrivetrainPropertiesJson {
-  /** Drivetrain subsystem key name */
-  public static String DRIVE_TRAIN = "DriveTrain";
-  /**
-   * Reads the drivetrain configuration from the given directory
-   *
-   * @param robot the robot being configured
-   * @param directory the directory to read from
-   * @throws IOException if something fails on the filesystem
-   */
-  public void readDrivetrainConfiguration(GenericRobot robot, File directory) throws IOException;
+    /** Drivetrain subsystem key name */
+    public static String DRIVE_TRAIN = "DriveTrain";
+    /**
+     * Reads the drivetrain configuration from the given directory
+     *
+     * @param robot the robot being configured
+     * @param directory the directory to read from
+     * @throws IOException if something fails on the filesystem
+     */
+    public void readDrivetrainConfiguration(GenericRobot robot, File directory) throws IOException;
 
-  /**
-   * Creates the drivetrain
-   *
-   * @param robot the robot being configured
-   */
-  public void createDriveTrain(GenericRobot robot);
+    /**
+     * Creates the drivetrain
+     *
+     * @param robot the robot being configured
+     */
+    public void createDriveTrain(GenericRobot robot);
 }

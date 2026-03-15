@@ -9,22 +9,21 @@ import org.frc5010.common.arch.GenericRobot;
 import org.frc5010.common.sensors.Controller;
 
 /** Add your docs here. */
-public class TestRobot extends GenericRobot {
-  public TestRobot() {
-    super();
-  }
+public class TestRobot extends GenericRobot
+{
+    public TestRobot()
+    {
+        super();
+    }
 
-  @Override
-  public Command generateAutoCommand(Command autoCommand) {
-    return autoCommand;
-  }
+    @Override public Command generateAutoCommand(Command autoCommand)
+    {
+        return autoCommand;
+    }
 
-  @Override
-  public void initAutoCommands() {}
+    @Override public void initAutoCommands() {}
 
-  @Override
-  public void setupDefaultCommands(Controller one, Controller two) {}
+    @Override public void setupDefaultCommands(Controller one, Controller two) {}
 
-  @Override
-  public void configureButtonBindings(Controller one, Controller two) {}
+    @Override public void configureButtonBindings(Controller one, Controller two) {}
 }

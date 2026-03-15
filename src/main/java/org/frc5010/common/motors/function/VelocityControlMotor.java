@@ -27,77 +27,77 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 /** Add your docs here. */
-public class VelocityControlMotor extends GenericControlledMotor {
-  protected LoggedMechanismLigament2d speedometer;
-  protected LoggedMechanismLigament2d setpoint;
-  protected LoggedMechanismRoot2d root;
-  protected FlywheelSim flyWheelSim;
+public class VelocityControlMotor extends GenericControlledMotor
+{
+    protected LoggedMechanismLigament2d speedometer;
+    protected LoggedMechanismLigament2d setpoint;
+    protected LoggedMechanismRoot2d root;
+    protected FlywheelSim flyWheelSim;
 
-  public VelocityControlMotor(
-      GenericMotorController motor, String visualName, DisplayValuesHelper display) {
-    super(motor, visualName, display);
-    controller.setControlType(PIDControlType.VELOCITY);
-  }
+    public VelocityControlMotor(GenericMotorController motor,
+                                String visualName,
+                                DisplayValuesHelper display)
+    {
+        super(motor, visualName, display);
+        controller.setControlType(PIDControlType.VELOCITY);
+    }
 
-  public VelocityControlMotor setupSimulatedMotor(double gearing, double jKgMetersSquared) {
-    flyWheelSim =
-        new FlywheelSim(
-            LinearSystemId.identifyVelocitySystem(
-                12.0 / _motor.getMaxRPM().in(RotationsPerSecond), 0.001),
-            // LinearSystemId.createFlywheelSystem(_motor.getMotorSimulationType(),
-            // jKgMetersSquared, gearing),
-            _motor.getMotorSimulationType());
-    return this;
-  }
+    public VelocityControlMotor setupSimulatedMotor(double gearing, double jKgMetersSquared)
+    {
+        flyWheelSim =
+            new FlywheelSim(LinearSystemId.identifyVelocitySystem(
+                                12.0 / _motor.getMaxRPM().in(RotationsPerSecond), 0.001),
+                            // LinearSystemId.createFlywheelSystem(_motor.getMotorSimulationType(),
+                            // jKgMetersSquared, gearing),
+                            _motor.getMotorSimulationType());
+        return this;
+    }
 
-  @Override
-  public VelocityControlMotor setVisualizer(LoggedMechanism2d visualizer, Pose3d robotToMotor) {
-    super.setVisualizer(visualizer, robotToMotor);
+    @Override
+    public VelocityControlMotor setVisualizer(LoggedMechanism2d visualizer, Pose3d robotToMotor)
+    {
+        super.setVisualizer(visualizer, robotToMotor);
 
-    root =
-        visualizer.getRoot(
-            _visualName,
-            getSimX(Meters.of(robotToMotor.getX())),
-            getSimY(Meters.of(robotToMotor.getZ())));
-    speedometer =
-        new LoggedMechanismLigament2d(
+        root        = visualizer.getRoot(_visualName, getSimX(Meters.of(robotToMotor.getX())),
+                                  getSimY(Meters.of(robotToMotor.getZ())));
+        speedometer = new LoggedMechanismLigament2d(
             _visualName + "-velocity", 0.1, 0, 5, new Color8Bit(MotorFactory.getNextVisualColor()));
-    setpoint =
-        new LoggedMechanismLigament2d(
-            _visualName + "-setpoint", 0.1, 0, 5, new Color8Bit(MotorFactory.getNextVisualColor()));
-    root.append(speedometer);
-    root.append(setpoint);
-    return this;
-  }
+        setpoint = new LoggedMechanismLigament2d(_visualName + "-setpoint", 0.1, 0, 5,
+                                                 new Color8Bit(MotorFactory.getNextVisualColor()));
+        root.append(speedometer);
+        root.append(setpoint);
+        return this;
+    }
 
-  @Override
-  public void periodicUpdate() {
-    double currentVelocity = encoder.getVelocity();
-    velocity.setValue(currentVelocity);
-    speedometer.setAngle(270 - currentVelocity / _motor.getMaxRPM().in(RPM) * 180);
-    setpoint.setAngle(270 - getReference() / _motor.getMaxRPM().in(RPM) * 180);
-  }
+    @Override public void periodicUpdate()
+    {
+        double currentVelocity = encoder.getVelocity();
+        velocity.setValue(currentVelocity);
+        speedometer.setAngle(270 - currentVelocity / _motor.getMaxRPM().in(RPM) *180);
+        setpoint.setAngle(270 - getReference() / _motor.getMaxRPM().in(RPM) *180);
+    }
 
-  @Override
-  public void simulationUpdate() {
-    flyWheelSim.setInput(_motor.getVoltage());
-    outputEffort.setVoltage(_motor.getVoltage(), Volts);
-    flyWheelSim.update(0.020);
+    @Override public void simulationUpdate()
+    {
+        flyWheelSim.setInput(_motor.getVoltage());
+        outputEffort.setVoltage(_motor.getVoltage(), Volts);
+        flyWheelSim.update(0.020);
 
-    _motor.simulationUpdate(Optional.empty(), flyWheelSim.getAngularVelocityRPM());
+        _motor.simulationUpdate(Optional.empty(), flyWheelSim.getAngularVelocityRPM());
 
-    RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(flyWheelSim.getCurrentDrawAmps()));
-  }
+        RoboRioSim.setVInVoltage(
+            BatterySim.calculateDefaultBatteryLoadedVoltage(flyWheelSim.getCurrentDrawAmps()));
+    }
 
-  @Override
-  public Command getSysIdCommand(SubsystemBase subsystemBase) {
-    return SystemIdentification.getSysIdFullCommand(
-        SystemIdentification.rpmSysIdRoutine(_motor, encoder, _visualName, subsystemBase), 5, 3, 3);
-  }
+    @Override public Command getSysIdCommand(SubsystemBase subsystemBase)
+    {
+        return SystemIdentification.getSysIdFullCommand(
+            SystemIdentification.rpmSysIdRoutine(_motor, encoder, _visualName, subsystemBase), 5, 3,
+            3);
+    }
 
-  @Override
-  public double getEncoderFeedback() {
-    return encoder.getVelocity();
-  }
+    @Override public double getEncoderFeedback()
+    {
+        return encoder.getVelocity();
+    }
 }

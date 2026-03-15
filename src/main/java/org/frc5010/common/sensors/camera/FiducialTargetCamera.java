@@ -8,19 +8,19 @@ import java.util.List;
 
 /** Add your docs here. */
 public interface FiducialTargetCamera {
-  /**
-   * Gets the current list of fiducial IDs for this camera.
-   *
-   * @return the current list of fiducial IDs
-   */
-  public List<Integer> getFiducialIds();
+    /**
+     * Gets the current list of fiducial IDs for this camera.
+     *
+     * @return the current list of fiducial IDs
+     */
+    public List<Integer> getFiducialIds();
 
-  /**
-   * Sets the list of fiducial IDs for this camera. The camera will only consider targets with IDs
-   * in this list when locating targets. This does not change the list spefified at construction
-   * time to the pose camera so that the camera can be both a pose and target camera.
-   *
-   * @param fiducialIds the list of fiducial IDs to consider
-   */
-  public void setFiducialIds(List<Integer> fiducialIds);
+    /**
+     * Sets the list of fiducial IDs for this camera. The camera will only consider targets with IDs
+     * in this list when locating targets. This does not change the list spefified at construction
+     * time to the pose camera so that the camera can be both a pose and target camera.
+     *
+     * @param fiducialIds the list of fiducial IDs to consider
+     */
+    public void setFiducialIds(List<Integer> fiducialIds);
 }

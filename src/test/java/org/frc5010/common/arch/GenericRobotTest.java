@@ -13,25 +13,25 @@ import org.frc5010.robot.TestRobot;
 import org.junit.jupiter.api.Test;
 
 /** Add your docs here. */
-public class GenericRobotTest {
+public class GenericRobotTest
+{
+    @Test public void testCreateDefaultGenericRobot()
+    {
+        TestRobot robot = new TestRobot();
+        assertNotNull(robot);
+        assertNotNull(robot.getMechVisual());
+        assertNotNull(robot.getController("driver"));
+        assertNotNull(robot.getController("operator"));
+    }
 
-  @Test
-  public void testCreateDefaultGenericRobot() {
-    TestRobot robot = new TestRobot();
-    assertNotNull(robot);
-    assertNotNull(robot.getMechVisual());
-    assertNotNull(robot.getController("driver"));
-    assertNotNull(robot.getController("operator"));
-  }
+    @Test public void testDetermineAllianceColor()
+    {
+        TestRobot robot = new TestRobot();
+        assertEquals(Alliance.Blue, robot.determineAllianceColor());
+    }
 
-  @Test
-  public void testDetermineAllianceColor() {
-    TestRobot robot = new TestRobot();
-    assertEquals(Alliance.Blue, robot.determineAllianceColor());
-  }
-
-  @Test
-  public void testChooseAllianceColor() {
-    assertEquals(Color.ORANGE, GenericRobot.chooseAllianceDisplayColor());
-  }
+    @Test public void testChooseAllianceColor()
+    {
+        assertEquals(Color.ORANGE, GenericRobot.chooseAllianceDisplayColor());
+    }
 }

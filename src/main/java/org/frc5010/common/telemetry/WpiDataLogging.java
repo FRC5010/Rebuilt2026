@@ -8,23 +8,28 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 
 /** Add your docs here. */
-public class WpiDataLogging {
-  private static boolean logging = false;
+public class WpiDataLogging
+{
+    private static boolean logging = false;
 
-  private WpiDataLogging() {}
+    private WpiDataLogging() {}
 
-  public static void start(boolean log) {
-    logging = log;
-    if (log) {
-      DataLogManager.start();
-      DriverStation.startDataLog(DataLogManager.getLog(), false);
-      DataLogManager.logNetworkTables(true);
+    public static void start(boolean log)
+    {
+        logging = log;
+        if (log)
+        {
+            DataLogManager.start();
+            DriverStation.startDataLog(DataLogManager.getLog(), false);
+            DataLogManager.logNetworkTables(true);
+        }
     }
-  }
 
-  public static void log(String message) {
-    if (logging) {
-      DataLogManager.log(message);
+    public static void log(String message)
+    {
+        if (logging)
+        {
+            DataLogManager.log(message);
+        }
     }
-  }
 }

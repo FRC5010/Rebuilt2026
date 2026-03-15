@@ -5,29 +5,35 @@
 package org.frc5010.common.constants;
 
 /** Add your docs here. */
-public class SwervePorts extends DrivePorts {
-  private int turnPort;
-  private int encoderPort;
+public class SwervePorts extends DrivePorts
+{
+    private int turnPort;
+    private int encoderPort;
 
-  public SwervePorts(int drivePort, int turnPort, int encoderPort) {
-    super(drivePort);
-    this.turnPort = turnPort;
-    this.encoderPort = encoderPort;
-  }
+    public SwervePorts(int drivePort, int turnPort, int encoderPort)
+    {
+        super(drivePort);
+        this.turnPort    = turnPort;
+        this.encoderPort = encoderPort;
+    }
 
-  public int getTurnPort() {
-    return turnPort;
-  }
+    public int getTurnPort()
+    {
+        return turnPort;
+    }
 
-  public void setTurnPort(int turnPort) {
-    this.turnPort = turnPort;
-  }
+    public void setTurnPort(int turnPort)
+    {
+        this.turnPort = turnPort;
+    }
 
-  public int getEncoderPort() {
-    return encoderPort;
-  }
+    public int getEncoderPort()
+    {
+        return encoderPort;
+    }
 
-  public void setEncoderPort(int encoderPort) {
-    this.encoderPort = encoderPort;
-  }
+    public void setEncoderPort(int encoderPort)
+    {
+        this.encoderPort = encoderPort;
+    }
 }

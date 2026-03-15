@@ -13,13 +13,14 @@ package org.frc5010.common.config.json;
  *   <li>axis: A public field to store an array of axis file names for a driveteam controller.
  * </ul>
  */
-public class DriveteamControllerJson {
-  /** The name of the controller */
-  public String name;
+public class DriveteamControllerJson
+{
+    /** The name of the controller */
+    public String name;
 
-  /** The port number of the controller */
-  public int port;
+    /** The port number of the controller */
+    public int port;
 
-  /** An array of axis file names for the controller */
-  public String[] axis;
+    /** An array of axis file names for the controller */
+    public String[] axis;
 }

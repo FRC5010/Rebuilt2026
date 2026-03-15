@@ -11,74 +11,75 @@ import org.frc5010.common.drive.swerve.YAGSLSwerveDrivetrain;
 import swervelib.SwerveDrive;
 
 /** An class for accessing the yagsl gyro */
-public class YagslGyro implements GenericGyro {
-  private SwerveDrive swerveDrive = YAGSLSwerveDrivetrain.getSwerveDrive();
+public class YagslGyro implements GenericGyro
+{
+    private SwerveDrive swerveDrive = YAGSLSwerveDrivetrain.getSwerveDrive();
 
-  /**
-   * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
-   */
-  @Override
-  public void reset() {
-    swerveDrive.zeroGyro();
-  }
+    /**
+     * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
+     */
+    @Override public void reset()
+    {
+        swerveDrive.zeroGyro();
+    }
 
-  /**
-   * Gets the angle of the gyro
-   *
-   * @return the angle of the gyro in degrees
-   */
-  @Override
-  public double getAngle() {
-    return swerveDrive.getYaw().getDegrees();
-  }
+    /**
+     * Gets the angle of the gyro
+     *
+     * @return the angle of the gyro in degrees
+     */
+    @Override public double getAngle()
+    {
+        return swerveDrive.getYaw().getDegrees();
+    }
 
-  /**
-   * Gets the angle of the gyro on the x-axis (roll)
-   *
-   * @return the angle of the gyro on the x-axis in degrees
-   */
-  @Override
-  public double getAngleX() {
-    return swerveDrive.getRoll().getDegrees();
-  }
+    /**
+     * Gets the angle of the gyro on the x-axis (roll)
+     *
+     * @return the angle of the gyro on the x-axis in degrees
+     */
+    @Override public double getAngleX()
+    {
+        return swerveDrive.getRoll().getDegrees();
+    }
 
-  /**
-   * Gets the angle of the gyro on the y-axis (pitch)
-   *
-   * @return the angle of the gyro on the y-axis in degrees
-   */
-  @Override
-  public double getAngleY() {
-    return swerveDrive.getPitch().getDegrees();
-  }
+    /**
+     * Gets the angle of the gyro on the y-axis (pitch)
+     *
+     * @return the angle of the gyro on the y-axis in degrees
+     */
+    @Override public double getAngleY()
+    {
+        return swerveDrive.getPitch().getDegrees();
+    }
 
-  /**
-   * Gets the angle of the gyro on the z-axis (yaw)
-   *
-   * @return the angle of the gyro on the z-axis in degrees
-   */
-  @Override
-  public double getAngleZ() {
-    return swerveDrive.getYaw().getDegrees();
-  }
+    /**
+     * Gets the angle of the gyro on the z-axis (yaw)
+     *
+     * @return the angle of the gyro on the z-axis in degrees
+     */
+    @Override public double getAngleZ()
+    {
+        return swerveDrive.getYaw().getDegrees();
+    }
 
-  /**
-   * Gets the rate of the gyro
-   *
-   * @return the rate of the gyro in degrees per second
-   */
-  @Override
-  public double getRate() {
-    return swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond);
-  }
+    /**
+     * Gets the rate of the gyro
+     *
+     * @return the rate of the gyro in degrees per second
+     */
+    @Override public double getRate()
+    {
+        return swerveDrive.getGyro().getYawAngularVelocity().in(DegreesPerSecond);
+    }
 
-  /**
-   * Sets the angle of the gyro to the given angle.
-   *
-   * @param angle - the angle to set in degrees
-   */
-  @Override
-  public void setAngle(double angle) {
-    swerveDrive.getGyro().setOffset(new Rotation3d(0, 0, getAngleZ() - angle));
-  }
+    /**
+     * Sets the angle of the gyro to the given angle.
+     *
+     * @param angle - the angle to set in degrees
+     */
+    @Override public void setAngle(double angle)
+    {
+        swerveDrive.getGyro().setOffset(new Rotation3d(0, 0, getAngleZ() - angle));
+    }
 }

@@ -10,21 +10,28 @@ import java.io.File;
 import java.io.IOException;
 
 /** Add your docs here. */
-public class LEDStripParser {
-  public static void parse(String robotDirectory) {
-    try {
-      File directory = new File(Filesystem.getDeployDirectory(), robotDirectory + "/subsystems");
-      DeviceConfigReader.checkDirectory(directory);
-      File deviceFile = new File(directory, "led_strip.json");
-      if (!deviceFile.exists()) {
-        return;
-      }
-      LEDStripConfigJson ledStrip =
-          new ObjectMapper().readValue(deviceFile, LEDStripConfigJson.class);
-      ledStrip.configure();
-    } catch (IOException e) {
-      System.out.println("Error reading device configuration: " + e.getMessage());
-      return;
+public class LEDStripParser
+{
+    public static void parse(String robotDirectory)
+    {
+        try
+        {
+            File directory =
+                new File(Filesystem.getDeployDirectory(), robotDirectory + "/subsystems");
+            DeviceConfigReader.checkDirectory(directory);
+            File deviceFile = new File(directory, "led_strip.json");
+            if (!deviceFile.exists())
+            {
+                return;
+            }
+            LEDStripConfigJson ledStrip =
+                new ObjectMapper().readValue(deviceFile, LEDStripConfigJson.class);
+            ledStrip.configure();
+        }
+        catch (IOException e)
+        {
+            System.out.println("Error reading device configuration: " + e.getMessage());
+            return;
+        }
     }
-  }
 }

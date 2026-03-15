@@ -27,266 +27,268 @@ import yams.motorcontrollers.SmartMotorControllerConfig;
 import yams.motorcontrollers.local.NovaWrapper;
 
 /** Add your docs here. */
-public class GenericThriftyNovaMotor implements GenericMotorController {
-  /** The motor controller */
-  protected ThriftyNova motor;
-  /** The maximum RPM */
-  protected AngularVelocity maxRPM;
-  /** The motor simulation type */
-  protected DCMotor motorSim;
+public class GenericThriftyNovaMotor implements GenericMotorController
+{
+    /** The motor controller */
+    protected ThriftyNova motor;
+    /** The maximum RPM */
+    protected AngularVelocity maxRPM;
+    /** The motor simulation type */
+    protected DCMotor motorSim;
 
-  /** The current limit */
-  protected Current currentLimit;
-  /** The internal encoder representation */
-  protected GenericEncoder encoder;
-  /** The internal simulation representation */
-  protected SimulatedEncoder simEncoder;
-  /** The internal PID controller representation */
-  protected GenericPIDController controller;
-  /** The configuration */
-  protected Motor config;
+    /** The current limit */
+    protected Current currentLimit;
+    /** The internal encoder representation */
+    protected GenericEncoder encoder;
+    /** The internal simulation representation */
+    protected SimulatedEncoder simEncoder;
+    /** The internal PID controller representation */
+    protected GenericPIDController controller;
+    /** The configuration */
+    protected Motor config;
 
-  public GenericThriftyNovaMotor(int canId) {
-    motor = new ThriftyNova(canId);
-  }
+    public GenericThriftyNovaMotor(int canId)
+    {
+        motor = new ThriftyNova(canId);
+    }
 
-  private GenericThriftyNovaMotor(int canId, Motor config, Current currentLimit) {
-    this(canId, config);
-    setCurrentLimit(currentLimit);
-  }
+    private GenericThriftyNovaMotor(int canId, Motor config, Current currentLimit)
+    {
+        this(canId, config);
+        setCurrentLimit(currentLimit);
+    }
 
-  public GenericThriftyNovaMotor(int canId, Motor config) {
-    motor = new ThriftyNova(canId);
-    this.config = config;
-    factoryDefaults();
-    clearStickyFaults();
-    setCurrentLimit(config.currentLimit);
-    setMotorSimulationType(config.getMotorSimulationType());
-    setMaxRPM(config.maxRpm);
-    encoder = new ThriftyNovaEncoder(motor);
-    simEncoder =
-        new SimulatedEncoder(
-            MotorFactory.getNextSimEncoderPort(), MotorFactory.getNextSimEncoderPort());
-    controller = new ThriftyNovaController(motor);
-  }
+    public GenericThriftyNovaMotor(int canId, Motor config)
+    {
+        motor       = new ThriftyNova(canId);
+        this.config = config;
+        factoryDefaults();
+        clearStickyFaults();
+        setCurrentLimit(config.currentLimit);
+        setMotorSimulationType(config.getMotorSimulationType());
+        setMaxRPM(config.maxRpm);
+        encoder    = new ThriftyNovaEncoder(motor);
+        simEncoder = new SimulatedEncoder(MotorFactory.getNextSimEncoderPort(),
+                                          MotorFactory.getNextSimEncoderPort());
+        controller = new ThriftyNovaController(motor);
+    }
 
-  @Override
-  public void set(double speed) {
-    motor.set(speed);
-    checkErrors("Setting motor percent failed: ");
-  }
+    @Override public void set(double speed)
+    {
+        motor.set(speed);
+        checkErrors("Setting motor percent failed: ");
+    }
 
-  @Override
-  public double get() {
-    double output = motor.get();
-    checkErrors("Getting motor percent failed: ");
-    return output;
-  }
+    @Override public double get()
+    {
+        double output = motor.get();
+        checkErrors("Getting motor percent failed: ");
+        return output;
+    }
 
-  @Override
-  public void setInverted(boolean isInverted) {
-    motor.setInverted(isInverted);
-    checkErrors("Setting motor inversion failed: ");
-    simEncoder.setInverted(isInverted);
-  }
+    @Override public void setInverted(boolean isInverted)
+    {
+        motor.setInverted(isInverted);
+        checkErrors("Setting motor inversion failed: ");
+        simEncoder.setInverted(isInverted);
+    }
 
-  @Override
-  public boolean getInverted() {
-    boolean inverted = motor.getInverted();
-    checkErrors("Getting motor inversion failed: ");
-    return inverted;
-  }
+    @Override public boolean getInverted()
+    {
+        boolean inverted = motor.getInverted();
+        checkErrors("Getting motor inversion failed: ");
+        return inverted;
+    }
 
-  @Override
-  public void disable() {
-    motor.disable();
-    checkErrors("Setting motor disable failed: ");
-  }
+    @Override public void disable()
+    {
+        motor.disable();
+        checkErrors("Setting motor disable failed: ");
+    }
 
-  @Override
-  public void stopMotor() {
-    motor.set(0);
-    checkErrors("Stopping motor failed: ");
-  }
+    @Override public void stopMotor()
+    {
+        motor.set(0);
+        checkErrors("Stopping motor failed: ");
+    }
 
-  @Override
-  public GenericMotorController duplicate(int port) {
-    return new GenericThriftyNovaMotor(port, config, currentLimit);
-  }
+    @Override public GenericMotorController duplicate(int port)
+    {
+        return new GenericThriftyNovaMotor(port, config, currentLimit);
+    }
 
-  @Override
-  public GenericMotorController setSlewRate(double rate) {
-    motor.setRampUp(rate);
-    checkErrors("Setting motor ramp up failed: ");
-    motor.setRampDown(rate);
-    checkErrors("Setting motor ramp down failed: ");
-    return this;
-  }
+    @Override public GenericMotorController setSlewRate(double rate)
+    {
+        motor.setRampUp(rate);
+        checkErrors("Setting motor ramp up failed: ");
+        motor.setRampDown(rate);
+        checkErrors("Setting motor ramp down failed: ");
+        return this;
+    }
 
-  @Override
-  public GenericMotorController setFollow(GenericMotorController motor) {
-    this.motor.follow(((ThriftyNova) motor.getMotor()).getID());
-    checkErrors("Setting motor follow failed: ");
-    return this;
-  }
+    @Override public GenericMotorController setFollow(GenericMotorController motor)
+    {
+        this.motor.follow(((ThriftyNova) motor.getMotor()).getID());
+        checkErrors("Setting motor follow failed: ");
+        return this;
+    }
 
-  @Override
-  public GenericMotorController setFollow(GenericMotorController motor, boolean inverted) {
-    this.motor.follow(((ThriftyNova) motor.getMotor()).getID());
-    this.motor.setInverted(inverted);
-    checkErrors("Setting motor inversion failed: ");
-    return this;
-  }
+    @Override
+    public GenericMotorController setFollow(GenericMotorController motor, boolean inverted)
+    {
+        this.motor.follow(((ThriftyNova) motor.getMotor()).getID());
+        this.motor.setInverted(inverted);
+        checkErrors("Setting motor inversion failed: ");
+        return this;
+    }
 
-  @Override
-  public GenericMotorController invert(boolean inverted) {
-    motor.setInverted(inverted);
-    simEncoder.setInverted(inverted);
-    checkErrors("Setting motor inversion failed: ");
-    return this;
-  }
+    @Override public GenericMotorController invert(boolean inverted)
+    {
+        motor.setInverted(inverted);
+        simEncoder.setInverted(inverted);
+        checkErrors("Setting motor inversion failed: ");
+        return this;
+    }
 
-  @Override
-  public GenericMotorController setCurrentLimit(Current limit) {
-    this.currentLimit = limit;
-    motor.setMaxCurrent(CurrentType.STATOR, limit.in(Amps));
-    checkErrors("Setting current limit failed: ");
-    return this;
-  }
+    @Override public GenericMotorController setCurrentLimit(Current limit)
+    {
+        this.currentLimit = limit;
+        motor.setMaxCurrent(CurrentType.STATOR, limit.in(Amps));
+        checkErrors("Setting current limit failed: ");
+        return this;
+    }
 
-  @Override
-  public GenericEncoder getMotorEncoder() {
-    return encoder;
-  }
+    @Override public GenericEncoder getMotorEncoder()
+    {
+        return encoder;
+    }
 
-  @Override
-  public GenericEncoder createMotorEncoder(int countsPerRev) {
-    encoder.setPositionConversion(countsPerRev);
-    simEncoder.setPositionConversion(countsPerRev);
-    encoder.setVelocityConversion(countsPerRev / 60.0);
-    simEncoder.setVelocityConversion(countsPerRev / 60.0);
-    return encoder;
-  }
+    @Override public GenericEncoder createMotorEncoder(int countsPerRev)
+    {
+        encoder.setPositionConversion(countsPerRev);
+        simEncoder.setPositionConversion(countsPerRev);
+        encoder.setVelocityConversion(countsPerRev / 60.0);
+        simEncoder.setVelocityConversion(countsPerRev / 60.0);
+        return encoder;
+    }
 
-  @Override
-  public GenericPIDController getPIDController5010() {
-    return controller;
-  }
+    @Override public GenericPIDController getPIDController5010()
+    {
+        return controller;
+    }
 
-  @Override
-  public Object getMotor() {
-    return motor;
-  }
+    @Override public Object getMotor()
+    {
+        return motor;
+    }
 
-  @Override
-  public void factoryDefaults() {}
+    @Override public void factoryDefaults() {}
 
-  @Override
-  public SysIdRoutine getDefaultSysId(SubsystemBase subsystemBase) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getDefaultSysId'");
-  }
+    @Override public SysIdRoutine getDefaultSysId(SubsystemBase subsystemBase)
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getDefaultSysId'");
+    }
 
-  @Override
-  public DCMotor getMotorSimulationType() {
-    return motorSim;
-  }
+    @Override public DCMotor getMotorSimulationType()
+    {
+        return motorSim;
+    }
 
-  @Override
-  public AngularVelocity getMaxRPM() {
-    return maxRPM;
-  }
+    @Override public AngularVelocity getMaxRPM()
+    {
+        return maxRPM;
+    }
 
-  @Override
-  public GenericMotorController setVoltageCompensation(double nominalVoltage) {
-    motor.setVoltageCompensation(nominalVoltage);
-    checkErrors("Setting voltage compensation failed: ");
-    return this;
-  }
+    @Override public GenericMotorController setVoltageCompensation(double nominalVoltage)
+    {
+        motor.setVoltageCompensation(nominalVoltage);
+        checkErrors("Setting voltage compensation failed: ");
+        return this;
+    }
 
-  @Override
-  public void clearStickyFaults() {
-    motor.clearErrors();
-    checkErrors("Clearing sticky faults failed: ");
-  }
+    @Override public void clearStickyFaults()
+    {
+        motor.clearErrors();
+        checkErrors("Clearing sticky faults failed: ");
+    }
 
-  @Override
-  public GenericMotorController setMotorBrake(boolean isBrakeMode) {
-    motor.setBrakeMode(isBrakeMode);
-    checkErrors("Setting motor brake mode failed: ");
-    return this;
-  }
+    @Override public GenericMotorController setMotorBrake(boolean isBrakeMode)
+    {
+        motor.setBrakeMode(isBrakeMode);
+        checkErrors("Setting motor brake mode failed: ");
+        return this;
+    }
 
-  @Override
-  public void burnFlash() {}
+    @Override public void burnFlash() {}
 
-  @Override
-  public double getVoltage() {
-    double voltage = motor.getVoltage();
-    checkErrors("Getting voltage output failed: ");
-    return voltage;
-  }
+    @Override public double getVoltage()
+    {
+        double voltage = motor.getVoltage();
+        checkErrors("Getting voltage output failed: ");
+        return voltage;
+    }
 
-  @Override
-  public double getAppliedOutput() {
-    return getOutputCurrent() * getVoltage();
-  }
+    @Override public double getAppliedOutput()
+    {
+        return getOutputCurrent() * getVoltage();
+    }
 
-  @Override
-  public double getOutputCurrent() {
-    double current = motor.getStatorCurrent();
-    checkErrors("Getting output current failed: ");
-    return current;
-  }
+    @Override public double getOutputCurrent()
+    {
+        double current = motor.getStatorCurrent();
+        checkErrors("Getting output current failed: ");
+        return current;
+    }
 
-  @Override
-  public void setMotorSimulationType(DCMotor motorSimulationType) {
-    motorSim = motorSimulationType;
-  }
+    @Override public void setMotorSimulationType(DCMotor motorSimulationType)
+    {
+        motorSim = motorSimulationType;
+    }
 
-  @Override
-  public void simulationUpdate(Optional<Double> position, Double velocity) {
-    simEncoder.setPosition(position.map(it -> it).orElse(0.0));
-    simEncoder.setRate(velocity);
-  }
+    @Override public void simulationUpdate(Optional<Double> position, Double velocity)
+    {
+        simEncoder.setPosition(position.map(it -> it).orElse(0.0));
+        simEncoder.setRate(velocity);
+    }
 
-  @Override
-  public void setMaxRPM(AngularVelocity rpm) {
-    maxRPM = rpm;
-  }
+    @Override public void setMaxRPM(AngularVelocity rpm)
+    {
+        maxRPM = rpm;
+    }
 
-  /**
-   * Checks for errors in the motor and logs them if any are found.
-   *
-   * @param message the message to prepend to the log and print statement
-   */
-  private void checkErrors(String message) {
+    /**
+     * Checks for errors in the motor and logs them if any are found.
+     *
+     * @param message the message to prepend to the log and print statement
+     */
+    private void checkErrors(String message)
+    {
+        // List<ThriftyNova.Error> errors = motor.getErrors();
+        // if (errors.size() > 0)
+        // {
+        // for (ThriftyNova.Error error : errors)
+        // {
+        // DataLogManager.log(this.getClass().getSimpleName() + ": " + message +
+        // error.toString());
+        // System.out.println(this.getClass().getSimpleName() + ": " + message +
+        // error.toString());
+        // }
+        // }
+    }
 
-    // List<ThriftyNova.Error> errors = motor.getErrors();
-    // if (errors.size() > 0)
-    // {
-    // for (ThriftyNova.Error error : errors)
-    // {
-    // DataLogManager.log(this.getClass().getSimpleName() + ": " + message +
-    // error.toString());
-    // System.out.println(this.getClass().getSimpleName() + ": " + message +
-    // error.toString());
-    // }
-    // }
-  }
+    /**
+     * Returns the configuration of the motor as a Motor object.
+     *
+     * @return The motor configuration
+     */
+    @Override public Motor getMotorConfig()
+    {
+        return config;
+    }
 
-  /**
-   * Returns the configuration of the motor as a Motor object.
-   *
-   * @return The motor configuration
-   */
-  @Override
-  public Motor getMotorConfig() {
-    return config;
-  }
-
-  @Override
-  public SmartMotorController getSmartMotorController(SmartMotorControllerConfig config) {
-    return new NovaWrapper(motor, motorSim, config);
-  }
+    @Override public SmartMotorController getSmartMotorController(SmartMotorControllerConfig config)
+    {
+        return new NovaWrapper(motor, motorSim, config);
+    }
 }

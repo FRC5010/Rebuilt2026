@@ -12,27 +12,32 @@ import java.io.IOException;
 import yams.mechanisms.positional.Elevator;
 
 /** Add your docs here. */
-public class ElevatorParser {
-  /**
-   * Parses an elevator configuration from the specified JSON file and configures the elevator
-   * subsystem.
-   *
-   * @param subDirectory the subdirectory containing the configuration file
-   * @param filename the name of the configuration file
-   * @param system the subsystem to configure
-   * @return the configured Elevator instance, or null if an error occurs
-   */
-  public static Elevator parse(String subDirectory, String filename, SubsystemBase system) {
-    try {
-      File directory = new File(Filesystem.getDeployDirectory(), subDirectory);
-      DeviceConfigReader.checkDirectory(directory);
-      File deviceFile = new File(directory, filename);
-      YamsElevatorConfigurationJson yamsElevatorConfigurationJson =
-          new ObjectMapper().readValue(deviceFile, YamsElevatorConfigurationJson.class);
-      return yamsElevatorConfigurationJson.configure(system);
-    } catch (IOException e) {
-      System.out.println("Error reading device configuration: " + e.getMessage());
-      return null;
+public class ElevatorParser
+{
+    /**
+     * Parses an elevator configuration from the specified JSON file and configures the elevator
+     * subsystem.
+     *
+     * @param subDirectory the subdirectory containing the configuration file
+     * @param filename the name of the configuration file
+     * @param system the subsystem to configure
+     * @return the configured Elevator instance, or null if an error occurs
+     */
+    public static Elevator parse(String subDirectory, String filename, SubsystemBase system)
+    {
+        try
+        {
+            File directory = new File(Filesystem.getDeployDirectory(), subDirectory);
+            DeviceConfigReader.checkDirectory(directory);
+            File deviceFile = new File(directory, filename);
+            YamsElevatorConfigurationJson yamsElevatorConfigurationJson =
+                new ObjectMapper().readValue(deviceFile, YamsElevatorConfigurationJson.class);
+            return yamsElevatorConfigurationJson.configure(system);
+        }
+        catch (IOException e)
+        {
+            System.out.println("Error reading device configuration: " + e.getMessage());
+            return null;
+        }
     }
-  }
 }

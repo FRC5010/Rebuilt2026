@@ -11,39 +11,40 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /** A simulated camera using the PhotonVision library. */
-public class SimulatedVisualTargetCamera extends SimulatedCamera {
-
-  /**
-   * Constructor
-   *
-   * @param name - the name of the camera
-   * @param colIndex - the column index for the dashboard
-   * @param fieldLayout - the field layout
-   * @param strategy - the pose strategy
-   * @param cameraToRobot - the camera-to-robot transform
-   * @param poseSupplier - the pose supplier
-   * @param width - the camera width
-   * @param height - the camera height
-   * @param fov - the camera field of view
-   */
-  public SimulatedVisualTargetCamera(
-      String name,
-      int colIndex,
-      AprilTagFieldLayout fieldLayout,
-      Transform3d cameraToRobot,
-      Supplier<Pose2d> poseSupplier,
-      int width,
-      int height,
-      double fov) {
-    super(name, colIndex, fieldLayout, cameraToRobot, poseSupplier, width, height, fov);
-  }
-
-  /** Update the simulated camera */
-  @Override
-  public void updateCameraInfo() {
-    super.updateCameraInfo();
-    if (camResult.hasTargets()) {
-      target = Optional.ofNullable(camResult.getBestTarget());
+public class SimulatedVisualTargetCamera extends SimulatedCamera
+{
+    /**
+     * Constructor
+     *
+     * @param name - the name of the camera
+     * @param colIndex - the column index for the dashboard
+     * @param fieldLayout - the field layout
+     * @param strategy - the pose strategy
+     * @param cameraToRobot - the camera-to-robot transform
+     * @param poseSupplier - the pose supplier
+     * @param width - the camera width
+     * @param height - the camera height
+     * @param fov - the camera field of view
+     */
+    public SimulatedVisualTargetCamera(String name,
+                                       int colIndex,
+                                       AprilTagFieldLayout fieldLayout,
+                                       Transform3d cameraToRobot,
+                                       Supplier<Pose2d> poseSupplier,
+                                       int width,
+                                       int height,
+                                       double fov)
+    {
+        super(name, colIndex, fieldLayout, cameraToRobot, poseSupplier, width, height, fov);
     }
-  }
+
+    /** Update the simulated camera */
+    @Override public void updateCameraInfo()
+    {
+        super.updateCameraInfo();
+        if (camResult.hasTargets())
+        {
+            target = Optional.ofNullable(camResult.getBestTarget());
+        }
+    }
 }

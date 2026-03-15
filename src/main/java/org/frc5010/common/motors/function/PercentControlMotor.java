@@ -26,80 +26,81 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 /** Add your docs here. */
-public class PercentControlMotor extends GenericFunctionalMotor {
-  protected LoggedMechanismLigament2d speedometer;
-  protected LoggedMechanismRoot2d root;
-  protected FlywheelSim simMotor;
-  protected SimulatedEncoder simEncoder;
-  protected DisplayDouble speed;
-  protected DisplayVoltage effort;
-  protected DisplayDouble simRPM;
+public class PercentControlMotor extends GenericFunctionalMotor
+{
+    protected LoggedMechanismLigament2d speedometer;
+    protected LoggedMechanismRoot2d root;
+    protected FlywheelSim simMotor;
+    protected SimulatedEncoder simEncoder;
+    protected DisplayDouble speed;
+    protected DisplayVoltage effort;
+    protected DisplayDouble simRPM;
 
-  public PercentControlMotor(
-      GenericMotorController motor, String visualName, DisplayValuesHelper tab) {
-    super(motor, visualName);
-    setDisplayValuesHelper(tab);
-  }
+    public PercentControlMotor(GenericMotorController motor,
+                               String visualName,
+                               DisplayValuesHelper tab)
+    {
+        super(motor, visualName);
+        setDisplayValuesHelper(tab);
+    }
 
-  @Override
-  public void initiateDisplayValues() {
-    speed = _displayValuesHelper.makeDisplayDouble("Speed");
-    effort = _displayValuesHelper.makeDisplayVoltage("Effort");
-    simRPM = _displayValuesHelper.makeDisplayDouble("Sim RPM");
-  }
+    @Override public void initiateDisplayValues()
+    {
+        speed  = _displayValuesHelper.makeDisplayDouble("Speed");
+        effort = _displayValuesHelper.makeDisplayVoltage("Effort");
+        simRPM = _displayValuesHelper.makeDisplayDouble("Sim RPM");
+    }
 
-  public PercentControlMotor(GenericMotorController motor, double slewRate) {
-    super(motor, slewRate);
-  }
+    public PercentControlMotor(GenericMotorController motor, double slewRate)
+    {
+        super(motor, slewRate);
+    }
 
-  public PercentControlMotor setupSimulatedMotor(double gearing, double momentOfInertiaKgMetersSq) {
-    simMotor =
-        new FlywheelSim(
-            LinearSystemId.identifyVelocitySystem(
-                12.0 / _motor.getMaxRPM().in(RotationsPerSecond), 0.001),
-            // LinearSystemId.createFlywheelSystem(_motor.getMotorSimulationType(),
-            // momentOfInertiaKgMetersSq, gearing),
-            _motor.getMotorSimulationType());
-    simEncoder =
-        new SimulatedEncoder(
-            MotorFactory.getNextSimEncoderPort(), MotorFactory.getNextSimEncoderPort());
-    return this;
-  }
+    public PercentControlMotor setupSimulatedMotor(double gearing, double momentOfInertiaKgMetersSq)
+    {
+        simMotor =
+            new FlywheelSim(LinearSystemId.identifyVelocitySystem(
+                                12.0 / _motor.getMaxRPM().in(RotationsPerSecond), 0.001),
+                            // LinearSystemId.createFlywheelSystem(_motor.getMotorSimulationType(),
+                            // momentOfInertiaKgMetersSq, gearing),
+                            _motor.getMotorSimulationType());
+        simEncoder = new SimulatedEncoder(MotorFactory.getNextSimEncoderPort(),
+                                          MotorFactory.getNextSimEncoderPort());
+        return this;
+    }
 
-  @Override
-  public PercentControlMotor setVisualizer(LoggedMechanism2d visualizer, Pose3d robotToMotor) {
-    super.setVisualizer(visualizer, robotToMotor);
+    @Override
+    public PercentControlMotor setVisualizer(LoggedMechanism2d visualizer, Pose3d robotToMotor)
+    {
+        super.setVisualizer(visualizer, robotToMotor);
 
-    root =
-        visualizer.getRoot(
-            _visualName,
-            getSimX(Meters.of(robotToMotor.getX())),
-            getSimY(Meters.of(robotToMotor.getZ())));
-    speedometer =
-        new LoggedMechanismLigament2d(
+        root        = visualizer.getRoot(_visualName, getSimX(Meters.of(robotToMotor.getX())),
+                                  getSimY(Meters.of(robotToMotor.getZ())));
+        speedometer = new LoggedMechanismLigament2d(
             _visualName + "-speed", 0.1, 0, 5, new Color8Bit(MotorFactory.getNextVisualColor()));
-    root.append(speedometer);
-    return this;
-  }
+        root.append(speedometer);
+        return this;
+    }
 
-  @Override
-  public void periodicUpdate() {
-    speed.setValue(_motor.getMotorEncoder().getVelocity());
-    speedometer.setAngle(270 - _motor.get() * 180);
-  }
+    @Override public void periodicUpdate()
+    {
+        speed.setValue(_motor.getMotorEncoder().getVelocity());
+        speedometer.setAngle(270 - _motor.get() * 180);
+    }
 
-  @Override
-  public void simulationUpdate() {
-    effort.setVoltage(_motor.getVoltage(), Volts);
-    simMotor.setInput(effort.getVoltageInVolts());
-    simMotor.update(0.020);
-    simRPM.setValue(simMotor.getAngularVelocityRPM());
-    _motor.simulationUpdate(Optional.empty(), simRPM.getValue());
-    RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(simMotor.getCurrentDrawAmps()));
-  }
+    @Override public void simulationUpdate()
+    {
+        effort.setVoltage(_motor.getVoltage(), Volts);
+        simMotor.setInput(effort.getVoltageInVolts());
+        simMotor.update(0.020);
+        simRPM.setValue(simMotor.getAngularVelocityRPM());
+        _motor.simulationUpdate(Optional.empty(), simRPM.getValue());
+        RoboRioSim.setVInVoltage(
+            BatterySim.calculateDefaultBatteryLoadedVoltage(simMotor.getCurrentDrawAmps()));
+    }
 
-  public GenericMotorController getMotorcontroller() {
-    throw new UnsupportedOperationException("Unimplemented method 'getMotorcontroller'");
-  }
+    public GenericMotorController getMotorcontroller()
+    {
+        throw new UnsupportedOperationException("Unimplemented method 'getMotorcontroller'");
+    }
 }

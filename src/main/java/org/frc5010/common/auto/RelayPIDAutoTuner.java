@@ -12,127 +12,141 @@ import java.util.ArrayList;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-/* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
-public class RelayPIDAutoTuner extends Command {
-  private double relayAmplitude;
-  private Consumer<Double> valueConsumer;
-  private Supplier<Double> valueSupplier;
-  private final Timer timer = new Timer();
-  private final ArrayList<Double> outputList = new ArrayList<>();
-  private final ArrayList<Double> timeList = new ArrayList<>();
-  private final ArrayList<Double> errorList = new ArrayList<>();
-  private final ArrayList<Double> switchTimeList = new ArrayList<>();
-  private double lastOutput = 0;
-  private double zeroValue;
+/* You should consider using the more terse Command factories API instead
+ * https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands
+ */
+public class RelayPIDAutoTuner extends Command
+{
+    private double relayAmplitude;
+    private Consumer<Double> valueConsumer;
+    private Supplier<Double> valueSupplier;
+    private final Timer timer                      = new Timer();
+    private final ArrayList<Double> outputList     = new ArrayList<>();
+    private final ArrayList<Double> timeList       = new ArrayList<>();
+    private final ArrayList<Double> errorList      = new ArrayList<>();
+    private final ArrayList<Double> switchTimeList = new ArrayList<>();
+    private double lastOutput                      = 0;
+    private double zeroValue;
 
-  /** Creates a new RelayPIDAutoTuner. */
-  public RelayPIDAutoTuner(
-      Consumer<Double> valueConsumer,
-      Supplier<Double> valueSupplier,
-      double relayAmplitude,
-      Subsystem... requirements) {
-    // Use addRequirements() here to declare subsystem dependencies.
-    this.relayAmplitude = relayAmplitude;
-    this.valueConsumer = valueConsumer;
-    this.valueSupplier = valueSupplier;
-    addRequirements(requirements);
-  }
-
-  // Called when the command is initially scheduled.
-  @Override
-  public void initialize() {
-    zeroValue = valueSupplier.get();
-    timer.reset();
-    timer.start();
-    lastOutput = relayAmplitude;
-    timeList.clear();
-    outputList.clear();
-    errorList.clear();
-  }
-
-  private double relay(double error) {
-    return error < 0 ? relayAmplitude : -relayAmplitude;
-  }
-
-  // Called every time the scheduler runs while the command is scheduled.
-  @Override
-  public void execute() {
-    double time = timer.get();
-    double error = valueSupplier.get().doubleValue() - zeroValue;
-
-    double relayValue = relay(error);
-    if (relayValue * lastOutput < 0) {
-      switchTimeList.add(time);
+    /** Creates a new RelayPIDAutoTuner. */
+    public RelayPIDAutoTuner(Consumer<Double> valueConsumer,
+                             Supplier<Double> valueSupplier,
+                             double relayAmplitude,
+                             Subsystem... requirements)
+    {
+        // Use addRequirements() here to declare subsystem dependencies.
+        this.relayAmplitude = relayAmplitude;
+        this.valueConsumer  = valueConsumer;
+        this.valueSupplier  = valueSupplier;
+        addRequirements(requirements);
     }
-    lastOutput = relay(error);
-    valueConsumer.accept(lastOutput);
-    SmartDashboard.putNumber("Error", error);
 
-    outputList.add(lastOutput);
-    errorList.add(error);
-    timeList.add(time);
-
-    SmartDashboard.putNumber("Relay Output", lastOutput);
-  }
-
-  private double calculateOscillationPeriod() {
-    double average = 0;
-    for (int i = 0; i < switchTimeList.size() - 1; i++) {
-      average += switchTimeList.get(i + 1) - switchTimeList.get(i);
+    // Called when the command is initially scheduled.
+    @Override public void initialize()
+    {
+        zeroValue = valueSupplier.get();
+        timer.reset();
+        timer.start();
+        lastOutput = relayAmplitude;
+        timeList.clear();
+        outputList.clear();
+        errorList.clear();
     }
-    average /= switchTimeList.size() - 1;
-    return average * 2;
-  }
 
-  private int[] getPeaks() {
-    int[] peaks = new int[errorList.size()];
-    for (int i = 1; i < errorList.size() - 1; i++) {
-      if (errorList.get(i) > errorList.get(i - 1) && errorList.get(i) > errorList.get(i + 1)) {
-        peaks[i] = 1;
-      }
+    private double relay(double error)
+    {
+        return error < 0 ? relayAmplitude : -relayAmplitude;
     }
-    return peaks;
-  }
 
-  private double calculateAverageResponseAmplitude() {
-    int[] peaks = getPeaks();
-    double sum = 0;
-    int count = 0;
-    for (int i = 0; i < peaks.length; i++) {
-      if (peaks[i] == 1) {
-        sum += errorList.get(i);
-        count++;
-      }
+    // Called every time the scheduler runs while the command is scheduled.
+    @Override public void execute()
+    {
+        double time  = timer.get();
+        double error = valueSupplier.get().doubleValue() - zeroValue;
+
+        double relayValue = relay(error);
+        if (relayValue * lastOutput < 0)
+        {
+            switchTimeList.add(time);
+        }
+        lastOutput = relay(error);
+        valueConsumer.accept(lastOutput);
+        SmartDashboard.putNumber("Error", error);
+
+        outputList.add(lastOutput);
+        errorList.add(error);
+        timeList.add(time);
+
+        SmartDashboard.putNumber("Relay Output", lastOutput);
     }
-    return sum / count;
-  }
 
-  private void tunePID() {
-    double uPeriod = calculateOscillationPeriod();
-    double amplitude = calculateAverageResponseAmplitude();
+    private double calculateOscillationPeriod()
+    {
+        double average = 0;
+        for (int i = 0; i < switchTimeList.size() - 1; i++)
+        {
+            average += switchTimeList.get(i + 1) - switchTimeList.get(i);
+        }
+        average /= switchTimeList.size() - 1;
+        return average * 2;
+    }
 
-    double uGain = 4 * relayAmplitude / (Math.PI * amplitude);
+    private int[] getPeaks()
+    {
+        int[] peaks = new int[errorList.size()];
+        for (int i = 1; i < errorList.size() - 1; i++)
+        {
+            if (errorList.get(i) > errorList.get(i - 1) && errorList.get(i) > errorList.get(i + 1))
+            {
+                peaks[i] = 1;
+            }
+        }
+        return peaks;
+    }
 
-    SmartDashboard.putNumber("Ultimate Gain", uGain);
-    SmartDashboard.putNumber("Ultimate Period", uPeriod);
+    private double calculateAverageResponseAmplitude()
+    {
+        int[] peaks = getPeaks();
+        double sum  = 0;
+        int count   = 0;
+        for (int i = 0; i < peaks.length; i++)
+        {
+            if (peaks[i] == 1)
+            {
+                sum += errorList.get(i);
+                count++;
+            }
+        }
+        return sum / count;
+    }
 
-    double kP = 0.2 * uGain;
-    double kI = 2 * kP / uPeriod;
-    double kD = kP * uPeriod / 3;
-    SmartDashboard.putNumber("kP System", kP);
-    SmartDashboard.putNumber("kI System", kI);
-    SmartDashboard.putNumber("kD System", kD);
-  }
+    private void tunePID()
+    {
+        double uPeriod   = calculateOscillationPeriod();
+        double amplitude = calculateAverageResponseAmplitude();
 
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
-    tunePID();
-  }
+        double uGain = 4 * relayAmplitude / (Math.PI * amplitude);
 
-  // Returns true when the command should end.
-  @Override
-  public boolean isFinished() {
-    return false;
-  }
+        SmartDashboard.putNumber("Ultimate Gain", uGain);
+        SmartDashboard.putNumber("Ultimate Period", uPeriod);
+
+        double kP = 0.2 * uGain;
+        double kI = 2 * kP / uPeriod;
+        double kD = kP * uPeriod / 3;
+        SmartDashboard.putNumber("kP System", kP);
+        SmartDashboard.putNumber("kI System", kI);
+        SmartDashboard.putNumber("kD System", kD);
+    }
+
+    // Called once the command ends or is interrupted.
+    @Override public void end(boolean interrupted)
+    {
+        tunePID();
+    }
+
+    // Returns true when the command should end.
+    @Override public boolean isFinished()
+    {
+        return false;
+    }
 }

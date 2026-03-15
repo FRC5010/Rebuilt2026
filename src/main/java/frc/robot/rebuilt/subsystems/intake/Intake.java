@@ -17,117 +17,135 @@ import org.frc5010.common.arch.GenericSubsystem;
 import org.frc5010.common.sensors.Controller;
 import org.littletonrobotics.junction.Logger;
 
-public class Intake extends GenericSubsystem {
-  private IntakeIO io;
-  private IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
+public class Intake extends GenericSubsystem
+{
+    private IntakeIO io;
+    private IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
-  /** Creates a new Intake and selects the IO */
-  public Intake() {
-    super("intake.json");
-    if (RobotBase.isSimulation()) {
-      io = new IntakeIOSim(devices);
-    } else {
-      io = new IntakeIOReal(devices);
+    /** Creates a new Intake and selects the IO */
+    public Intake()
+    {
+        super("intake.json");
+        if (RobotBase.isSimulation())
+        {
+            io = new IntakeIOSim(devices);
+        }
+        else
+        {
+            io = new IntakeIOReal(devices);
+        }
     }
-  }
 
-  public void runSpintake(double speed) {
-    io.runSpintake(speed);
-  }
-  /** Creates a command that runs the spintake at the given speed and stops when done */
-  public Command spintakeCommand(double speed) {
-    return Commands.run(
-            () -> {
-              runSpintake(speed);
-            })
-        .finallyDo(
-            () -> {
-              runSpintake(0);
-            });
-  }
+    public void runSpintake(double speed)
+    {
+        io.runSpintake(speed);
+    }
+    /** Creates a command that runs the spintake at the given speed and stops when done */
+    public Command spintakeCommand(double speed)
+    {
+        return Commands.run(() -> { runSpintake(speed); }).finallyDo(() -> { runSpintake(0); });
+    }
 
-  public void setDesiredHopperAngle(Angle angle) {
-    io.setHopperAngle(angle);
-  }
+    public void setDesiredHopperAngle(Angle angle)
+    {
+        io.setHopperAngle(angle);
+    }
 
-  public boolean isRetracted() {
-    return io.isRetracted();
-  }
+    public boolean isRetracted()
+    {
+        return io.isRetracted();
+    }
 
-  public boolean isDeployed() {
-    return io.isDeployed();
-  }
+    public boolean isDeployed()
+    {
+        return io.isDeployed();
+    }
 
-  public void runHopper(double speed) {
-    io.runHopper(speed);
-  }
-  /** Configures test controller bindings for the spintake, hopper control, and sysid */
-  public void configTestController(Controller controller) {
-    controller.createRightBumper().whileTrue(spintakeCommand(0.5));
-    controller.createYButton().whileTrue(getHopperSysIdCommand());
-    controller.setRightYAxis(controller.createRightYAxis());
-    Trigger rightYAxis = new Trigger(() -> controller.getRightYAxis() > 0.01);
-    rightYAxis.whileTrue(Commands.run(() -> runHopper(controller.getRightYAxis())));
-  }
-  /** Updates intake inputs from the io periodically and logs them each robot cycle */
-  @Override
-  public void periodic() {
-    super.periodic();
-    io.updateInputs(inputs);
-    Logger.processInputs("Intake", inputs);
-  }
+    public void runHopper(double speed)
+    {
+        io.runHopper(speed);
+    }
+    /** Configures test controller bindings for the spintake, hopper control, and sysid */
+    public void configTestController(Controller controller)
+    {
+        controller.createRightBumper().whileTrue(spintakeCommand(0.5));
+        controller.createYButton().whileTrue(getHopperSysIdCommand());
+        controller.setRightYAxis(controller.createRightYAxis());
+        Trigger rightYAxis = new Trigger(() -> controller.getRightYAxis() > 0.01);
+        rightYAxis.whileTrue(Commands.run(() -> runHopper(controller.getRightYAxis())));
+    }
+    /** Updates intake inputs from the io periodically and logs them each robot cycle */
+    @Override public void periodic()
+    {
+        super.periodic();
+        io.updateInputs(inputs);
+        Logger.processInputs("Intake", inputs);
+    }
 
-  public boolean isRequested(IntakeState state) {
-    return inputs.stateRequested == state;
-  }
+    public boolean isRequested(IntakeState state)
+    {
+        return inputs.stateRequested == state;
+    }
 
-  public boolean isCurrent(IntakeState state) {
-    return inputs.stateCurrent == state;
-  }
+    public boolean isCurrent(IntakeState state)
+    {
+        return inputs.stateCurrent == state;
+    }
 
-  public boolean isNearTrench() {
-    return isCurrent(IntakeState.DEPLOYING) && io.isNearTrench();
-  }
+    public boolean isNearTrench()
+    {
+        return isCurrent(IntakeState.DEPLOYING) && io.isNearTrench();
+    }
 
-  public void setCurrentState(IntakeState state) {
-    inputs.stateCurrent = state;
-  }
+    public void setCurrentState(IntakeState state)
+    {
+        inputs.stateCurrent = state;
+    }
 
-  public IntakeState getCurrentState() {
-    return inputs.stateCurrent;
-  }
+    public IntakeState getCurrentState()
+    {
+        return inputs.stateCurrent;
+    }
 
-  public boolean isHopperStalling() {
-    return io.isHopperStalling();
-  }
+    public boolean isHopperStalling()
+    {
+        return io.isHopperStalling();
+    }
 
-  public Command getHopperSysIdCommand() {
-    return io.getHopperSysIdCommand();
-  }
+    public Command getHopperSysIdCommand()
+    {
+        return io.getHopperSysIdCommand();
+    }
 
-  public Command getHopperCharacterizationCommand() {
-    return io.getHopperCharacterizationCommand(this);
-  }
+    public Command getHopperCharacterizationCommand()
+    {
+        return io.getHopperCharacterizationCommand(this);
+    }
 
-  public void setRequestedState(IntakeState state) {
-    inputs.stateRequested = state;
-  }
+    public void setRequestedState(IntakeState state)
+    {
+        inputs.stateRequested = state;
+    }
 
-  public void setHopperDeployed() {
-    io.setHopperPosition(Degrees.of(0));
-    setRequestedState(IntakeCommands.IntakeState.DEPLOYED);
-  }
+    public void setHopperDeployed()
+    {
+        io.setHopperPosition(Degrees.of(0));
+        setRequestedState(IntakeCommands.IntakeState.DEPLOYED);
+    }
 
-  public void setHopperRetracted() {
-    io.setHopperPosition(Degrees.of(120));
-    setRequestedState(IntakeCommands.IntakeState.RETRACTED);
-  }
+    public void setHopperRetracted()
+    {
+        io.setHopperPosition(Degrees.of(120));
+        setRequestedState(IntakeCommands.IntakeState.RETRACTED);
+    }
 
-  public boolean isHopperMoving() {
-    return io.isHopperMoving();
-  }
+    public boolean isHopperMoving()
+    {
+        return io.isHopperMoving();
+    }
 
-  public void setHopperPosition(Angle angle) {
-    io.setHopperPosition(angle);
-  }
+    public void setHopperPosition(Angle angle)
+    {
+        io.setHopperPosition(angle);
+    }
 }

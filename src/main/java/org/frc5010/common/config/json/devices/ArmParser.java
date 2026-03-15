@@ -11,28 +11,33 @@ import java.io.File;
 import yams.mechanisms.positional.Arm;
 
 /** Add your docs here. */
-public class ArmParser {
-  /**
-   * Parses a YamsArm configuration from the given file and adds it to the system.
-   *
-   * @param subDirectory the subdirectory of the configuration file, relative to the deploy
-   *     directory
-   * @param filename the name of the configuration file to read
-   * @param system the system to add the device to
-   * @return the parsed Arm, or null if the file cannot be read or parsed
-   */
-  public static Arm parse(String subDirectory, String filename, SubsystemBase system) {
-    try {
-      File directory = new File(Filesystem.getDeployDirectory(), subDirectory);
-      DeviceConfigReader.checkDirectory(directory);
-      File deviceFile = new File(directory, filename);
-      YamsArmConfigurationJson yamsArmConfigurationJson =
-          new ObjectMapper().readValue(deviceFile, YamsArmConfigurationJson.class);
-      return yamsArmConfigurationJson.configure(system);
-    } catch (Exception e) {
-      System.out.println("Error reading device configuration: " + e.getMessage());
-      e.printStackTrace();
-      return null;
+public class ArmParser
+{
+    /**
+     * Parses a YamsArm configuration from the given file and adds it to the system.
+     *
+     * @param subDirectory the subdirectory of the configuration file, relative to the deploy
+     *     directory
+     * @param filename the name of the configuration file to read
+     * @param system the system to add the device to
+     * @return the parsed Arm, or null if the file cannot be read or parsed
+     */
+    public static Arm parse(String subDirectory, String filename, SubsystemBase system)
+    {
+        try
+        {
+            File directory = new File(Filesystem.getDeployDirectory(), subDirectory);
+            DeviceConfigReader.checkDirectory(directory);
+            File deviceFile = new File(directory, filename);
+            YamsArmConfigurationJson yamsArmConfigurationJson =
+                new ObjectMapper().readValue(deviceFile, YamsArmConfigurationJson.class);
+            return yamsArmConfigurationJson.configure(system);
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error reading device configuration: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
     }
-  }
 }

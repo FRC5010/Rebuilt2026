@@ -10,44 +10,42 @@ import org.frc5010.common.arch.GenericSubsystem;
 import org.frc5010.common.drive.GenericDrivetrain;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
-public class AutoCommands {
+public class AutoCommands
+{
+    private Map<String, GenericSubsystem> subsystems;
 
-  private Map<String, GenericSubsystem> subsystems;
+    public AutoCommands(Map<String, GenericSubsystem> subsystems)
+    {
+        this.subsystems = subsystems;
+    }
 
-  public AutoCommands(Map<String, GenericSubsystem> subsystems) {
-    this.subsystems = subsystems;
-  }
+    public void configureNamedCommands() {}
 
-  public void configureNamedCommands() {}
+    public void configureCharacterizationCommands(LoggedDashboardChooser<Command> selectableCommand)
+    {
+        selectableCommand.addOption(
+            "PRO: Intake Hopper Characterization",
+            ((Intake) subsystems.get(Constants.INTAKE)).getHopperCharacterizationCommand());
+        selectableCommand.addOption(
+            "PRO: Launcher Hood Characterization",
+            ((Launcher) subsystems.get(Constants.LAUNCHER)).getHoodCharacterizationCommand());
+        selectableCommand.addOption(
+            "PRO: Launcher Turret Characterization",
+            ((Launcher) subsystems.get(Constants.LAUNCHER)).getTurretCharacterizationCommand());
+        selectableCommand.addOption("TUNE: Shot Lookup Table Tuning",
+                                    ShotCalibrationCommand.createWithFeed(
+                                        (Launcher) subsystems.get(Constants.LAUNCHER),
+                                        (GenericDrivetrain) subsystems.get(
+                                            org.frc5010.common.config.ConfigConstants.DRIVETRAIN),
+                                        2.0, 0.5));
+    }
 
-  public void configureCharacterizationCommands(LoggedDashboardChooser<Command> selectableCommand) {
-    selectableCommand.addOption(
-        "PRO: Intake Hopper Characterization",
-        ((Intake) subsystems.get(Constants.INTAKE)).getHopperCharacterizationCommand());
-    selectableCommand.addOption(
-        "PRO: Launcher Hood Characterization",
-        ((Launcher) subsystems.get(Constants.LAUNCHER)).getHoodCharacterizationCommand());
-    selectableCommand.addOption(
-        "PRO: Launcher Turret Characterization",
-        ((Launcher) subsystems.get(Constants.LAUNCHER)).getTurretCharacterizationCommand());
-    selectableCommand.addOption(
-        "TUNE: Shot Lookup Table Tuning",
-        ShotCalibrationCommand.createWithFeed(
-            (Launcher) subsystems.get(Constants.LAUNCHER),
-            (GenericDrivetrain)
-                subsystems.get(org.frc5010.common.config.ConfigConstants.DRIVETRAIN),
-            2.0,
-            0.5));
-  }
-
-  public void configureBasicAutoCommands(LoggedDashboardChooser<Command> selectableCommand) {
-    selectableCommand.addOption(
-        "Shoot Preload Only",
-        Commands.sequence(
-            IntakeCommands.shouldIntaking(),
-            Commands.waitSeconds(2),
-            LauncherCommands.shouldPrepCommand(),
-            Commands.waitSeconds(2),
-            IndexerCommands.shouldForceCommand()));
-  }
+    public void configureBasicAutoCommands(LoggedDashboardChooser<Command> selectableCommand)
+    {
+        selectableCommand.addOption(
+            "Shoot Preload Only",
+            Commands.sequence(IntakeCommands.shouldIntaking(), Commands.waitSeconds(2),
+                              LauncherCommands.shouldPrepCommand(), Commands.waitSeconds(2),
+                              IndexerCommands.shouldForceCommand()));
+    }
 }

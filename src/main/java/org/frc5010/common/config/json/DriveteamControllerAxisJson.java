@@ -17,25 +17,26 @@ package org.frc5010.common.config.json;
  *   <li>rate: Optional. The slew rate for the axis.
  * </ul>
  */
-public class DriveteamControllerAxisJson {
-  /** The channel number of the axis on the controller */
-  public int channel;
+public class DriveteamControllerAxisJson
+{
+    /** The channel number of the axis on the controller */
+    public int channel;
 
-  /** The mininal value of the axis to register motion */
-  public double deadband = 0.0;
+    /** The mininal value of the axis to register motion */
+    public double deadband = 0.0;
 
-  /** Whether the axis should be inverted */
-  public boolean invert = false;
+    /** Whether the axis should be inverted */
+    public boolean invert = false;
 
-  /** The scaling factor for the axis */
-  public double scale = 1.0;
+    /** The scaling factor for the axis */
+    public double scale = 1.0;
 
-  /** The mathematical power to apply to the axis to create a curved response */
-  public double curvePower = 1.0;
+    /** The mathematical power to apply to the axis to create a curved response */
+    public double curvePower = 1.0;
 
-  /** The absolute maximum limit value for the axis */
-  public double limit = 1.0;
+    /** The absolute maximum limit value for the axis */
+    public double limit = 1.0;
 
-  /** Optional. The slew rate for the axis */
-  public double rate = 0.0;
+    /** Optional. The slew rate for the axis */
+    public double rate = 0.0;
 }

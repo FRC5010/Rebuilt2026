@@ -36,184 +36,177 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 /** Provides PID control for angular motors */
-public class AngularControlMotor extends GenericControlledMotor {
-  protected LoggedMechanismLigament2d simulatedArm;
-  protected LoggedMechanismLigament2d setpoint;
-  protected LoggedMechanismRoot2d root;
-  protected SingleJointedArmSim simMechanism;
-  protected GenericEncoder encoder;
-  protected Distance armLength = Meters.of(0.0);
-  protected Angle minAngle = Degrees.of(0.0);
-  protected Angle maxAngle = Degrees.of(0.0);
-  protected Angle startingAngle = Degrees.of(0.0);
-  protected final String K_G = "kG";
-  protected DisplayDouble kG;
-  ArmFeedforward pivotFeedforward;
+public class AngularControlMotor extends GenericControlledMotor
+{
+    protected LoggedMechanismLigament2d simulatedArm;
+    protected LoggedMechanismLigament2d setpoint;
+    protected LoggedMechanismRoot2d root;
+    protected SingleJointedArmSim simMechanism;
+    protected GenericEncoder encoder;
+    protected Distance armLength  = Meters.of(0.0);
+    protected Angle minAngle      = Degrees.of(0.0);
+    protected Angle maxAngle      = Degrees.of(0.0);
+    protected Angle startingAngle = Degrees.of(0.0);
+    protected final String K_G    = "kG";
+    protected DisplayDouble kG;
+    ArmFeedforward pivotFeedforward;
 
-  public AngularControlMotor(
-      GenericMotorController motor, String visualName, DisplayValuesHelper tab) {
-    super(motor, visualName, tab);
-    kG = _displayValuesHelper.makeConfigDouble(K_G);
-    encoder = motor.getMotorEncoder();
-    setControlType(PIDControlType.POSITION);
-  }
+    public AngularControlMotor(GenericMotorController motor,
+                               String visualName,
+                               DisplayValuesHelper tab)
+    {
+        super(motor, visualName, tab);
+        kG      = _displayValuesHelper.makeConfigDouble(K_G);
+        encoder = motor.getMotorEncoder();
+        setControlType(PIDControlType.POSITION);
+    }
 
-  public AngularControlMotor setupSimulatedMotor(
-      double gearing,
-      double mass,
-      Distance armLength,
-      Angle minAngle,
-      Angle maxAngle,
-      boolean simulateGravity,
-      double kG,
-      Angle startingAngle,
-      boolean inverted,
-      double conversion) {
-    this.armLength = armLength;
-    this.minAngle = minAngle;
-    this.maxAngle = maxAngle;
-    this.startingAngle = startingAngle;
-    this.kG.setValue(kG);
+    public AngularControlMotor setupSimulatedMotor(double gearing,
+                                                   double mass,
+                                                   Distance armLength,
+                                                   Angle minAngle,
+                                                   Angle maxAngle,
+                                                   boolean simulateGravity,
+                                                   double kG,
+                                                   Angle startingAngle,
+                                                   boolean inverted,
+                                                   double conversion)
+    {
+        this.armLength     = armLength;
+        this.minAngle      = minAngle;
+        this.maxAngle      = maxAngle;
+        this.startingAngle = startingAngle;
+        this.kG.setValue(kG);
 
-    simMechanism =
-        new SingleJointedArmSim(
-            _motor.getMotorSimulationType(),
-            gearing,
-            SingleJointedArmSim.estimateMOI(armLength.in(Meters), mass),
-            armLength.in(Meters),
-            minAngle.in(Radians),
-            maxAngle.in(Radians),
-            simulateGravity,
-            startingAngle.in(Radians));
+        simMechanism = new SingleJointedArmSim(
+            _motor.getMotorSimulationType(), gearing,
+            SingleJointedArmSim.estimateMOI(armLength.in(Meters), mass), armLength.in(Meters),
+            minAngle.in(Radians), maxAngle.in(Radians), simulateGravity, startingAngle.in(Radians));
 
-    encoder.setInverted(inverted);
-    encoder.setPosition(startingAngle.in(Degrees));
-    encoder.setPositionConversion(conversion / gearing);
-    position.setValue(startingAngle.in(Degrees));
-    return this;
-  }
+        encoder.setInverted(inverted);
+        encoder.setPosition(startingAngle.in(Degrees));
+        encoder.setPositionConversion(conversion / gearing);
+        position.setValue(startingAngle.in(Degrees));
+        return this;
+    }
 
-  @Override
-  public AngularControlMotor setVisualizer(LoggedMechanism2d visualizer, Pose3d robotToMotor) {
-    super.setVisualizer(visualizer, robotToMotor);
+    @Override
+    public AngularControlMotor setVisualizer(LoggedMechanism2d visualizer, Pose3d robotToMotor)
+    {
+        super.setVisualizer(visualizer, robotToMotor);
 
-    root =
-        visualizer.getRoot(
-            _visualName,
-            getSimX(Meters.of(robotToMotor.getX())),
-            getSimY(Meters.of(robotToMotor.getZ())));
-    simulatedArm =
-        new LoggedMechanismLigament2d(
-            _visualName + "-arm",
-            armLength.in(Meters),
-            startingAngle.in(Degrees),
-            5,
+        root         = visualizer.getRoot(_visualName, getSimX(Meters.of(robotToMotor.getX())),
+                                  getSimY(Meters.of(robotToMotor.getZ())));
+        simulatedArm = new LoggedMechanismLigament2d(
+            _visualName + "-arm", armLength.in(Meters), startingAngle.in(Degrees), 5,
             new Color8Bit(MotorFactory.getNextVisualColor()));
-    setpoint =
-        new LoggedMechanismLigament2d(
-            _visualName + "-setpoint",
-            armLength.in(Meters),
-            startingAngle.in(Degrees),
-            5,
-            new Color8Bit(MotorFactory.getNextVisualColor()));
-    root.append(simulatedArm);
-    root.append(setpoint);
-    return this;
-  }
-
-  @Override
-  public void setReference(double reference) {
-    setReference(
-        reference,
-        controller.getControlType(),
-        getFeedForward(0).in(Volts) / RobotController.getBatteryVoltage());
-  }
-
-  public void updateReference() {
-    if (PIDControlType.NONE != controller.getControlType()) {
-      controller.setReference(
-          reference.getValue(),
-          getControlType(),
-          getFeedForward(0).in(Volts) / RobotController.getBatteryVoltage());
+        setpoint = new LoggedMechanismLigament2d(_visualName + "-setpoint", armLength.in(Meters),
+                                                 startingAngle.in(Degrees), 5,
+                                                 new Color8Bit(MotorFactory.getNextVisualColor()));
+        root.append(simulatedArm);
+        root.append(setpoint);
+        return this;
     }
-  }
 
-  public double getPivotPosition() {
-    if (RobotBase.isReal()) {
-      return encoder.getPosition() > 180 ? encoder.getPosition() - 360 : encoder.getPosition();
-    } else {
-      return Units.radiansToDegrees(simMechanism.getAngleRads());
+    @Override public void setReference(double reference)
+    {
+        setReference(reference, controller.getControlType(),
+                     getFeedForward(0).in(Volts) / RobotController.getBatteryVoltage());
     }
-  }
 
-  @Override
-  public Voltage getFeedForward(double velocity) {
-    if (null == pivotFeedforward || _displayValuesHelper.getLoggingLevel() == LogLevel.CONFIG) {
-      pivotFeedforward =
-          new ArmFeedforward(
-              getMotorFeedFwd().getkS(),
-              kG.getValue(),
-              getMotorFeedFwd().getkV(),
-              getMotorFeedFwd().getkA());
+    public void updateReference()
+    {
+        if (PIDControlType.NONE != controller.getControlType())
+        {
+            controller.setReference(
+                reference.getValue(), getControlType(),
+                getFeedForward(0).in(Volts) / RobotController.getBatteryVoltage());
+        }
     }
-    Voltage ff =
-        Volts.of(pivotFeedforward.calculate(Degrees.of(getPivotPosition()).in(Radians), 0.0));
-    feedForward.setValue(ff.in(Volts));
-    return ff;
-  }
 
-  @Override
-  public void periodicUpdate() {
-    updateReference();
-    double currentPosition = getPivotPosition();
-    position.setValue(currentPosition);
-    velocity.setValue(encoder.getVelocity());
-    simulatedArm.setAngle(currentPosition);
-    setpoint.setAngle(getReference());
-  }
+    public double getPivotPosition()
+    {
+        if (RobotBase.isReal())
+        {
+            return encoder.getPosition() > 180 ? encoder.getPosition() - 360
+                                               : encoder.getPosition();
+        }
+        else
+        {
+            return Units.radiansToDegrees(simMechanism.getAngleRads());
+        }
+    }
 
-  @Override
-  public void simulationUpdate() {
-    simMechanism.setInput(_motor.getVoltage());
-    outputEffort.setVoltage(_motor.getVoltage(), Volts);
-    simMechanism.update(0.020);
-    _motor.simulationUpdate(
-        Optional.of(simMechanism.getAngleRads()), simMechanism.getVelocityRadPerSec());
+    @Override public Voltage getFeedForward(double velocity)
+    {
+        if (null == pivotFeedforward || _displayValuesHelper.getLoggingLevel() == LogLevel.CONFIG)
+        {
+            pivotFeedforward =
+                new ArmFeedforward(getMotorFeedFwd().getkS(), kG.getValue(),
+                                   getMotorFeedFwd().getkV(), getMotorFeedFwd().getkA());
+        }
+        Voltage ff =
+            Volts.of(pivotFeedforward.calculate(Degrees.of(getPivotPosition()).in(Radians), 0.0));
+        feedForward.setValue(ff.in(Volts));
+        return ff;
+    }
 
-    RoboRioSim.setVInVoltage(
-        BatterySim.calculateDefaultBatteryLoadedVoltage(simMechanism.getCurrentDrawAmps()));
-  }
+    @Override public void periodicUpdate()
+    {
+        updateReference();
+        double currentPosition = getPivotPosition();
+        position.setValue(currentPosition);
+        velocity.setValue(encoder.getVelocity());
+        simulatedArm.setAngle(currentPosition);
+        setpoint.setAngle(getReference());
+    }
 
-  public boolean isAtMaximum() {
-    return encoder.getPosition() >= maxAngle.in(Degrees);
-  }
+    @Override public void simulationUpdate()
+    {
+        simMechanism.setInput(_motor.getVoltage());
+        outputEffort.setVoltage(_motor.getVoltage(), Volts);
+        simMechanism.update(0.020);
+        _motor.simulationUpdate(Optional.of(simMechanism.getAngleRads()),
+                                simMechanism.getVelocityRadPerSec());
 
-  public boolean isAtMinimum() {
-    return encoder.getPosition() <= minAngle.in(Degrees);
-  }
+        RoboRioSim.setVInVoltage(
+            BatterySim.calculateDefaultBatteryLoadedVoltage(simMechanism.getCurrentDrawAmps()));
+    }
 
-  public boolean isAtStartingAngle() {
-    return encoder.getPosition() == startingAngle.in(Degrees);
-  }
+    public boolean isAtMaximum()
+    {
+        return encoder.getPosition() >= maxAngle.in(Degrees);
+    }
 
-  public boolean isAtTarget() {
-    return Math.abs(getReference() - getPivotPosition()) < tolerance.getValue();
-  }
+    public boolean isAtMinimum()
+    {
+        return encoder.getPosition() <= minAngle.in(Degrees);
+    }
 
-  public void setEncoder(GenericEncoder encoder) {
-    this.encoder = encoder;
-  }
+    public boolean isAtStartingAngle()
+    {
+        return encoder.getPosition() == startingAngle.in(Degrees);
+    }
 
-  public Command getSysIdCommand(SubsystemBase subsystemBase) {
-    return SystemIdentification.getSysIdFullCommand(
-        SystemIdentification.angleSysIdRoutine(_motor, encoder, "Angular Motor", subsystemBase),
-        5,
-        3,
-        3);
-  }
+    public boolean isAtTarget()
+    {
+        return Math.abs(getReference() - getPivotPosition()) < tolerance.getValue();
+    }
 
-  @Override
-  public double getEncoderFeedback() {
-    return encoder.getPosition();
-  }
+    public void setEncoder(GenericEncoder encoder)
+    {
+        this.encoder = encoder;
+    }
+
+    public Command getSysIdCommand(SubsystemBase subsystemBase)
+    {
+        return SystemIdentification.getSysIdFullCommand(
+            SystemIdentification.angleSysIdRoutine(_motor, encoder, "Angular Motor", subsystemBase),
+            5, 3, 3);
+    }
+
+    @Override public double getEncoderFeedback()
+    {
+        return encoder.getPosition();
+    }
 }

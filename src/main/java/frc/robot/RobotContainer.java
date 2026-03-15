@@ -11,60 +11,70 @@ import org.frc5010.common.arch.WpiNetworkTableValuesHelper;
 import org.frc5010.common.config.RobotsParser;
 import org.frc5010.common.constants.Constants;
 
-public class RobotContainer implements WpiHelperInterface {
-  private static final RobotsParser robotsParser = new RobotsParser();
-  public static Constants constants;
-  private GenericRobot robot;
+public class RobotContainer implements WpiHelperInterface
+{
+    private static final RobotsParser robotsParser = new RobotsParser();
+    public static Constants constants;
+    private GenericRobot robot;
 
-  public RobotContainer() {
-    constants = new Constants();
+    public RobotContainer()
+    {
+        constants = new Constants();
 
-    robot = robotsParser.getRobot();
+        robot = robotsParser.getRobot();
 
-    initAutoCommands();
-    WpiNetworkTableValuesHelper.loadRegisteredToNetworkTables();
-  }
+        initAutoCommands();
+        WpiNetworkTableValuesHelper.loadRegisteredToNetworkTables();
+    }
 
-  /**
-   * Configures the button bindings for the robot. This should be called from the robot periodic
-   * methods (i.e. robotPeriodic) to update the button bindings.
-   */
-  public void configureButtonBindings() {
-    robot.configureButtonBindings();
-  }
+    /**
+     * Configures the button bindings for the robot. This should be called from the robot periodic
+     * methods (i.e. robotPeriodic) to update the button bindings.
+     */
+    public void configureButtonBindings()
+    {
+        robot.configureButtonBindings();
+    }
 
-  public void disabledInit() {
-    robot.disabledInit();
-  }
+    public void disabledInit()
+    {
+        robot.disabledInit();
+    }
 
-  public void configureAltButtonBindings() {
-    robot.configureAltButtonBindings();
-  }
+    public void configureAltButtonBindings()
+    {
+        robot.configureAltButtonBindings();
+    }
 
-  // Just sets up defalt commands (setUpDeftCom)
-  public void setupDefaults() {
-    robot.determineAlliance();
-    robot.setupDefaultCommands();
-  }
+    // Just sets up defalt commands (setUpDeftCom)
+    public void setupDefaults()
+    {
+        robot.determineAlliance();
+        robot.setupDefaultCommands();
+    }
 
-  public void setupAltDefaultCommands() {
-    robot.setupAltDefaultCommands();
-  }
+    public void setupAltDefaultCommands()
+    {
+        robot.setupAltDefaultCommands();
+    }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    return robot.getAutonomousCommand();
-  }
+    /**
+     * Use this to pass the autonomous command to the main {@link Robot} class.
+     *
+     * @return the command to run in autonomous
+     */
+    public Command getAutonomousCommand()
+    {
+        return robot.getAutonomousCommand();
+    }
 
-  public void initAutoCommands() {
-    robot.buildAutoCommands();
-  }
+    public void initAutoCommands()
+    {
+        robot.buildAutoCommands();
+    }
 
-  public void disabledPeriodic() {
-    robot.disabledPeriodic();
-  }
+    public void disabledPeriodic()
+    {
+        robot.disabledPeriodic();
+    }
 }

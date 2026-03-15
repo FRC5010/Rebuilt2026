@@ -9,38 +9,38 @@ import org.frc5010.common.arch.GenericSubsystem;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface IntakeIO {
-  @AutoLog
-  public static class IntakeIOInputs {
-    public IntakeCommands.IntakeState stateRequested = IntakeCommands.IntakeState.UNKNOWN;
-    public IntakeCommands.IntakeState stateCurrent = IntakeCommands.IntakeState.UNKNOWN;
-    public double speed = 0.0;
-    public Angle hopperAngle = Degrees.of(0.0);
-    public double hopperAngleDouble = 0.0;
-    public double hopperAmps = 0;
-    public int simulatedGamepieces = 0;
-  }
+    @AutoLog public static class IntakeIOInputs
+    {
+        public IntakeCommands.IntakeState stateRequested = IntakeCommands.IntakeState.UNKNOWN;
+        public IntakeCommands.IntakeState stateCurrent   = IntakeCommands.IntakeState.UNKNOWN;
+        public double speed                              = 0.0;
+        public Angle hopperAngle                         = Degrees.of(0.0);
+        public double hopperAngleDouble                  = 0.0;
+        public double hopperAmps                         = 0;
+        public int simulatedGamepieces                   = 0;
+    }
 
-  public void runSpintake(double speed);
+    public void runSpintake(double speed);
 
-  public void setHopperAngle(Angle angle);
+    public void setHopperAngle(Angle angle);
 
-  public void setHopperPosition(Angle angle);
+    public void setHopperPosition(Angle angle);
 
-  public boolean isHopperMoving();
+    public boolean isHopperMoving();
 
-  public boolean isRetracted();
+    public boolean isRetracted();
 
-  public boolean isDeployed();
+    public boolean isDeployed();
 
-  public boolean isHopperStalling();
+    public boolean isHopperStalling();
 
-  public void runHopper(double speed);
+    public void runHopper(double speed);
 
-  public boolean isNearTrench();
+    public boolean isNearTrench();
 
-  public Command getHopperSysIdCommand();
+    public Command getHopperSysIdCommand();
 
-  public Command getHopperCharacterizationCommand(GenericSubsystem intake);
+    public Command getHopperCharacterizationCommand(GenericSubsystem intake);
 
-  public default void updateInputs(IntakeIOInputs inputs) {}
+    public default void updateInputs(IntakeIOInputs inputs) {}
 }

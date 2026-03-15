@@ -18,63 +18,76 @@ import org.frc5010.common.drive.swerve.SwerveDriveFunctions;
  * Abstract base class for odometry threads, providing common functionality for managing signals,
  * queues, and periodic updates.
  */
-public abstract class OdometryThread extends Thread {
-  protected final Lock signalsLock = new ReentrantLock();
-  protected final List<DoubleSupplier> genericSignals = new ArrayList<>();
-  protected final List<Queue<Double>> genericQueues = new ArrayList<>();
-  protected final List<Queue<Double>> timestampQueues = new ArrayList<>();
-  protected static OdometryThread commonInstance;
+public abstract class OdometryThread extends Thread
+{
+    protected final Lock signalsLock                    = new ReentrantLock();
+    protected final List<DoubleSupplier> genericSignals = new ArrayList<>();
+    protected final List<Queue<Double>> genericQueues   = new ArrayList<>();
+    protected final List<Queue<Double>> timestampQueues = new ArrayList<>();
+    protected static OdometryThread commonInstance;
 
-  public static OdometryThread getInstance() {
-    return commonInstance;
-  }
-  /** Creates a new odometry thread with the specified name. */
-  protected OdometryThread(String threadName) {
-    setName(threadName);
-    setDaemon(true);
-  }
-
-  @Override
-  public void start() {
-    if (!timestampQueues.isEmpty() && RobotBase.isReal()) {
-      super.start();
+    public static OdometryThread getInstance()
+    {
+        return commonInstance;
     }
-  }
-
-  /** Registers a generic signal to be read from the thread. */
-  public Queue<Double> registerSignal(DoubleSupplier signal) {
-    Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    signalsLock.lock();
-    SwerveDriveFunctions.odometryLock.lock();
-    try {
-      genericSignals.add(signal);
-      genericQueues.add(queue);
-    } finally {
-      signalsLock.unlock();
-      SwerveDriveFunctions.odometryLock.unlock();
+    /** Creates a new odometry thread with the specified name. */
+    protected OdometryThread(String threadName)
+    {
+        setName(threadName);
+        setDaemon(true);
     }
-    return queue;
-  }
 
-  /** Returns a new queue that returns timestamp values for each sample. */
-  public Queue<Double> makeTimestampQueue() {
-    Queue<Double> queue = new ArrayBlockingQueue<>(20);
-    SwerveDriveFunctions.odometryLock.lock();
-    try {
-      timestampQueues.add(queue);
-    } finally {
-      SwerveDriveFunctions.odometryLock.unlock();
+    @Override public void start()
+    {
+        if (!timestampQueues.isEmpty() && RobotBase.isReal())
+        {
+            super.start();
+        }
     }
-    return queue;
-  }
 
-  /** Abstract method to be implemented by subclasses for specific signal handling. */
-  protected abstract void runThreadLogic();
-
-  @Override
-  public void run() {
-    while (true) {
-      runThreadLogic();
+    /** Registers a generic signal to be read from the thread. */
+    public Queue<Double> registerSignal(DoubleSupplier signal)
+    {
+        Queue<Double> queue = new ArrayBlockingQueue<>(20);
+        signalsLock.lock();
+        SwerveDriveFunctions.odometryLock.lock();
+        try
+        {
+            genericSignals.add(signal);
+            genericQueues.add(queue);
+        }
+        finally
+        {
+            signalsLock.unlock();
+            SwerveDriveFunctions.odometryLock.unlock();
+        }
+        return queue;
     }
-  }
+
+    /** Returns a new queue that returns timestamp values for each sample. */
+    public Queue<Double> makeTimestampQueue()
+    {
+        Queue<Double> queue = new ArrayBlockingQueue<>(20);
+        SwerveDriveFunctions.odometryLock.lock();
+        try
+        {
+            timestampQueues.add(queue);
+        }
+        finally
+        {
+            SwerveDriveFunctions.odometryLock.unlock();
+        }
+        return queue;
+    }
+
+    /** Abstract method to be implemented by subclasses for specific signal handling. */
+    protected abstract void runThreadLogic();
+
+    @Override public void run()
+    {
+        while (true)
+        {
+            runThreadLogic();
+        }
+    }
 }

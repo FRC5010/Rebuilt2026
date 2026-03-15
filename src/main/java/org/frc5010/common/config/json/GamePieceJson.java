@@ -5,9 +5,10 @@
 package org.frc5010.common.config.json;
 
 /** Json class for game piece configuration */
-public class GamePieceJson {
-  public String type;
-  public double x;
-  public double y;
-  public double rotation;
+public class GamePieceJson
+{
+    public String type;
+    public double x;
+    public double y;
+    public double rotation;
 }

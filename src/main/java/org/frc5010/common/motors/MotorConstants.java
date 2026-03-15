@@ -13,56 +13,63 @@ import edu.wpi.first.units.measure.Current;
 import java.util.function.Function;
 
 /** Add your docs here. */
-public class MotorConstants {
-  public static enum Motor {
-    Neo(Amps.of(40), RPM.of(5676), (Integer numberOfMotors) -> DCMotor.getNEO(numberOfMotors), 42),
-    Neo550(
-        Amps.of(20),
-        RPM.of(11000),
-        (Integer numberOfMotors) -> DCMotor.getNeo550(numberOfMotors),
-        42),
-    NeoVortex(
-        Amps.of(40),
-        RPM.of(6000),
-        (Integer numberOfMotors) -> DCMotor.getNeoVortex(numberOfMotors),
-        42),
-    KrakenX60(
-        Amps.of(40),
-        RPM.of(6000),
-        (Integer numberOfMotors) -> DCMotor.getKrakenX60(numberOfMotors),
-        1023),
-    KrakenX60Foc(
-        Amps.of(40),
-        RPM.of(6000),
-        (Integer numberOfMotors) -> DCMotor.getKrakenX60Foc(numberOfMotors),
-        1023),
-    KrakenX44(
-        Amps.of(40),
-        RPM.of(6000),
-        (Integer numberOfMotors) -> DCMotor.getKrakenX44(numberOfMotors),
-        1023);
+public class MotorConstants
+{
+    public static enum Motor {
+        Neo(Amps.of(40),
+            RPM.of(5676),
+            (Integer numberOfMotors)
+                -> DCMotor.getNEO(numberOfMotors),
+            42),
+        Neo550(Amps.of(20),
+               RPM.of(11000),
+               (Integer numberOfMotors)
+                   -> DCMotor.getNeo550(numberOfMotors),
+               42),
+        NeoVortex(Amps.of(40),
+                  RPM.of(6000),
+                  (Integer numberOfMotors)
+                      -> DCMotor.getNeoVortex(numberOfMotors),
+                  42),
+        KrakenX60(Amps.of(40),
+                  RPM.of(6000),
+                  (Integer numberOfMotors)
+                      -> DCMotor.getKrakenX60(numberOfMotors),
+                  1023),
+        KrakenX60Foc(Amps.of(40),
+                     RPM.of(6000),
+                     (Integer numberOfMotors)
+                         -> DCMotor.getKrakenX60Foc(numberOfMotors),
+                     1023),
+        KrakenX44(Amps.of(40),
+                  RPM.of(6000),
+                  (Integer numberOfMotors)
+                      -> DCMotor.getKrakenX44(numberOfMotors),
+                  1023);
 
-    public Current currentLimit = Amps.of(20);
-    public AngularVelocity maxRpm;
-    public Function<Integer, DCMotor> motorSim;
-    public double ticsPerRotation;
+        public Current currentLimit = Amps.of(20);
+        public AngularVelocity maxRpm;
+        public Function<Integer, DCMotor> motorSim;
+        public double ticsPerRotation;
 
-    private Motor(
-        Current currentLimit,
-        AngularVelocity rpm,
-        Function<Integer, DCMotor> motorSim,
-        double ticsPerRotation) {
-      this.currentLimit = currentLimit;
-      maxRpm = rpm;
-      this.motorSim = motorSim;
+        private Motor(Current currentLimit,
+                      AngularVelocity rpm,
+                      Function<Integer, DCMotor> motorSim,
+                      double ticsPerRotation)
+        {
+            this.currentLimit = currentLimit;
+            maxRpm            = rpm;
+            this.motorSim     = motorSim;
+        }
+
+        public DCMotor getMotorSimulationType()
+        {
+            return getMotorSimulationType(1);
+        }
+
+        public DCMotor getMotorSimulationType(int numberOfMotors)
+        {
+            return motorSim.apply(numberOfMotors);
+        }
     }
-
-    public DCMotor getMotorSimulationType() {
-      return getMotorSimulationType(1);
-    }
-
-    public DCMotor getMotorSimulationType(int numberOfMotors) {
-      return motorSim.apply(numberOfMotors);
-    }
-  }
 }

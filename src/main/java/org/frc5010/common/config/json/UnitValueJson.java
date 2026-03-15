@@ -5,22 +5,26 @@
 package org.frc5010.common.config.json;
 
 /** Add your docs here. */
-public class UnitValueJson {
-  public String uom;
-  public double val;
+public class UnitValueJson
+{
+    public String uom;
+    public double val;
 
-  public UnitValueJson() {}
+    public UnitValueJson() {}
 
-  public UnitValueJson(double val, String uom) {
-    this.val = val;
-    this.uom = uom;
-  }
+    public UnitValueJson(double val, String uom)
+    {
+        this.val = val;
+        this.uom = uom;
+    }
 
-  public double getMagnitude() {
-    return val;
-  }
+    public double getMagnitude()
+    {
+        return val;
+    }
 
-  public String getUnit() {
-    return uom;
-  }
+    public String getUnit()
+    {
+        return uom;
+    }
 }

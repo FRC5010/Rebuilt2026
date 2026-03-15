@@ -22,31 +22,33 @@ import org.frc5010.common.arch.GenericSubsystem;
  * @see SubsystemBase
  */
 public interface DeviceConfiguration {
-  /**
-   * Configures and returns a device instance based on this configuration object.
-   *
-   * <p>This method is called with the subsystem that will contain the device. The implementing
-   * class is responsible for creating the appropriate device instance using the configuration data
-   * and adding it to the subsystem if necessary.
-   *
-   * @param deviceHandler the {@link SubsystemBase} to configure with this device configuration
-   * @return the configured device object, or {@code null} if no device was created
-   */
-  public default Object configure(SubsystemBase deviceHandler) {
-    return null;
-  }
+    /**
+     * Configures and returns a device instance based on this configuration object.
+     *
+     * <p>This method is called with the subsystem that will contain the device. The implementing
+     * class is responsible for creating the appropriate device instance using the configuration
+     * data and adding it to the subsystem if necessary.
+     *
+     * @param deviceHandler the {@link SubsystemBase} to configure with this device configuration
+     * @return the configured device object, or {@code null} if no device was created
+     */
+    public default Object configure(SubsystemBase deviceHandler)
+    {
+        return null;
+    }
 
-  /**
-   * Configures and returns a device instance using a {@link GenericSubsystem}.
-   *
-   * <p>This method delegates to {@link #configure(SubsystemBase)} after casting the {@code
-   * GenericSubsystem} to a {@code SubsystemBase}. Subclasses can override this method for more
-   * specific handling when working with {@code GenericSubsystem} instances.
-   *
-   * @param deviceHandler the {@link GenericSubsystem} to configure with this device configuration
-   * @return the configured device object, or {@code null} if no device was created
-   */
-  public default Object configure(GenericSubsystem deviceHandler) {
-    return configure((SubsystemBase) deviceHandler);
-  }
+    /**
+     * Configures and returns a device instance using a {@link GenericSubsystem}.
+     *
+     * <p>This method delegates to {@link #configure(SubsystemBase)} after casting the {@code
+     * GenericSubsystem} to a {@code SubsystemBase}. Subclasses can override this method for more
+     * specific handling when working with {@code GenericSubsystem} instances.
+     *
+     * @param deviceHandler the {@link GenericSubsystem} to configure with this device configuration
+     * @return the configured device object, or {@code null} if no device was created
+     */
+    public default Object configure(GenericSubsystem deviceHandler)
+    {
+        return configure((SubsystemBase) deviceHandler);
+    }
 }

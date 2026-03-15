@@ -10,21 +10,25 @@ import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 import swervelib.simulation.ironmaple.simulation.seasonspecific.crescendo2024.CrescendoNoteOnField;
 
 /** Json class for game piece configurations */
-public class GamePiecesJson {
-  public GamePieceJson[] gamePieces;
+public class GamePiecesJson
+{
+    public GamePieceJson[] gamePieces;
 
-  public void createGamePieces(GenericSwerveDrivetrain drivetrain) {
-    SimulatedArena arena = SimulatedArena.getInstance();
-    for (GamePieceJson gamePiece : gamePieces) {
-      switch (gamePiece.type) {
-        case "Note":
-          CrescendoNoteOnField note =
-              new CrescendoNoteOnField(new Translation2d(gamePiece.x, gamePiece.y));
-          arena.addGamePiece(note);
-          break;
-        default:
-          break;
-      }
+    public void createGamePieces(GenericSwerveDrivetrain drivetrain)
+    {
+        SimulatedArena arena = SimulatedArena.getInstance();
+        for (GamePieceJson gamePiece : gamePieces)
+        {
+            switch (gamePiece.type)
+            {
+                case "Note":
+                    CrescendoNoteOnField note =
+                        new CrescendoNoteOnField(new Translation2d(gamePiece.x, gamePiece.y));
+                    arena.addGamePiece(note);
+                    break;
+                default:
+                    break;
+            }
+        }
     }
-  }
 }

@@ -27,102 +27,108 @@ import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismRoot2d;
 
 /** Add your docs here. */
-public class SimulatedDrivetrain extends GenericDrivetrain {
-  private LoggedMechanismRoot2d unicycle;
-  private LoggedMechanismLigament2d wheel;
-  private Persisted<Integer> driveVisualH;
-  private Persisted<Integer> driveVisualV;
-  private ChassisSpeeds chassisSpeeds;
+public class SimulatedDrivetrain extends GenericDrivetrain
+{
+    private LoggedMechanismRoot2d unicycle;
+    private LoggedMechanismLigament2d wheel;
+    private Persisted<Integer> driveVisualH;
+    private Persisted<Integer> driveVisualV;
+    private ChassisSpeeds chassisSpeeds;
 
-  public SimulatedDrivetrain(GenericGyro gyro, LoggedMechanism2d mechVisual) {
-    super(mechVisual);
-    setDrivetrainPoseEstimator(new DrivePoseEstimator(new SimulatedPose(gyro)));
+    public SimulatedDrivetrain(GenericGyro gyro, LoggedMechanism2d mechVisual)
+    {
+        super(mechVisual);
+        setDrivetrainPoseEstimator(new DrivePoseEstimator(new SimulatedPose(gyro)));
 
-    driveVisualH = new Persisted<>(RobotConstantsDef.DRIVE_VISUAL_H, Integer.class);
-    driveVisualV = new Persisted<>(RobotConstantsDef.DRIVE_VISUAL_V, Integer.class);
+        driveVisualH = new Persisted<>(RobotConstantsDef.DRIVE_VISUAL_H, Integer.class);
+        driveVisualV = new Persisted<>(RobotConstantsDef.DRIVE_VISUAL_V, Integer.class);
 
-    Integer centerH = driveVisualH.getInteger() / 2;
-    Integer centerV = driveVisualV.getInteger() / 2;
+        Integer centerH = driveVisualH.getInteger() / 2;
+        Integer centerV = driveVisualV.getInteger() / 2;
 
-    unicycle = mechVisual.getRoot("unicycle", centerH, centerV);
-    wheel = new LoggedMechanismLigament2d("wheel", 1.0, 0.0, 6.0, new Color8Bit(Color.kYellow));
-    unicycle.append(wheel);
-  }
+        unicycle = mechVisual.getRoot("unicycle", centerH, centerV);
+        wheel = new LoggedMechanismLigament2d("wheel", 1.0, 0.0, 6.0, new Color8Bit(Color.kYellow));
+        unicycle.append(wheel);
+    }
 
-  @Override
-  public void driveWithFeedforwards(ChassisSpeeds chassisSpeeds, DriveFeedforwards feedforwards) {
-    this.chassisSpeeds = chassisSpeeds;
-    Pose2d pose = poseEstimator.getCurrentPose();
-    Transform2d direction =
-        new Transform2d(
-            new Translation2d(
-                chassisSpeeds.vxMetersPerSecond * 0.02, chassisSpeeds.vyMetersPerSecond * 0.02),
-            new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * 0.02));
-    pose = pose.transformBy(direction);
-    poseEstimator.resetToPose(pose);
+    @Override
+    public void driveWithFeedforwards(ChassisSpeeds chassisSpeeds, DriveFeedforwards feedforwards)
+    {
+        this.chassisSpeeds = chassisSpeeds;
+        Pose2d pose        = poseEstimator.getCurrentPose();
+        Transform2d direction =
+            new Transform2d(new Translation2d(chassisSpeeds.vxMetersPerSecond * 0.02,
+                                              chassisSpeeds.vyMetersPerSecond * 0.02),
+                            new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * 0.02));
+        pose = pose.transformBy(direction);
+        poseEstimator.resetToPose(pose);
 
-    // Update visualizaton
-    wheel.setAngle(pose.getRotation());
-    wheel.setLength(direction.getTranslation().getNorm() * 1500);
-  }
+        // Update visualizaton
+        wheel.setAngle(pose.getRotation());
+        wheel.setLength(direction.getTranslation().getNorm() * 1500);
+    }
 
-  public ChassisSpeeds getChassisSpeeds() {
-    return chassisSpeeds;
-  }
+    public ChassisSpeeds getChassisSpeeds()
+    {
+        return chassisSpeeds;
+    }
 
-  public Rotation2d getHeading() {
-    return poseEstimator.getGyroRotation2d();
-  }
+    public Rotation2d getHeading()
+    {
+        return poseEstimator.getGyroRotation2d();
+    }
 
-  @Override
-  public void setAutoBuilder() {
-    AutoBuilder.configure(
-        () -> getPoseEstimator().getCurrentPose(), // Pose2d supplier
-        (Pose2d pose) -> getPoseEstimator().resetToPose(pose),
-        this::getChassisSpeeds, // Current ChassisSpeeds supplier
-        this::drive, // Method that will drive the robot given ChassisSpeeds
-        new PPHolonomicDriveController( // PPHolonomicController is the built in path following
-            // controller for holonomic
-            // drive trains
-            new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
-            new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
-            ),
-        ppRobotConfig, // The robot configuration
-        () -> {
-          // Boolean supplier that controls when the path will be mirrored for the red
-          // alliance
-          // This will flip the path being followed to the red side of the field.
-          // THE ORIGIN WILL REMAIN ON THE BLUE SIDE
+    @Override public void setAutoBuilder()
+    {
+        AutoBuilder.configure(()
+                                  -> getPoseEstimator().getCurrentPose(), // Pose2d supplier
+                              (Pose2d pose)
+                                  -> getPoseEstimator().resetToPose(pose),
+                              this::getChassisSpeeds, // Current ChassisSpeeds supplier
+                              this::drive, // Method that will drive the robot given ChassisSpeeds
+                              new PPHolonomicDriveController( // PPHolonomicController is the built
+                                                              // in path following controller for
+                                                              // holonomic drive trains
+                                  new PIDConstants(5.0, 0.0, 0.0), // Translation PID constants
+                                  new PIDConstants(5.0, 0.0, 0.0) // Rotation PID constants
+                                  ),
+                              ppRobotConfig, // The robot configuration
+                              ()
+                                  -> {
+                                  // Boolean supplier that controls when the path will be mirrored
+                                  // for the red alliance This will flip the path being followed to
+                                  // the red side of the field. THE ORIGIN WILL REMAIN ON THE BLUE
+                                  // SIDE
 
-          var alliance = DriverStation.getAlliance();
-          if (alliance.isPresent()) {
-            return alliance.get() == DriverStation.Alliance.Red;
-          }
-          return false;
-        },
-        this // Reference to this subsystem to set requirements
+                                  var alliance = DriverStation.getAlliance();
+                                  if (alliance.isPresent())
+                                  {
+                                      return alliance.get() == DriverStation.Alliance.Red;
+                                  }
+                                  return false;
+                              },
+                              this // Reference to this subsystem to set requirements
         );
-  }
+    }
 
-  @Override
-  public void drive(ChassisSpeeds chassisSpeeds) {
-    this.chassisSpeeds = chassisSpeeds;
-    Pose2d pose = poseEstimator.getCurrentPose();
-    Transform2d direction =
-        new Transform2d(
-            new Translation2d(
-                chassisSpeeds.vxMetersPerSecond * 0.02, chassisSpeeds.vyMetersPerSecond * 0.02),
-            new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * 0.02));
-    pose = pose.transformBy(direction);
-    poseEstimator.resetToPose(pose);
+    @Override public void drive(ChassisSpeeds chassisSpeeds)
+    {
+        this.chassisSpeeds = chassisSpeeds;
+        Pose2d pose        = poseEstimator.getCurrentPose();
+        Transform2d direction =
+            new Transform2d(new Translation2d(chassisSpeeds.vxMetersPerSecond * 0.02,
+                                              chassisSpeeds.vyMetersPerSecond * 0.02),
+                            new Rotation2d(chassisSpeeds.omegaRadiansPerSecond * 0.02));
+        pose = pose.transformBy(direction);
+        poseEstimator.resetToPose(pose);
 
-    // Update visualizaton
-    wheel.setAngle(pose.getRotation());
-    wheel.setLength(direction.getTranslation().getNorm() * 1500);
-  }
+        // Update visualizaton
+        wheel.setAngle(pose.getRotation());
+        wheel.setLength(direction.getTranslation().getNorm() * 1500);
+    }
 
-  @Override
-  public Field2d getField2d() {
-    throw new UnsupportedOperationException("Unimplemented method 'getField2d'");
-  }
+    @Override public Field2d getField2d()
+    {
+        throw new UnsupportedOperationException("Unimplemented method 'getField2d'");
+    }
 }

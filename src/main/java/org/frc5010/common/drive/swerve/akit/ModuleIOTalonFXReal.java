@@ -25,35 +25,37 @@ import org.frc5010.common.drive.swerve.AkitSwerveConfig;
  *
  * <p>Device configuration and other behaviors not exposed by TunerConstants can be customized here.
  */
-public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
-  // Queue to read inputs from odometry thread
-  private final Queue<Double> timestampQueue;
-  private final Queue<Double> drivePositionQueue;
-  private final Queue<Double> turnPositionQueue;
+public class ModuleIOTalonFXReal extends ModuleIOTalonFX
+{
+    // Queue to read inputs from odometry thread
+    private final Queue<Double> timestampQueue;
+    private final Queue<Double> drivePositionQueue;
+    private final Queue<Double> turnPositionQueue;
 
-  public ModuleIOTalonFXReal(AkitSwerveConfig config, SwerveModuleConstants constants) {
-    super(config, constants);
+    public ModuleIOTalonFXReal(AkitSwerveConfig config, SwerveModuleConstants constants)
+    {
+        super(config, constants);
 
-    this.timestampQueue = TalonFXOdometryThread.getInstance().makeTimestampQueue();
-    this.drivePositionQueue =
-        TalonFXOdometryThread.getInstance().registerSignal(super.drivePosition);
-    this.turnPositionQueue =
-        TalonFXOdometryThread.getInstance().registerSignal(super.turnAbsolutePosition);
-  }
+        this.timestampQueue = TalonFXOdometryThread.getInstance().makeTimestampQueue();
+        this.drivePositionQueue =
+            TalonFXOdometryThread.getInstance().registerSignal(super.drivePosition);
+        this.turnPositionQueue =
+            TalonFXOdometryThread.getInstance().registerSignal(super.turnAbsolutePosition);
+    }
 
-  @Override
-  public void updateInputs(ModuleIOInputs inputs) {
-    super.updateInputs(inputs);
+    @Override public void updateInputs(ModuleIOInputs inputs)
+    {
+        super.updateInputs(inputs);
 
-    // Update odometry inputs
-    inputs.odometryTimestamps =
-        timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
-    inputs.odometryDrivePositionsRad =
-        drivePositionQueue.stream().mapToDouble(Units::rotationsToRadians).toArray();
-    inputs.odometryTurnPositions =
-        turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[]::new);
-    timestampQueue.clear();
-    drivePositionQueue.clear();
-    turnPositionQueue.clear();
-  }
+        // Update odometry inputs
+        inputs.odometryTimestamps =
+            timestampQueue.stream().mapToDouble((Double value) -> value).toArray();
+        inputs.odometryDrivePositionsRad =
+            drivePositionQueue.stream().mapToDouble(Units::rotationsToRadians).toArray();
+        inputs.odometryTurnPositions =
+            turnPositionQueue.stream().map(Rotation2d::fromRotations).toArray(Rotation2d[] ::new);
+        timestampQueue.clear();
+        drivePositionQueue.clear();
+        turnPositionQueue.clear();
+    }
 }
