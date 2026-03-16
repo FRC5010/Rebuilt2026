@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.rebuilt.Constants;
 import frc.robot.rebuilt.FieldConstants;
+import frc.robot.rebuilt.Rebuilt;
 import frc.robot.rebuilt.subsystems.Launcher.Launcher;
 import frc.robot.rebuilt.subsystems.Launcher.ShotCalculator;
 import frc.robot.rebuilt.subsystems.Launcher.ShotCalculator.ShootingParameters;
@@ -236,6 +237,7 @@ public class LauncherCommands {
         Commands.runOnce(
             () -> {
               launcher.setCurrentState(LauncherState.IDLE);
+              Rebuilt.speedLimiter = 1.0;
             }),
         launcher.stopTrackingCommand());
   }
@@ -245,6 +247,7 @@ public class LauncherCommands {
         Commands.runOnce(
             () -> {
               launcher.setCurrentState(LauncherState.LOW_SPEED);
+              Rebuilt.speedLimiter = 1.0;
               LEDStrip.changeSegmentPattern(
                   ConfigConstants.ALL_LEDS, LEDStrip.getSolidPattern(Color.kGreen));
             }),
@@ -258,6 +261,11 @@ public class LauncherCommands {
               launcher.setCurrentState(LauncherState.PREP);
               LEDStrip.changeSegmentPattern(
                   ConfigConstants.ALL_LEDS, LEDStrip.getRainbowPattern(0));
+              if (launcher.isShooting()) {
+                Rebuilt.speedLimiter = Constants.Launcher.SOTM_SPEED_FACTOR;
+              } else {
+                Rebuilt.speedLimiter = 1.0;
+              }
             }),
         launcher.trackTargetCommand());
   }
@@ -267,6 +275,7 @@ public class LauncherCommands {
         Commands.runOnce(
             () -> {
               launcher.setCurrentState(LauncherState.PRESET);
+              Rebuilt.speedLimiter = 1.0;
             }),
         Commands.run(
             () -> launcher.usePresets(presetHoodAngle, presetTurretAngle, presetFlywheelSpeed)));

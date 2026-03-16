@@ -214,6 +214,11 @@ public abstract class GenericDrivetrain extends GenericSubsystem {
     isFieldOrientedDrive.setValue(!isFieldOrientedDrive.getValue());
   }
 
+  /** Get the field oriented drive mode */
+  public boolean isFieldOrientedDrive() {
+    return isFieldOrientedDrive.getValue();
+  }
+
   /** Resets the orientation of the pose estimator */
   public void resetOrientation() {
     poseEstimator.resetToPose(
