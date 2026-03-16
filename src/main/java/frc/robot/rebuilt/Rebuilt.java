@@ -19,9 +19,13 @@ import frc.robot.rebuilt.subsystems.Indexer.Indexer;
 import frc.robot.rebuilt.subsystems.Launcher.FieldRegions;
 import frc.robot.rebuilt.subsystems.Launcher.Launcher;
 import frc.robot.rebuilt.subsystems.intake.Intake;
+import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 import org.frc5010.common.arch.GenericRobot;
+import org.frc5010.common.commands.JoystickToSwerve;
 import org.frc5010.common.config.ConfigConstants;
 import org.frc5010.common.drive.GenericDrivetrain;
+import org.frc5010.common.drive.swerve.GenericSwerveDrivetrain;
 import org.frc5010.common.sensors.Controller;
 import org.frc5010.common.utils.geometry.AllianceFlipUtil;
 
@@ -40,6 +44,7 @@ public class Rebuilt extends GenericRobot {
   public static IntakeCommands intakecommands;
   public static IndexerCommands indexerCommands;
   public static TestCommands testCommands;
+  public static double speedLimiter = 1.0;
   private boolean isButtonsConfigured = false;
   private boolean isAltButtonsConfigured = false;
 
@@ -90,10 +95,24 @@ public class Rebuilt extends GenericRobot {
   public void setupDefaultCommands(Controller driver, Controller operator) {
     // This is part of auto init, so a good place to run this
     FieldRegions.setupFieldRegions();
-    drivetrain.setDefaultCommand(drivetrain.createDefaultCommand(driver));
+    drivetrain.setDefaultCommand(createSpeedLimitedDriveCommand(driver));
     launcherCommands.setDefaultCommands();
     indexerCommands.setupDefaultCommands();
     intakecommands.setupDefaultCommands();
+  }
+
+  private Command createSpeedLimitedDriveCommand(Controller driverXbox) {
+    DoubleSupplier leftY = () -> driverXbox.getLeftYAxis() * speedLimiter;
+    DoubleSupplier leftX = () -> driverXbox.getLeftXAxis() * speedLimiter;
+    DoubleSupplier rightX = () -> driverXbox.getRightXAxis() * speedLimiter;
+    BooleanSupplier isFieldOriented = () -> drivetrain.isFieldOrientedDrive();
+    return new JoystickToSwerve(
+        ((GenericSwerveDrivetrain) drivetrain),
+        leftY,
+        leftX,
+        rightX,
+        isFieldOriented,
+        () -> GenericRobot.getAlliance());
   }
 
   @Override

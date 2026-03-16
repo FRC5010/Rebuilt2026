@@ -36,6 +36,8 @@ public class Constants {
     public static final Angle TURRET_FORWARD = Degrees.of(0);
     public static final AngularVelocity FWD_FLYWHEEL_RPM = LOW_FLYWHEEL_RPM;
     public static final Angle FWD_HOOD_ANGLE = LOW_HOOD_ANGLE;
+
+    public static final double SOTM_SPEED_FACTOR = 0.5;
   }
 
   public static class Indexer {
