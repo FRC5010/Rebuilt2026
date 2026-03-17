@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.rebuilt.Constants;
 import frc.robot.rebuilt.FieldConstants;
 import frc.robot.rebuilt.Rebuilt;
+import frc.robot.rebuilt.commands.IndexerCommands.IndexerState;
+import frc.robot.rebuilt.subsystems.Indexer.Indexer;
 import frc.robot.rebuilt.subsystems.Launcher.Launcher;
 import frc.robot.rebuilt.subsystems.Launcher.ShotCalculator;
 import frc.robot.rebuilt.subsystems.Launcher.ShotCalculator.ShootingParameters;
@@ -44,6 +46,7 @@ public class LauncherCommands {
   private State autoHammerTimeState;
   private State escapeHammerTimeState;
   private static Launcher launcher;
+  private static Indexer indexer;
   private static GenericDrivetrain drivetrain;
   private Map<String, GenericSubsystem> subsystems;
   private static Translation2d hubTarget = FieldConstants.Hub.topCenterPoint.toTranslation2d();
@@ -92,6 +95,7 @@ public class LauncherCommands {
   public LauncherCommands(Map<String, GenericSubsystem> subsystems) {
     this.subsystems = subsystems;
     launcher = (Launcher) subsystems.get(Constants.LAUNCHER);
+    indexer = (Indexer) subsystems.get(Constants.INDEXER);
     launcher.setCurrentState(LauncherState.IDLE);
     launcher.setRequestedState(LauncherState.IDLE);
 
@@ -261,13 +265,17 @@ public class LauncherCommands {
               launcher.setCurrentState(LauncherState.PREP);
               LEDStrip.changeSegmentPattern(
                   ConfigConstants.ALL_LEDS, LEDStrip.getRainbowPattern(0));
-              if (launcher.isShooting()) {
-                Rebuilt.speedLimiter = Constants.Launcher.SOTM_SPEED_FACTOR;
-              } else {
-                Rebuilt.speedLimiter = 1.0;
-              }
             }),
-        launcher.trackTargetCommand());
+        Commands.parallel(
+            launcher.trackTargetCommand(),
+            Commands.run(
+                () -> {
+                  if (indexer.isCurrent(IndexerState.FEED)) {
+                    Rebuilt.speedLimiter = Constants.Launcher.SOTM_SPEED_FACTOR;
+                  } else {
+                    Rebuilt.speedLimiter = 1.0;
+                  }
+                })));
   }
   /** creates command behavior for when the launcher is at preset */
   private static Command presetStateCommand() {
@@ -409,6 +417,7 @@ public class LauncherCommands {
         Commands.run(
             () -> {
               launcher.setCurrentState(LauncherState.HAMMERTIME);
+              Rebuilt.speedLimiter = 1.0;
               launcher.usePresets(
                   Constants.Launcher.LOW_HOOD_ANGLE,
                   Degrees.of(0),
