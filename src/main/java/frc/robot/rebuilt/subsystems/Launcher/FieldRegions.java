@@ -4,8 +4,6 @@
 
 package frc.robot.rebuilt.subsystems.Launcher;
 
-import static edu.wpi.first.units.Units.Meters;
-
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -16,6 +14,16 @@ import org.frc5010.common.utils.geometry.AllianceFlipUtil;
 
 /** Add your docs here. */
 public class FieldRegions {
+  /** Identifies which shot profile is appropriate for a given field region. */
+  public enum ShotMode {
+    /** Alliance-side shots targeting the hub. */
+    HUB,
+    /** Mid-field or opponent-side shots targeting a tower upright (shuttle). */
+    SHUTTLE
+  }
+
+  /** Bundles the selected target position with its corresponding shot mode. */
+  public record TargetingResult(Optional<Translation2d> targetPos, ShotMode shotMode) {}
   static double topTrenchLeftX = FieldConstants.TrenchZoneTop.nearAllianceLeftDanger.getX();
   static double topTrenchRightX = FieldConstants.TrenchZoneTop.nearAllianceRightDanger.getX();
 
@@ -130,10 +138,34 @@ public class FieldRegions {
     return nearAllianceTop || nearOppAllianceTop || nearAllianceBottom || nearOppAllianceBottom;
   }
 
-  static Translation2d leftAdjustment = new Translation2d(Meters.of(1), Meters.of(1.5));
-  static Translation2d rightAdjustment = new Translation2d(Meters.of(1), Meters.of(-1.5));
+  // Shuttle drop zones: located just inside each trench opening so the ball lands behind the bump.
+  // The drop offset pushes the target 0.30 m past the bump's outer edge, into the trench.
+  private static final double SHUTTLE_DROP_OFFSET_METERS = 0.30;
 
-  public static Optional<Translation2d> determineTargetPose(Pose2d currentPose) {
+  // Left trench: Y > leftBumpStart (toward the top / fieldWidth wall)
+  private static final Translation2d LEFT_SHUTTLE_TARGET =
+      new Translation2d(
+          FieldConstants.LinesVertical.hubCenter,
+          FieldConstants.LinesHorizontal.leftBumpStart + SHUTTLE_DROP_OFFSET_METERS);
+
+  // Right trench: Y < rightBumpEnd (toward the bottom / 0 wall)
+  private static final Translation2d RIGHT_SHUTTLE_TARGET =
+      new Translation2d(
+          FieldConstants.LinesVertical.hubCenter,
+          FieldConstants.LinesHorizontal.rightBumpEnd - SHUTTLE_DROP_OFFSET_METERS);
+
+  /** Returns the shuttle target behind whichever bump the robot is closer to. */
+  private static Translation2d shuttleTarget(double robotY) {
+    return robotY > FieldConstants.fieldWidth / 2 ? LEFT_SHUTTLE_TARGET : RIGHT_SHUTTLE_TARGET;
+  }
+
+  /**
+   * Determines the target position and required shot mode for the given robot pose.
+   *
+   * <p>Alliance-side positions use the hub profile; mid-field and opponent-side positions use the
+   * shuttle profile targeting a tower upright.
+   */
+  public static TargetingResult determineTargetingResult(Pose2d currentPose) {
     Boolean inAllianceField = allianceField.contains(currentPose.getTranslation());
     Boolean inUpperMidField = upperMidField.contains(currentPose.getTranslation());
     Boolean inLowerMidField = lowerMidField.contains(currentPose.getTranslation());
@@ -145,17 +177,17 @@ public class FieldRegions {
     SmartDashboard.putBoolean("In Opp Upper Field", inOppUpperField);
     SmartDashboard.putBoolean("In Opp Lower Field", inOppLowerField);
     if (inAllianceField) {
-      return Optional.of(FieldConstants.Hub.topCenterPoint.toTranslation2d());
-    } else if (inUpperMidField) {
-      return Optional.of(FieldConstants.Tower.leftUpright.plus(leftAdjustment));
-    } else if (inLowerMidField) {
-      return Optional.of(FieldConstants.Tower.rightUpright.plus(rightAdjustment));
-    } else if (inOppUpperField) {
-      return Optional.of(FieldConstants.Tower.leftUpright.plus(leftAdjustment));
-    } else if (inOppLowerField) {
-      return Optional.of(FieldConstants.Tower.rightUpright.plus(rightAdjustment));
+      return new TargetingResult(
+          Optional.of(FieldConstants.Hub.topCenterPoint.toTranslation2d()), ShotMode.HUB);
+    } else if (inUpperMidField || inLowerMidField || inOppUpperField || inOppLowerField) {
+      return new TargetingResult(
+          Optional.of(shuttleTarget(currentPose.getY())), ShotMode.SHUTTLE);
     } else {
-      return Optional.empty();
+      return new TargetingResult(Optional.empty(), ShotMode.HUB);
     }
+  }
+
+  public static Optional<Translation2d> determineTargetPose(Pose2d currentPose) {
+    return determineTargetingResult(currentPose).targetPos();
   }
 }

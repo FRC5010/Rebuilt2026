@@ -70,6 +70,7 @@ public class LauncherIOReal implements LauncherIO {
 
   private boolean isNearTrench = false;
   private IntakeState lastState = IntakeState.RETRACTED;
+  private FieldRegions.ShotMode activeShotMode = null;
 
   protected Intake intake;
 
@@ -226,7 +227,18 @@ public class LauncherIOReal implements LauncherIO {
     // SmartDashboard.putNumber("CRT Error Rot",
     // easyCrtSolver.getLastErrorRotations());
 
-    Optional<Translation2d> targetPose = determineTarget();
+    FieldRegions.TargetingResult targetResult = determineTarget();
+    Optional<Translation2d> targetPose = targetResult.targetPos();
+
+    // Switch shot tables whenever the robot crosses into a different shot zone.
+    if (!targetResult.shotMode().equals(activeShotMode)) {
+      activeShotMode = targetResult.shotMode();
+      switch (activeShotMode) {
+        case HUB -> ShotCalculator.getInstance().setShotTables(ShotCalculator.HUB_TABLES);
+        case SHUTTLE -> ShotCalculator.getInstance().setShotTables(ShotCalculator.SHUTTLE_TABLES);
+      }
+    }
+
     inputs.isValidCalculation = false;
     SmartDashboard.putNumber("Flywheel Multiplier", ShotCalculator.getFlywheelMultiplier());
     if (targetPose.isPresent()) {
@@ -290,7 +302,7 @@ public class LauncherIOReal implements LauncherIO {
   public void configureShotCalculator(ShotCalculator shotCalculator) {
     var turretConfig = turret.getMotorController().getConfig();
 
-    shotCalculator.setShotTables(ShotCalculator.createDefaultTables());
+    shotCalculator.setShotTables(ShotCalculator.HUB_TABLES);
 
     // Turret angular limits and aim tolerance — read directly from the YAMS config so they stay
     // in sync with the soft-limit values defined in launcher/turret.json.
@@ -484,9 +496,9 @@ public class LauncherIOReal implements LauncherIO {
     return FieldRegions.isNearTrench(currentX, currentY);
   }
 
-  public Optional<Translation2d> determineTarget() {
+  public FieldRegions.TargetingResult determineTarget() {
     Pose2d current = drivetrain.getPoseEstimator().getCurrentPose();
-    return FieldRegions.determineTargetPose(current);
+    return FieldRegions.determineTargetingResult(current);
   }
 
   public Command getFlyWheelSysIdCommand(GenericSubsystem launcher) {

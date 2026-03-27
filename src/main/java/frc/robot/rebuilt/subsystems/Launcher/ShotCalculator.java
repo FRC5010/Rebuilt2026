@@ -139,8 +139,12 @@ public class ShotCalculator {
       double gravityMetersPerSecondSquared,
       double hoodAngleReferenceRadians) {}
 
+  // Eagerly-constructed profiles — each is built exactly once and reused on every profile switch.
+  public static final ShotTables HUB_TABLES = createDefaultTables();
+  public static final ShotTables SHUTTLE_TABLES = createShuttleTables();
+
   static {
-    applyShotTables(createDefaultTables());
+    applyShotTables(HUB_TABLES);
   }
   /** Creates default hood angle, flywheel speeds, and time of light tables */
   public static ShotTables createDefaultTables() {
@@ -175,6 +179,38 @@ public class ShotCalculator {
             Map.entry(5.58, 1.28)),
         0.7,
         10.0,
+        0.03);
+  }
+
+  /**
+   * Creates hood angle, flywheel speed, and time-of-flight tables for shuttle/tower shots.
+   *
+   * <p>These data points cover the longer distances used when shooting at the tower uprights from
+   * mid-field or the opponent's side. Replace the placeholder values below with tuned values
+   * collected during field testing.
+   */
+  public static ShotTables createShuttleTables() {
+    return new ShotTables(
+        Map.ofEntries(
+            Map.entry(5.0, Rotation2d.fromDegrees(35.0)),
+            Map.entry(7.0, Rotation2d.fromDegrees(38.0)),
+            Map.entry(9.0, Rotation2d.fromDegrees(40.0)),
+            Map.entry(11.0, Rotation2d.fromDegrees(43.0)),
+            Map.entry(13.0, Rotation2d.fromDegrees(46.0))),
+        Map.ofEntries(
+            Map.entry(5.0, 115.0),
+            Map.entry(7.0, 125.0),
+            Map.entry(9.0, 135.0),
+            Map.entry(11.0, 145.0),
+            Map.entry(13.0, 155.0)),
+        Map.ofEntries(
+            Map.entry(5.0, 1.00),
+            Map.entry(7.0, 1.20),
+            Map.entry(9.0, 1.40),
+            Map.entry(11.0, 1.60),
+            Map.entry(13.0, 1.80)),
+        4.0,
+        14.0,
         0.03);
   }
 
