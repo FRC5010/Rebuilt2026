@@ -5,7 +5,7 @@
       "file": "indexer/transfer_flywheel.json"
     },
     {
-      "device": "percent_motor",
+      "device": "yams_shooter",
       "file": "indexer/spindexer.json"
     }
   ]
