@@ -32,16 +32,16 @@
     },
     {
       "anchor": {
-        "x": 8.01866265060241,
-        "y": 3.586963855421687
+        "x": 7.592481927710843,
+        "y": 3.7399518072289153
       },
       "prevControl": {
-        "x": 8.005522942321718,
-        "y": 3.3373093980885598
+        "x": 7.579342219430152,
+        "y": 3.490297349895788
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "CTR-QTR"
+      "linkedName": "QTRLong"
     }
   ],
   "rotationTargets": [

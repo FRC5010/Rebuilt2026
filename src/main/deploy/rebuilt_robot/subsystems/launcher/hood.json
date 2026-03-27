@@ -60,7 +60,7 @@
     "uom": "deg"
   },
   "upperHardLimit": {
-    "val": 50,
+    "val": 55,
     "uom": "deg"
   },
   "startingAngle": {
@@ -72,7 +72,7 @@
     "uom": "deg"
   },
   "upperSoftLimit": {
-    "val": 50,
+    "val": 55,
     "uom": "deg"
   },
   "gearStages": "1015:33",

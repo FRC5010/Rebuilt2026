@@ -3,16 +3,16 @@
     "name": "hopper",
     "controllerType": "talonfx",
     "motorType": "KrakenX44",
-    "canId": 14,
+    "canId": 15,
     "logLevel": "LOW",
-    "inverted": false,
+    "inverted": true,
     "currentLimit": {
       "val": 60,
       "uom": "amps"
     },
     "followers": [
       {
-        "canId": 15,
+        "canId": 14,
         "inverted": true
       }
     ]
@@ -69,11 +69,11 @@
     "uom": "deg"
   },
   "upperHardLimit": {
-    "val": 132,
+    "val": 125,
     "uom": "deg"
   },
   "startingAngle": {
-    "val": 132,
+    "val": 125,
     "uom": "deg"
   },
   "lowerSoftLimit": {
@@ -81,7 +81,7 @@
     "uom": "deg"
   },
   "upperSoftLimit": {
-    "val": 132,
+    "val": 120,
     "uom": "deg"
   },
   "gearStages": "24:1",

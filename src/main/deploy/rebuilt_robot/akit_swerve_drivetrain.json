@@ -139,7 +139,7 @@
         "encoderInverted": false
       }
     },
-    "coupleRatio": 4.166666666666,
+    "coupleRatio": 3.0,
     "invertLeftSide": true,
     "invertRightSide": true,
     "steerInertia": {

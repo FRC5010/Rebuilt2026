@@ -3,62 +3,58 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.215590361445784,
-        "y": 3.2809879518072296
+        "x": 7.58155421686747,
+        "y": 4.1442771084337355
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.303290361445786,
-        "y": 0.3576546184738967
+        "x": 8.125552313952063,
+        "y": 7.001908936189969
       },
       "isLocked": false,
-      "linkedName": "nWall"
+      "linkedName": "QTRHLong"
     },
     {
       "anchor": {
-        "x": 4.662613636363636,
-        "y": 0.6108459595959597
+        "x": 6.182807228915664,
+        "y": 7.324240963855422
       },
       "prevControl": {
-        "x": 6.925893890115048,
-        "y": 0.6362759383412605
+        "x": 6.707337349397591,
+        "y": 7.313313253012049
       },
       "nextControl": {
-        "x": 2.4038444444444447,
-        "y": 0.5854666666666654
+        "x": 5.66708121700441,
+        "y": 7.334985255770239
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.5331807228915662,
-        "y": 0.8003975903614469
+        "x": 2.7187228915662653,
+        "y": 7.324240963855422
       },
       "prevControl": {
-        "x": 0.7765222222222223,
-        "y": 1.2968111111111114
+        "x": 7.3599702792211446,
+        "y": 7.408477559527209
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "HP"
+      "linkedName": "TL-Long"
     }
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0.7087136929460608,
-      "rotationDegrees": 0.0
-    },
-    {
-      "waypointRelativePos": 1.2962655601659734,
+      "waypointRelativePos": 0.7452282157676345,
       "rotationDegrees": 0.0
     }
   ],
   "constraintZones": [
     {
       "name": "Constraints Zone",
-      "minWaypointRelativePos": 0.5049833887043119,
-      "maxWaypointRelativePos": 1.4440753045404362,
+      "minWaypointRelativePos": 0.2,
+      "maxWaypointRelativePos": 0.3,
       "constraints": {
         "maxVelocity": 2.0,
         "maxAcceleration": 6.0,
@@ -73,7 +69,7 @@
   "eventMarkers": [
     {
       "name": "launcherPrep",
-      "waypointRelativePos": 1.046153846153844,
+      "waypointRelativePos": 1.8878411910669979,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
@@ -93,13 +89,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -55.22216863363612
   },
   "useDefaultConstraints": true
 }

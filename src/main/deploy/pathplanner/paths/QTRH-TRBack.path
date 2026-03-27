@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.215590361445784,
-        "y": 3.2809879518072296
+        "x": 6.313939759036145,
+        "y": 3.3684096385542173
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.303290361445786,
-        "y": 0.3576546184738967
+        "x": 6.401639759036146,
+        "y": 0.44507630522088437
       },
       "isLocked": false,
-      "linkedName": "nWall"
+      "linkedName": "nWallNew"
     },
     {
       "anchor": {
@@ -20,28 +20,28 @@
         "y": 0.6108459595959597
       },
       "prevControl": {
-        "x": 6.925893890115048,
-        "y": 0.6362759383412605
+        "x": 6.9227336217661595,
+        "y": 0.4886091303499399
       },
       "nextControl": {
-        "x": 2.4038444444444447,
-        "y": 0.5854666666666654
+        "x": 4.390662650602409,
+        "y": 0.6255542168674697
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 0.5331807228915662,
-        "y": 0.8003975903614469
+        "x": 2.9919156626506025,
+        "y": 0.680192771084337
       },
       "prevControl": {
-        "x": 0.7765222222222223,
-        "y": 1.2968111111111114
+        "x": 4.379734939759036,
+        "y": 0.669265060240964
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "HP"
+      "linkedName": "TRBack"
     }
   ],
   "rotationTargets": [
@@ -58,7 +58,7 @@
     {
       "name": "Constraints Zone",
       "minWaypointRelativePos": 0.5049833887043119,
-      "maxWaypointRelativePos": 1.4440753045404362,
+      "maxWaypointRelativePos": 2.0,
       "constraints": {
         "maxVelocity": 2.0,
         "maxAcceleration": 6.0,
@@ -93,7 +93,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -90.0
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": null,

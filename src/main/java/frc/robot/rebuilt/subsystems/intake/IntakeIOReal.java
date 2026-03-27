@@ -66,11 +66,11 @@ public class IntakeIOReal implements IntakeIO {
   }
 
   public boolean isRetracted() {
-    return (intakeHopper.getAngle().isNear(Degrees.of(130), Degrees.of(10)));
+    return (intakeHopper.getAngle().gte(Constants.Intake.HOPPER_RETRACTED_ANGLE));
   }
 
   public boolean isDeployed() {
-    return (intakeHopper.getAngle().isNear(Degrees.of(0.0), Degrees.of(10)));
+    return (intakeHopper.getAngle().lte(Degrees.of(2.0)));
   }
 
   public Command getHopperSysIdCommand() {

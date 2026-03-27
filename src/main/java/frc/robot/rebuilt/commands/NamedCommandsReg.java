@@ -29,5 +29,6 @@ public class NamedCommandsReg {
     NamedCommands.registerCommand("towerPreset", LauncherCommands.towerPresetStateCommand());
     NamedCommands.registerCommand(
         "towerForwardPreset", LauncherCommands.turretForwardPresetStateCommand());
+    NamedCommands.registerCommand("WaitUntilIntaking", IntakeCommands.waitUntilIntaking());
   }
 }

@@ -70,7 +70,7 @@ public class Rebuilt extends GenericRobot {
       drivetrain.configureButtonBindings(driver, operator);
       climbCommands.configureButtonBindings(driver, operator);
       launcherCommands.configureButtonBindings(driver, operator);
-      intakecommands.configureButtonBindings(driver);
+      intakecommands.configureButtonBindings(driver, operator);
       indexerCommands.configureButtonBindings(driver, operator);
       isButtonsConfigured = true;
     }
@@ -101,6 +101,14 @@ public class Rebuilt extends GenericRobot {
     NamedCommandsReg.createNamedCommands();
     drivetrain.setAutoBuilder();
   }
+
+  // @Override
+  // public Command getAutonomousCommand() {
+  //   if (DriverStation.isFMSAttached()) {
+  //     intake.setHopperPosition(Constants.Intake.HOPPER_RETRACTED_ANGLE);
+  //   }
+  //   return super.getAutonomousCommand();
+  // }
 
   @Override
   public Command generateAutoCommand(Command autoCommand) {

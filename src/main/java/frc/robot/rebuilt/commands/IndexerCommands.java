@@ -38,7 +38,8 @@ public class IndexerCommands {
 
   public void configureButtonBindings(Controller driver, Controller operator) {
     // driver.createLeftBumper().onTrue(toggleForceFeed());
-    driver.createLeftBumper().whileTrue(shouldForceCommand()).onFalse(shouldChurnCommand());
+    // driver.createLeftBumper().whileTrue(shouldForceCommand()).onFalse(shouldChurnCommand());
+    driver.createLeftBumper().whileTrue(shouldHardChurnCommand()).onFalse(shouldChurnCommand());
     operator
         .createLeftBumper()
         .whileTrue(
@@ -63,11 +64,7 @@ public class IndexerCommands {
 
     // CHURN: the request can be set at any time, but the indexer only physically
     // starts churning once LauncherCommands.isFlywheelReadyForChurn() is satisfied.
-    new Trigger(
-            () ->
-                indexer.isRequested(IndexerState.CHURN)
-                    && LauncherCommands.isFlywheelReadyForChurn())
-        .onTrue(churnStateCommand());
+    new Trigger(() -> indexer.isRequested(IndexerState.CHURN)).onTrue(churnStateCommand());
   }
 
   public void setupDefaultCommands() {}
@@ -92,7 +89,7 @@ public class IndexerCommands {
               indexer.runTransferFront(Constants.Indexer.TRANSFER_CHURN);
             },
             indexer)
-        .withTimeout(0.5)
+        .andThen(Commands.waitSeconds(1.0))
         .andThen(
             Commands.runOnce(
                 () -> {
@@ -149,6 +146,13 @@ public class IndexerCommands {
   /** Requests the indexer to enter the churn state */
   public static Command shouldChurnCommand() {
     return Commands.runOnce(() -> indexer.setRequestedState(IndexerState.CHURN));
+  }
+
+  public static Command churnAuto() {
+    return Commands.run(
+        () -> {
+          indexer.runSpindexer(-0.1);
+        });
   }
 
   public static Command shouldHardChurnCommand() {

@@ -84,7 +84,7 @@ public class ShotCalculator {
 
   // Cache parameters
   private ShootingParameters latestParameters = null;
-  public static double flywheelMultiplier = 1.0;
+  public static double flywheelMultiplier = 1.04;
 
   private static double minDistance;
   private static double maxDistance;
@@ -160,7 +160,9 @@ public class ShotCalculator {
             Map.entry(4.317290273504823, Rotation2d.fromDegrees(42.0)),
             Map.entry(4.540307519714445, Rotation2d.fromDegrees(43.0)),
             Map.entry(5.77893560525366, Rotation2d.fromDegrees(45.0)),
-            Map.entry(6.35214199070158, Rotation2d.fromDegrees(47.0))),
+            Map.entry(6.35214199070158, Rotation2d.fromDegrees(47.0)),
+            Map.entry(10.990685758149123, Rotation2d.fromDegrees(50.0)),
+            Map.entry(13.024035615135324, Rotation2d.fromDegrees(55.0))),
         Map.ofEntries(
             Map.entry(2.0796297600462808, 97.0),
             Map.entry(2.3644814757115706, 103.0),
@@ -171,14 +173,16 @@ public class ShotCalculator {
             Map.entry(4.317290273504823, 115.0),
             Map.entry(4.540307519714445, 117.0),
             Map.entry(5.77893560525366, 127.0),
-            Map.entry(6.35214199070158, 133.0)),
+            Map.entry(6.35214199070158, 133.0),
+            Map.entry(10.990685758149123, 155.0),
+            Map.entry(13.024035615135324, 170.0)),
         Map.ofEntries(
             Map.entry(2.11, 1.04),
             Map.entry(3.92, 1.19),
             Map.entry(4.10, 1.22),
             Map.entry(5.58, 1.28)),
         0.7,
-        10.0,
+        100.0,
         0.03);
   }
 
