@@ -120,7 +120,7 @@ public class Launcher extends GenericSubsystem {
   }
 
   public Translation2d getRobotTarget() {
-    return io.determineTarget().get();
+    return io.determineTarget().targetPos().get();
   }
 
   @Override

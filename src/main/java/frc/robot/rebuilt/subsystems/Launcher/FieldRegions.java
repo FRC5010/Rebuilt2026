@@ -24,6 +24,7 @@ public class FieldRegions {
 
   /** Bundles the selected target position with its corresponding shot mode. */
   public record TargetingResult(Optional<Translation2d> targetPos, ShotMode shotMode) {}
+
   static double topTrenchLeftX = FieldConstants.TrenchZoneTop.nearAllianceLeftDanger.getX();
   static double topTrenchRightX = FieldConstants.TrenchZoneTop.nearAllianceRightDanger.getX();
 
@@ -180,8 +181,7 @@ public class FieldRegions {
       return new TargetingResult(
           Optional.of(FieldConstants.Hub.topCenterPoint.toTranslation2d()), ShotMode.HUB);
     } else if (inUpperMidField || inLowerMidField || inOppUpperField || inOppLowerField) {
-      return new TargetingResult(
-          Optional.of(shuttleTarget(currentPose.getY())), ShotMode.SHUTTLE);
+      return new TargetingResult(Optional.of(shuttleTarget(currentPose.getY())), ShotMode.SHUTTLE);
     } else {
       return new TargetingResult(Optional.empty(), ShotMode.HUB);
     }
