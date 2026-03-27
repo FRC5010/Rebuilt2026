@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inch;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
+import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -39,7 +40,7 @@ public class Constants {
   }
 
   public static class Indexer {
-    public static final double SPINDEXER_SPEED = 0.7;
+    public static final AngularVelocity SPINDEXER_SPEED = Units.RadiansPerSecond.of(0.7);
     public static final double TRANSFER_SPEED = 0.7;
     public static final double TRANSFER_CHURN = 0.25;
   }

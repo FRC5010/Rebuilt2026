@@ -4,6 +4,8 @@
 
 package frc.robot.rebuilt.subsystems.Indexer;
 
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -28,7 +30,7 @@ public class Indexer extends GenericSubsystem {
     }
   }
 
-  public void runSpindexer(double speed) {
+  public void runSpindexer(AngularVelocity speed) {
     io.runSpindexer(speed);
   }
 
@@ -45,7 +47,10 @@ public class Indexer extends GenericSubsystem {
   }
 
   public void configTestControls(Controller controller) {
-    controller.createLeftBumper().whileTrue((spindexerCommand(.25)).alongWith(feederCommand(0.25)));
+    controller
+        .createLeftBumper()
+        .whileTrue(
+            (spindexerCommand(Units.RadiansPerSecond.of(0.25))).alongWith(feederCommand(0.25)));
   }
   /** Command that runs the feeder at a given speed and stops when done */
   public Command feederCommand(double speed) {
@@ -60,14 +65,14 @@ public class Indexer extends GenericSubsystem {
             });
   }
   /** returns a command that runs the spindexer at a set speed and stops when done */
-  public Command spindexerCommand(double speed) {
+  public Command spindexerCommand(AngularVelocity speed) {
     return Commands.run(
             () -> {
               runSpindexer(speed);
             })
         .finallyDo(
             () -> {
-              runSpindexer(0);
+              runSpindexer(Units.RadiansPerSecond.of(0.0));
             });
   }
 

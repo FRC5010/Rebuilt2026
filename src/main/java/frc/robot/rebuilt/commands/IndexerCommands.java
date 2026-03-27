@@ -1,5 +1,6 @@
 package frc.robot.rebuilt.commands;
 
+import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -85,7 +86,7 @@ public class IndexerCommands {
     return Commands.runOnce(
             () -> {
               indexer.setCurrentState(IndexerState.CHURN);
-              indexer.runSpindexer(-0.1);
+              indexer.runSpindexer(Units.RadiansPerSecond.of(-0.1));
               indexer.runTransferFront(Constants.Indexer.TRANSFER_CHURN);
             },
             indexer)
@@ -93,7 +94,7 @@ public class IndexerCommands {
         .andThen(
             Commands.runOnce(
                 () -> {
-                  indexer.runSpindexer(0.0);
+                  indexer.runSpindexer(Units.RadiansPerSecond.of(0.0));
                   indexer.runTransferFront(0);
                 }));
   }
@@ -102,7 +103,7 @@ public class IndexerCommands {
     return Commands.runOnce(
         () -> {
           indexer.setCurrentState(IndexerState.HARD_CHURN);
-          indexer.runSpindexer(-0.5);
+          indexer.runSpindexer(Units.RadiansPerSecond.of(-0.5));
           indexer.runTransferFront(Constants.Indexer.TRANSFER_CHURN);
         },
         indexer);
@@ -116,7 +117,7 @@ public class IndexerCommands {
     return Commands.runOnce(
         () -> {
           indexer.setCurrentState(IndexerState.IDLE);
-          indexer.runSpindexer(0);
+          indexer.runSpindexer(Units.RadiansPerSecond.of(0.0));
           indexer.runTransferFront(0);
           //          indexer.runTransferBack(0);
           LEDStrip.changeSegmentPattern(ConfigConstants.ALL_LEDS, LEDStrip.getRainbowPattern(0));
@@ -151,7 +152,7 @@ public class IndexerCommands {
   public static Command churnAuto() {
     return Commands.run(
         () -> {
-          indexer.runSpindexer(-0.1);
+          indexer.runSpindexer(Units.RadiansPerSecond.of(-0.1));
         });
   }
 
