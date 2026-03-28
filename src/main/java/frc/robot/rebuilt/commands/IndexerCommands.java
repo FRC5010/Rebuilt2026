@@ -86,7 +86,7 @@ public class IndexerCommands {
     return Commands.runOnce(
             () -> {
               indexer.setCurrentState(IndexerState.CHURN);
-              indexer.runSpindexer(Units.RadiansPerSecond.of(-0.1));
+              indexer.runSpindexer(Constants.Indexer.SPINDEXER_CHURN_SPEED);
               indexer.runTransferFront(Constants.Indexer.TRANSFER_CHURN);
             },
             indexer)
@@ -103,7 +103,7 @@ public class IndexerCommands {
     return Commands.runOnce(
         () -> {
           indexer.setCurrentState(IndexerState.HARD_CHURN);
-          indexer.runSpindexer(Units.RadiansPerSecond.of(-0.5));
+          indexer.runSpindexer(Constants.Indexer.SPINDEXER_HARD_CHURN_SPEED);
           indexer.runTransferFront(Constants.Indexer.TRANSFER_CHURN);
         },
         indexer);

@@ -1,11 +1,70 @@
 {
-  "name": "spindexer",
-  "controller": "talonfx",
-  "type": "KrakenX44",
-  "id": 9,
-  "gearing": 1.0,
-  "momentOfInertiaKgMSq": 1.0,
-  "x": 0.5,
-  "y": -0.092,
-  "z": 0.2
+  "motorSetup": {
+    "name": "spindexer",
+    "controllerType": "talonfx",
+    "motorType": "KrakenX44",
+    "canId": 9,
+    "logLevel": "LOW",
+    "inverted": false,
+    "robotToMotor": {
+      "x": {
+        "val": 0.5,
+        "uom": "m"
+      },
+      "y": {
+        "val": -0.092,
+        "uom": "m"
+      },
+      "z": {
+        "val": 2,
+        "uom": "m"
+      },
+      "rotation": {
+        "val": 0.0,
+        "uom": "deg"
+      }
+    }
+  },
+  "motorSystemId": {
+    "controlMode": "CLOSED_LOOP",
+    "feedBack": {
+      "p": 4,
+      "i": 0.0,
+      "d": 0.0
+    },
+    "feedForward": {
+      "s": 0.0,
+      "v": 0.0,
+      "a": 0.0
+    }
+  },
+  "simSystemId": {
+    "feedBack": {
+      "p": 4,
+      "i": 0.0,
+      "d": 0.0
+    },
+    "feedForward": {
+      "s": 0.0,
+      "v": 0.0,
+      "a": 0.0
+    }
+  },
+  "lowerSoftLimit": {
+    "val": 0,
+    "uom": "rpm"
+  },
+  "upperSoftLimit": {
+    "val": 5000,
+    "uom": "rpm"
+  },
+  "gearStages": "9:1",
+  "mass": {
+    "val": 2,
+    "uom": "kg"
+  },
+  "radius": {
+    "val": 3,
+    "uom": "in"
+  }
 }

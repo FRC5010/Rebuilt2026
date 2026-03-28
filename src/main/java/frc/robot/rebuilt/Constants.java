@@ -40,7 +40,10 @@ public class Constants {
   }
 
   public static class Indexer {
-    public static final AngularVelocity SPINDEXER_SPEED = Units.RadiansPerSecond.of(0.7);
+    public static final AngularVelocity SPINDEXER_SPEED = Units.RotationsPerSecond.of(70);
+    public static final AngularVelocity SPINDEXER_CHURN_SPEED = Units.RotationsPerSecond.of(-30);
+    public static final AngularVelocity SPINDEXER_HARD_CHURN_SPEED =
+        Units.RotationsPerSecond.of(-50);
     public static final double TRANSFER_SPEED = 0.7;
     public static final double TRANSFER_CHURN = 0.25;
   }

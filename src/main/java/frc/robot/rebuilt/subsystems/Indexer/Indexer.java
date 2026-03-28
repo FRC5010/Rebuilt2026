@@ -108,4 +108,12 @@ public class Indexer extends GenericSubsystem {
   public void setDefaultCommands(StateMachine stateMachine) {
     inputs.stateRequested = IndexerState.IDLE;
   }
+
+  public Command getSpindexerSysIdCommand() {
+    return io.getSpindexerSysIdCommand(this);
+  }
+
+  public Command getTransferSysIdCommand() {
+    return io.getTransferSysIdCommand(this);
+  }
 }
