@@ -7,6 +7,7 @@ package frc.robot.rebuilt.subsystems.Indexer;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.rebuilt.Constants;
 import frc.robot.rebuilt.commands.IndexerCommands.IndexerState;
 import org.frc5010.common.arch.GenericSubsystem;
 import org.frc5010.common.arch.StateMachine;
@@ -76,6 +77,8 @@ public class Indexer extends GenericSubsystem {
     // This method will be called once per scheduler run
     super.periodic();
     io.updateInputs(inputs);
+    if (inputs.transferFrontActual.lt(Constants.Indexer.TRANFER_SPEED_UNJAM_THRESHOLD))
+      setRequestedState(IndexerState.UNJAM);
     Logger.processInputs("Indexer", inputs);
   }
 

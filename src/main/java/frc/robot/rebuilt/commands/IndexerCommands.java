@@ -25,7 +25,8 @@ public class IndexerCommands {
     CHURN,
     HARD_CHURN,
     FORCE,
-    FEED
+    FEED,
+    UNJAM
   }
 
   /** Stores the subsystem map and retrieves the indexer instance */
@@ -56,7 +57,8 @@ public class IndexerCommands {
             IndexerState.FEED, feedStateCommand(),
             IndexerState.FORCE, forceStateCommand(),
             IndexerState.IDLE, idleStateCommand(),
-            IndexerState.HARD_CHURN, hardChurnStateCommand());
+            IndexerState.HARD_CHURN, hardChurnStateCommand(),
+            IndexerState.UNJAM, unjamStateCommand());
 
     stateToCommand.forEach(
         (state, cmd) -> new Trigger(() -> indexer.isRequested(state)).onTrue(cmd));
@@ -79,6 +81,18 @@ public class IndexerCommands {
         },
         indexer);
   }
+
+  private static Command unjamStateCommand() {
+    // we gotta reverse, then try to force it
+    return Commands.runOnce(
+        () -> {
+          indexer.setCurrentState(IndexerState.UNJAM);
+          indexer.runSpindexer(-0.5);
+          shouldForceCommand();
+        },
+        indexer);
+  }
+
   /** defines command behavior for the churn state stops the indexer and runs the transfer at 25% */
   private static Command churnStateCommand() {
     return Commands.runOnce(

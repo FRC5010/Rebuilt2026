@@ -2,6 +2,7 @@ package frc.robot.rebuilt;
 
 import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inch;
+import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.RotationsPerSecond;
 
 import edu.wpi.first.units.measure.Angle;
@@ -42,6 +43,8 @@ public class Constants {
     public static final double SPINDEXER_SPEED = 1.0;
     public static final double TRANSFER_SPEED = 1.0;
     public static final double TRANSFER_CHURN = 0.25;
+    // temporary placeholder
+    public static final AngularVelocity TRANFER_SPEED_UNJAM_THRESHOLD = RPM.of(5);
   }
 
   public static class Intake {

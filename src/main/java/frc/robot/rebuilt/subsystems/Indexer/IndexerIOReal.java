@@ -25,6 +25,7 @@ public class IndexerIOReal implements IndexerIO {
   public void updateInputs(IndexerIOInputs inputs) {
     inputs.spindexerSpeed = spindexer.get();
     inputs.transferFrontSpeed = transferFront.getMotor().getDutyCycle();
+    inputs.transferFrontActual = transferFront.getSpeed();
     // inputs.transferFrontSpeed = transferFront.get();
     // inputs.transferBackSpeed = transferBack.get();
   }
