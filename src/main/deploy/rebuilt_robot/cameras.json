@@ -3,5 +3,7 @@
     "left.json",
     "right.json",
     "rear.json"
-  ]
+  ],
+  "viewGamePieces": false,
+  "aprilTagLayout": "2026-rebuilt-andymark.json"
 }

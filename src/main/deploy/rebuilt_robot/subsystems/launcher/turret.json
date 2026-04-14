@@ -5,7 +5,7 @@
     "motorType": "KrakenX44",
     "canId": 18,
     "inverted": true,
-    "logLevel": "LOW",
+    "logLevel": "HIGH",
     "canBus": "canivore",
     "robotToMotor": {
       "x": {
@@ -44,7 +44,7 @@
       "uom": "deg/s"
     },
     "maxAcceleration": {
-      "val": 700,
+      "val": 1000,
       "uom": "deg/s^2"
     }
   },
