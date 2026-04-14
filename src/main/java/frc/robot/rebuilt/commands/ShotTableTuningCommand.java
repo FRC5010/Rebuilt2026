@@ -127,9 +127,9 @@ public class ShotTableTuningCommand extends Command {
     double testFlywheelRPM = SmartDashboard.getNumber(PREFIX + "Test Flywheel RPM", 100.0);
 
     // --- Step 6: Apply turret tracking with user overrides ---
-    // The turret uses the solver's calculated angle + feedforward (from updateInputs),
-    // while hood and flywheel use the operator's test values.
-    launcher.trackWithOverrides(Degrees.of(testHoodDeg), RPM.of(testFlywheelRPM));
+    // Pass params so the turret tracks the actual tuning target (shuttle or hub), not whatever
+    // updateInputs last computed from the field-region auto-detection (which would always be hub).
+    launcher.trackWithOverrides(params, Degrees.of(testHoodDeg), RPM.of(testFlywheelRPM));
 
     // --- Step 7: Update telemetry ---
     SmartDashboard.putNumber(PREFIX + "Geometric Distance (m)", geometricDistance);

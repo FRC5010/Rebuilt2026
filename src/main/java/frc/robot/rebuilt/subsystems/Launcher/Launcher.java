@@ -282,16 +282,25 @@ public class Launcher extends GenericSubsystem {
   }
 
   /**
-   * Track the turret using the calculated angle + feedforward from the aiming solver, but apply
-   * user-specified hood angle and flywheel speed. Used by shot table tuning to let the turret track
-   * the target while the operator experiments with different shot parameters.
+   * Track the turret using the angle + feedforward from the provided {@link
+   * ShotCalculator.ShootingParameters}, but apply user-specified hood angle and flywheel speed.
+   * Used by shot table tuning so the turret tracks the tuning target (e.g. shuttle) rather than
+   * whatever {@code updateInputs} last computed from the field-region auto-detection.
+   *
+   * <p>If {@code params} is {@code null}, falls back to the most recent {@code
+   * inputs.turretAngleCalculated}.
    */
-  public void trackWithOverrides(Angle hoodAngle, AngularVelocity flywheelSpeed) {
+  public void trackWithOverrides(
+      ShotCalculator.ShootingParameters params, Angle hoodAngle, AngularVelocity flywheelSpeed) {
     io.setHoodAngle(hoodAngle);
+    Angle turretTarget =
+        (params != null) ? params.turretAngle().getMeasure() : inputs.turretAngleCalculated;
+    double ffRadPerSec =
+        (params != null)
+            ? params.solution().turretFeedforwardRadPerSec()
+            : inputs.turretFeedforwardRadPerSec;
     io.setTurretRotationWithFeedforward(
-        inputs.turretAngleCalculated,
-        inputs.turretFeedforwardRadPerSec,
-        inputs.turretFeedforwardAccelRadPerSecSq);
+        turretTarget, ffRadPerSec, inputs.turretFeedforwardAccelRadPerSecSq);
     io.setFlyWheelVelocity(flywheelSpeed);
   }
 
