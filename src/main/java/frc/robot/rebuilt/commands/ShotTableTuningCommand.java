@@ -48,12 +48,12 @@ public class ShotTableTuningCommand extends Command {
    * ShotCalculator#getParameters}.
    */
   private static final Translation2d SHUTTLE_TUNE_TARGET_BLUE =
-      new Translation2d(Units.inchesToMeters(HALF_BALL_INCHES), FieldConstants.fieldWidth / 2.0);
+      new Translation2d(Units.inchesToMeters(HALF_BALL_INCHES), Units.inchesToMeters(12.0));
 
   private final Launcher launcher;
   private final ShotCalculator shotCalculator;
 
-  private TuningMode currentMode = TuningMode.HUB;
+  private TuningMode currentMode = TuningMode.SHUTTLE;
   private final List<String> loggedHoodEntries = new ArrayList<>();
   private final List<String> loggedFlywheelEntries = new ArrayList<>();
   private final List<String> loggedTofEntries = new ArrayList<>();
@@ -67,16 +67,12 @@ public class ShotTableTuningCommand extends Command {
 
   @Override
   public void initialize() {
-    currentMode = TuningMode.HUB;
+    currentMode = TuningMode.SHUTTLE;
     loggedHoodEntries.clear();
     loggedFlywheelEntries.clear();
     loggedTofEntries.clear();
     pointCount = 0;
 
-    // Input controls
-    SmartDashboard.putString(PREFIX + "Mode", "HUB");
-    SmartDashboard.putNumber(PREFIX + "Test Hood Angle (deg)", 35.0);
-    SmartDashboard.putNumber(PREFIX + "Test Flywheel RPM", 100.0);
     SmartDashboard.putBoolean(PREFIX + "Force Firing", false);
     SmartDashboard.putBoolean(PREFIX + "Log Point", false);
     SmartDashboard.putBoolean(PREFIX + "Add To Live Table", false);
@@ -102,8 +98,6 @@ public class ShotTableTuningCommand extends Command {
   @Override
   public void execute() {
     // --- Step 1: Read mode and force correct shot tables ---
-    String modeStr = SmartDashboard.getString(PREFIX + "Mode", "HUB");
-    currentMode = modeStr.equalsIgnoreCase("SHUTTLE") ? TuningMode.SHUTTLE : TuningMode.HUB;
 
     switch (currentMode) {
       case HUB -> shotCalculator.setShotTables(ShotCalculator.HUB_TABLES);

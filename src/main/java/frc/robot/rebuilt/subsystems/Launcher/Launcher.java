@@ -289,7 +289,9 @@ public class Launcher extends GenericSubsystem {
   public void trackWithOverrides(Angle hoodAngle, AngularVelocity flywheelSpeed) {
     io.setHoodAngle(hoodAngle);
     io.setTurretRotationWithFeedforward(
-        inputs.turretAngleCalculated, inputs.turretFeedforwardRadPerSec);
+        inputs.turretAngleCalculated,
+        inputs.turretFeedforwardRadPerSec,
+        inputs.turretFeedforwardAccelRadPerSecSq);
     io.setFlyWheelVelocity(flywheelSpeed);
   }
 
