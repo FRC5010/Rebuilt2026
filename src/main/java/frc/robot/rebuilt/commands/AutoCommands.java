@@ -38,6 +38,9 @@ public class AutoCommands {
                 subsystems.get(org.frc5010.common.config.ConfigConstants.DRIVETRAIN),
             2.0,
             0.5));
+    selectableCommand.addOption(
+        "TUNE: Shot Table Tuning (Free Drive)",
+        ShotTableTuningCommand.createWithFeed((Launcher) subsystems.get(Constants.LAUNCHER)));
   }
 
   public void configureBasicAutoCommands(LoggedDashboardChooser<Command> selectableCommand) {
