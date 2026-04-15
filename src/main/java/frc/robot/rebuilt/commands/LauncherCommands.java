@@ -191,8 +191,12 @@ public class LauncherCommands {
   public void configureButtonBindings(Controller driver, Controller operator) {
 
     // driver.createAButton().onTrue(shouldPrepCommand());
-    driver.createBButton().whileTrue(shouldPrepCommand()).onFalse(shouldHammerTimeCommand());
-
+    // driver.createBButton().whileTrue(shouldPrepCommand()).onFalse(shouldHammerTimeCommand());
+    // TODO: REVERT
+    driver
+        .createBButton()
+        .whileTrue(
+            ShotTableTuningCommand.createWithFeed((Launcher) subsystems.get(Constants.LAUNCHER)));
     driver.createAButton().onTrue(shouldLowCommand()).onFalse(shouldHammerTimeCommand());
 
     operator

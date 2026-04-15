@@ -70,6 +70,7 @@ public class LauncherIOReal implements LauncherIO {
 
   private boolean isNearTrench = false;
   private IntakeState lastState = IntakeState.RETRACTED;
+  private FieldRegions.ShotMode activeShotMode = null;
 
   protected Intake intake;
 
@@ -134,8 +135,8 @@ public class LauncherIOReal implements LauncherIO {
                 /* encoder1Pinion */ 40,
                 /* encoder2Pinion */ 36)
             .withAbsoluteEncoderOffsets( // -0.474609375
-                Rotations.of(-0.07470703125),
-                Rotations.of(-0.167236328125)) // set after mechanical zero
+                Rotations.of(-0.15576171875),
+                Rotations.of(-0.083251953125)) // set after mechanical zero
             .withMechanismRange(Degrees.of(-168), Degrees.of(173)) // -360 deg to +720 deg
             .withMatchTolerance(Rotations.of(0.06)) // ~1.08 deg at encoder2 for the example ratio
             .withAbsoluteEncoderInversions(true, false)
@@ -249,7 +250,18 @@ public class LauncherIOReal implements LauncherIO {
     // SmartDashboard.putNumber("CRT Error Rot",
     // easyCrtSolver.getLastErrorRotations());
 
-    Optional<Translation2d> targetPose = determineTarget();
+    FieldRegions.TargetingResult targetResult = determineTarget();
+    Optional<Translation2d> targetPose = targetResult.targetPos();
+
+    // Switch shot tables whenever the robot crosses into a different shot zone.
+    if (!targetResult.shotMode().equals(activeShotMode)) {
+      activeShotMode = targetResult.shotMode();
+      switch (activeShotMode) {
+        case HUB -> ShotCalculator.getInstance().setShotTables(ShotCalculator.HUB_TABLES);
+        case SHUTTLE -> ShotCalculator.getInstance().setShotTables(ShotCalculator.SHUTTLE_TABLES);
+      }
+    }
+
     inputs.isValidCalculation = false;
     SmartDashboard.putNumber("Flywheel Multiplier", ShotCalculator.getFlywheelMultiplier());
     if (targetPose.isPresent()) {
@@ -321,7 +333,7 @@ public class LauncherIOReal implements LauncherIO {
   public void configureShotCalculator(ShotCalculator shotCalculator) {
     var turretConfig = turret.getMotorController().getConfig();
 
-    shotCalculator.setShotTables(ShotCalculator.createDefaultTables());
+    shotCalculator.setShotTables(ShotCalculator.HUB_TABLES);
 
     // Turret angular limits and aim tolerance — read directly from the YAMS config so they stay
     // in sync with the soft-limit values defined in launcher/turret.json.
@@ -520,9 +532,9 @@ public class LauncherIOReal implements LauncherIO {
     return FieldRegions.isNearTrench(currentX, currentY);
   }
 
-  public Optional<Translation2d> determineTarget() {
+  public FieldRegions.TargetingResult determineTarget() {
     Pose2d current = drivetrain.getPoseEstimator().getCurrentPose();
-    return FieldRegions.determineTargetPose(current);
+    return FieldRegions.determineTargetingResult(current);
   }
 
   public Command getFlyWheelSysIdCommand(GenericSubsystem launcher) {

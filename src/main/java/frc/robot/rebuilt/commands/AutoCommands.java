@@ -39,6 +39,9 @@ public class AutoCommands {
             2.0,
             0.5));
     selectableCommand.addOption(
+        "TUNE: Shot Table Tuning (Free Drive)",
+        ShotTableTuningCommand.createWithFeed((Launcher) subsystems.get(Constants.LAUNCHER)));
+    selectableCommand.addOption(
         "PRO: Turret Quasistatic (kS, kV)",
         ((Launcher) subsystems.get(Constants.LAUNCHER)).getTurretQuasistaticCommand());
     selectableCommand.addOption(

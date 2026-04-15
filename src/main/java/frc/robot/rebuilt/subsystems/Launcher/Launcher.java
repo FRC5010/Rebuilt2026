@@ -155,7 +155,7 @@ public class Launcher extends GenericSubsystem {
   }
 
   public Translation2d getRobotTarget() {
-    return io.determineTarget().get();
+    return io.determineTarget().targetPos().get();
   }
 
   @Override
@@ -278,6 +278,29 @@ public class Launcher extends GenericSubsystem {
   public void usePresets(Angle hoodAngle, Angle turretAngle, AngularVelocity flywheelSpeed) {
     io.setHoodAngle(hoodAngle);
     io.setTurretRotation(turretAngle);
+    io.setFlyWheelVelocity(flywheelSpeed);
+  }
+
+  /**
+   * Track the turret using the angle + feedforward from the provided {@link
+   * ShotCalculator.ShootingParameters}, but apply user-specified hood angle and flywheel speed.
+   * Used by shot table tuning so the turret tracks the tuning target (e.g. shuttle) rather than
+   * whatever {@code updateInputs} last computed from the field-region auto-detection.
+   *
+   * <p>If {@code params} is {@code null}, falls back to the most recent {@code
+   * inputs.turretAngleCalculated}.
+   */
+  public void trackWithOverrides(
+      ShotCalculator.ShootingParameters params, Angle hoodAngle, AngularVelocity flywheelSpeed) {
+    io.setHoodAngle(hoodAngle);
+    Angle turretTarget =
+        (params != null) ? params.turretAngle().getMeasure() : inputs.turretAngleCalculated;
+    double ffRadPerSec =
+        (params != null)
+            ? params.solution().turretFeedforwardRadPerSec()
+            : inputs.turretFeedforwardRadPerSec;
+    io.setTurretRotationWithFeedforward(
+        turretTarget, ffRadPerSec, inputs.turretFeedforwardAccelRadPerSecSq);
     io.setFlyWheelVelocity(flywheelSpeed);
   }
 
