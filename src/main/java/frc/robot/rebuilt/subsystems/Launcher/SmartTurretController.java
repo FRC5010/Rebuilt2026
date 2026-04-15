@@ -218,14 +218,20 @@ public class SmartTurretController {
         if (positionError < config.getTrackingDeadbandRotations()) {
           ksFeedforward = 0.0;
         } else {
-          ksFeedforward = Math.signum(signedError) * config.getKS();
+          // Linearly taper kS from 0 at the deadband edge to full kS at the taper width.
+          // This eliminates the harsh step that causes overshoot hunting.
+          double taperWidth = config.getKsTaperWidthRotations();
+          double errorBeyondDeadband = positionError - config.getTrackingDeadbandRotations();
+          double scale = MathUtil.clamp(errorBeyondDeadband / taperWidth, 0.0, 1.0);
+          ksFeedforward = Math.signum(signedError) * config.getKS() * scale;
         }
 
         talonFX.setControl(
             trackingRequest
                 .withPosition(currentTarget.positionMechRot())
                 .withVelocity(RadiansPerSecond.of(currentTarget.velocityRadPerSec))
-                .withFeedForward(ksFeedforward));
+                .withFeedForward(ksFeedforward)
+                .withUpdateFreqHz(1000));
 
         break;
     }
@@ -235,6 +241,7 @@ public class SmartTurretController {
     Logger.recordOutput("SmartTurret/PositionErrorRot", positionError);
     Logger.recordOutput("SmartTurret/ActualPositionMechRot", actualPositionMechRot);
     Logger.recordOutput("SmartTurret/TargetPositionMechRot", currentTarget.positionMechRot());
+    Logger.recordOutput("SmartTurret/PositionErrorDeg", positionError * 360.0);
   }
 
   /**
