@@ -10,6 +10,7 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radian;
+import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.Rotations;
 import static edu.wpi.first.units.Units.Second;
@@ -53,8 +54,10 @@ import yams.units.EasyCRT;
 import yams.units.EasyCRTConfig;
 
 /** Add your docs here. */
-public class LauncherIOReal implements LauncherIO {
-
+public class LauncherIOReal implements LauncherIO { // -0.030679615757712823
+  protected static final Angle HARD_STOP = Radians.of(2.9437091319525455);
+  protected static final double encoder40Offset = 0.362060546875;
+  protected static final double encoder36Offset = 0.226806640625;
   protected Map<String, Object> devices;
   protected Pivot turret;
   protected Arm hood;
@@ -135,8 +138,8 @@ public class LauncherIOReal implements LauncherIO {
                 /* encoder1Pinion */ 40,
                 /* encoder2Pinion */ 36)
             .withAbsoluteEncoderOffsets( // -0.474609375
-                Rotations.of(-0.15576171875),
-                Rotations.of(-0.083251953125)) // set after mechanical zero
+                Rotations.of(encoder40Offset),
+                Rotations.of(encoder36Offset)) // set after mechanical zero
             .withMechanismRange(Degrees.of(-168), Degrees.of(173)) // -360 deg to +720 deg
             .withMatchTolerance(Rotations.of(0.06)) // ~1.08 deg at encoder2 for the example ratio
             .withAbsoluteEncoderInversions(true, false)
@@ -190,9 +193,9 @@ public class LauncherIOReal implements LauncherIO {
         // Turret is a Pivot so getArmFeedforward() contains the characterised kS/kV/kA in SI units.
         // Fallback values match turret.json in case the YAMS FF was not set.
         ArmFeedforward yamsFf = turretConfig.getArmFeedforward().orElse(null);
-        double kS = yamsFf != null ? yamsFf.getKs() : 23.1645;
+        double kS = yamsFf != null ? yamsFf.getKs() : 12;
         double kV = yamsFf != null ? yamsFf.getKv() : 0.0;
-        double kA = yamsFf != null ? yamsFf.getKa() : 0.5134;
+        double kA = yamsFf != null ? yamsFf.getKa() : 2.0;
         SmartTurretConfig smartConfig =
             new SmartTurretConfig.Builder()
                 .withTalonFX(talonFXRaw)
@@ -200,10 +203,10 @@ public class LauncherIOReal implements LauncherIO {
                 .withGearRatio(30.0)
                 .withMotionConstraints(maxVelMechRotPerSec, maxAccelMechRotPerSecSq)
                 .withSeekingPID(255, 0, 50) // Initial values from turret.json
-                .withTrackingPID(255, 0, 300) // Start same, tune separately
+                .withTrackingPID(550, 0, 200) // Start same, tune separately
                 .withFeedforward(kS, kV, kA)
-                .withSeekingThreshold(Degrees.of(30).in(Rotations))
-                .withHysteresisBuffer(Degrees.of(5).in(Rotations))
+                .withSeekingThreshold(Degrees.of(8).in(Rotations))
+                .withHysteresisBuffer(Degrees.of(12).in(Rotations))
                 .withSoftLimits(lowerLimitRot, upperLimitRot)
                 .build();
 
@@ -576,5 +579,10 @@ public class LauncherIOReal implements LauncherIO {
   public Command getTurretSeekingTuneCommand(GenericSubsystem launcher) {
     if (smartTurretController == null) return Commands.none();
     return new frc.robot.rebuilt.commands.TurretSeekingTuneCommand(smartTurretController, launcher);
+  }
+
+  @Override
+  public void zeroTurret() {
+    turret.getMotor().setEncoderPosition(HARD_STOP);
   }
 }

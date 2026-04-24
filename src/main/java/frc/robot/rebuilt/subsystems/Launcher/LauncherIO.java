@@ -163,4 +163,6 @@ public interface LauncherIO {
   public default Command getTurretSeekingTuneCommand(GenericSubsystem launcher) {
     return Commands.none();
   }
+
+  public void zeroTurret();
 }

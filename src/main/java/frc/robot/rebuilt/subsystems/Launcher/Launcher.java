@@ -438,4 +438,8 @@ public class Launcher extends GenericSubsystem {
           }
         });
   }
+
+  public void zeroTurret() {
+    io.zeroTurret();
+  }
 }

@@ -16,32 +16,32 @@
     },
     {
       "anchor": {
-        "x": 7.364293865905848,
-        "y": 0.9491298145506415
+        "x": 7.1444457831325305,
+        "y": 1.008024096385542
       },
       "prevControl": {
-        "x": 7.037925860551096,
-        "y": 0.5752946070539874
+        "x": 6.818077777777778,
+        "y": 0.6341888888888879
       },
       "nextControl": {
-        "x": 7.899935548038918,
-        "y": 1.5626756159119493
+        "x": 7.680087465265601,
+        "y": 1.6215698977468498
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 7.713637660485022,
-        "y": 3.5368616262482178
+        "x": 7.752453637660485,
+        "y": 3.187517831669045
       },
       "prevControl": {
-        "x": 7.70049795220433,
-        "y": 3.2872071689150903
+        "x": 7.739313929379794,
+        "y": 2.9378633743359175
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "CTR-QTR"
+      "linkedName": "CTR-QTRShort"
     }
   ],
   "rotationTargets": [
@@ -99,7 +99,7 @@
   "eventMarkers": [
     {
       "name": "intakeIntake",
-      "waypointRelativePos": 0.1728561782579309,
+      "waypointRelativePos": 0.23227548953409913,
       "endWaypointRelativePos": null,
       "command": {
         "type": "named",
