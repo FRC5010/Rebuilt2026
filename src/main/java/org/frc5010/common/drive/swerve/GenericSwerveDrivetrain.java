@@ -35,6 +35,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -49,9 +50,11 @@ import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.frc5010.common.arch.GenericRobot;
+import org.frc5010.common.auto.AutoPausedFollowPathCommand;
 import org.frc5010.common.auto.pathplanner.PathFinderCommand;
 import org.frc5010.common.commands.DriveToPoseSupplier;
 import org.frc5010.common.commands.JoystickToSwerve;
+import org.frc5010.common.constants.Constants;
 import org.frc5010.common.constants.GenericDrivetrainConstants;
 import org.frc5010.common.constants.RobotConstantsDef;
 import org.frc5010.common.drive.GenericDrivetrain;
@@ -60,6 +63,7 @@ import org.frc5010.common.drive.swerve_utils.PathConstraints5010;
 import org.frc5010.common.drive.swerve_utils.SwerveSetpointGenerator5010;
 import org.frc5010.common.sensors.Controller;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -69,6 +73,8 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
 
   private SwerveDriveFunctions swerveDrive = null;
   private GenericDrivetrainConstants swerveConstants;
+  private boolean simAutonomousWasEnabled = false;
+  private double simAutonomousStartTimestampSec = Double.NaN;
 
   public GenericSwerveDrivetrain(
       LoggedMechanism2d mechVisual,
@@ -82,6 +88,10 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
     setDrivetrainPoseEstimator(swerveDrive.initializePoseEstimator());
     initializeSimulation(swerveConstants);
     driveTrainSimulationSupplier = swerveDrive.getDriveTrainSimulationSupplier();
+
+    if (RobotBase.isSimulation()) {
+      SmartDashboard.setDefaultBoolean(Constants.Simulation.AUTO_DISTURBANCE_DASHBOARD_KEY, false);
+    }
   }
 
   @Override
@@ -101,6 +111,9 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
 
   /** Setup AutoBuilder for PathPlanner. */
   public void setupPathPlanner() {
+    PPHolonomicDriveController pathController =
+        new PPHolonomicDriveController(new PIDConstants(4, 0, 0), new PIDConstants(1.0, 0, 0));
+
     AutoBuilder.configure(
         poseEstimator::getCurrentPose, // Robot pose supplier
         poseEstimator
@@ -110,13 +123,7 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
         // ChassisSpeeds supplier. MUST BE ROBOT RELATIVE
         this::setChassisSpeedsWithAngleSupplier,
         // RELATIVE ChassisSpeeds
-        new PPHolonomicDriveController( // PPHolonomicController is the built in path following
-            // controller for
-            // holonomic
-            // drive trains
-            new PIDConstants(4, 0, 0), // Translation PID constants
-            new PIDConstants(1.0, 0, 0) // Rotation PID constants
-            ),
+        pathController,
         ppRobotConfigSupplier.get(), // The robot configuration
         () -> {
           // Boolean supplier that controls when the path will be mirrored for the red
@@ -126,6 +133,17 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
         },
         this // Reference to this subsystem to set requirements
         );
+
+    AutoPausedFollowPathCommand.installIntoAutoBuilder(
+        poseEstimator::getCurrentPose,
+        this::getRobotVelocity,
+        this::setChassisSpeedsWithAngleSupplier,
+        pathController,
+        ppRobotConfigSupplier.get(),
+        () -> GenericRobot.getAlliance() == DriverStation.Alliance.Red,
+        Constants.AutonConstants.PATH_PAUSE_ERROR_METERS,
+        Constants.AutonConstants.PATH_RESUME_ERROR_METERS,
+        this);
 
     // Preload PathPlanner Path finding.
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
@@ -301,6 +319,8 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
 
   public void setChassisSpeedsWithAngleSupplier(
       ChassisSpeeds chassisSpeeds, DriveFeedforwards moduleFeedForwards) {
+    updateSimAutoDisturbanceState();
+
     ChassisSpeeds angleSuppliedChassisSpeeds =
         new ChassisSpeeds(
             chassisSpeeds.vxMetersPerSecond,
@@ -308,6 +328,12 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
             null != angleSpeedSupplier
                 ? angleSpeedSupplier.getAsDouble()
                 : chassisSpeeds.omegaRadiansPerSecond);
+
+    if (isSimAutoDisturbanceActive()) {
+      angleSuppliedChassisSpeeds = applySimAutoDisturbance(angleSuppliedChassisSpeeds);
+      moduleFeedForwards =
+          scaleFeedforwards(moduleFeedForwards, Constants.Simulation.AUTO_DISTURBANCE_LINEAR_SCALE);
+    }
 
     swerveDrive.drive(angleSuppliedChassisSpeeds, moduleFeedForwards);
   }
@@ -821,7 +847,77 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
 
   @Override
   public void simulationPeriodic() {
+    updateSimAutoDisturbanceState();
     super.simulationPeriodic();
     swerveDrive.updateSimulation();
+  }
+
+  private void updateSimAutoDisturbanceState() {
+    if (!RobotBase.isSimulation()) {
+      return;
+    }
+
+    boolean autonomousEnabled = DriverStation.isAutonomousEnabled();
+    if (autonomousEnabled && !simAutonomousWasEnabled) {
+      simAutonomousStartTimestampSec = Timer.getFPGATimestamp();
+    } else if (!autonomousEnabled) {
+      simAutonomousStartTimestampSec = Double.NaN;
+    }
+    simAutonomousWasEnabled = autonomousEnabled;
+
+    Logger.recordOutput("Auto/SimDisturbanceEnabled", isSimAutoDisturbanceEnabled());
+    Logger.recordOutput("Auto/SimDisturbanceActive", isSimAutoDisturbanceActive());
+    Logger.recordOutput("Auto/SimDisturbanceElapsedSec", getSimAutonomousElapsedSeconds());
+    Logger.recordOutput("Auto/SimDisturbanceMode", "TimedSlowdown");
+  }
+
+  private boolean isSimAutoDisturbanceEnabled() {
+    return RobotBase.isSimulation()
+        && SmartDashboard.getBoolean(Constants.Simulation.AUTO_DISTURBANCE_DASHBOARD_KEY, false);
+  }
+
+  private boolean isSimAutoDisturbanceActive() {
+    if (!isSimAutoDisturbanceEnabled()
+        || !DriverStation.isAutonomousEnabled()
+        || !Double.isFinite(simAutonomousStartTimestampSec)) {
+      return false;
+    }
+
+    double autonomousElapsedSeconds = getSimAutonomousElapsedSeconds();
+    return autonomousElapsedSeconds >= Constants.Simulation.AUTO_DISTURBANCE_START_SECONDS
+        && autonomousElapsedSeconds
+            <= Constants.Simulation.AUTO_DISTURBANCE_START_SECONDS
+                + Constants.Simulation.AUTO_DISTURBANCE_DURATION_SECONDS;
+  }
+
+  private double getSimAutonomousElapsedSeconds() {
+    if (!Double.isFinite(simAutonomousStartTimestampSec)) {
+      return 0.0;
+    }
+    return Timer.getFPGATimestamp() - simAutonomousStartTimestampSec;
+  }
+
+  private ChassisSpeeds applySimAutoDisturbance(ChassisSpeeds chassisSpeeds) {
+    return new ChassisSpeeds(
+        chassisSpeeds.vxMetersPerSecond * Constants.Simulation.AUTO_DISTURBANCE_LINEAR_SCALE,
+        chassisSpeeds.vyMetersPerSecond * Constants.Simulation.AUTO_DISTURBANCE_LINEAR_SCALE,
+        chassisSpeeds.omegaRadiansPerSecond * Constants.Simulation.AUTO_DISTURBANCE_ANGULAR_SCALE);
+  }
+
+  private DriveFeedforwards scaleFeedforwards(DriveFeedforwards feedforwards, double scale) {
+    return new DriveFeedforwards(
+        scale(feedforwards.accelerationsMPSSq(), scale),
+        scale(feedforwards.linearForcesNewtons(), scale),
+        scale(feedforwards.torqueCurrentsAmps(), scale),
+        scale(feedforwards.robotRelativeForcesXNewtons(), scale),
+        scale(feedforwards.robotRelativeForcesYNewtons(), scale));
+  }
+
+  private double[] scale(double[] values, double scale) {
+    double[] scaledValues = new double[values.length];
+    for (int index = 0; index < values.length; index++) {
+      scaledValues[index] = values[index] * scale;
+    }
+    return scaledValues;
   }
 }
