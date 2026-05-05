@@ -5,7 +5,7 @@
 <title>GenericSwerveModuleInfo (FRC5010Lib Javadocs)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="description" content="declaration: package: org.frc5010.common.drive.swerve, record: GenericSwerveModuleInfo">
+<meta name="description" content="declaration: package: org.frc5010.common.drive.swerve, class: GenericSwerveModuleInfo">
 <meta name="generator" content="javadoc/ClassWriterImpl">
 <link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
 <link rel="stylesheet" type="text/css" href="../../../../../script-dir/jquery-ui.min.css" title="Style">
@@ -45,13 +45,13 @@ loadScripts(document, 'script');</script>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field-summary">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor-summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-summary">Method</a></li>
 </ul>
 <ul class="sub-nav-list">
 <li>Detail:&nbsp;</li>
-<li>Field&nbsp;|&nbsp;</li>
+<li><a href="#field-detail">Field</a>&nbsp;|&nbsp;</li>
 <li><a href="#constructor-detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-detail">Method</a></li>
 </ul>
@@ -69,21 +69,50 @@ loadScripts(document, 'script');</script>
 <!-- ======== START OF CLASS DATA ======== -->
 <div class="header">
 <div class="sub-title"><span class="package-label-in-type">Package</span>&nbsp;<a href="package-summary.html">org.frc5010.common.drive.swerve</a></div>
-<h1 title="Record Class GenericSwerveModuleInfo" class="title">Record Class GenericSwerveModuleInfo</h1>
+<h1 title="Class GenericSwerveModuleInfo" class="title">Class GenericSwerveModuleInfo</h1>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
-<div class="inheritance"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">java.lang.Record</a>
 <div class="inheritance">org.frc5010.common.drive.swerve.GenericSwerveModuleInfo</div>
-</div>
 </div>
 <section class="class-description" id="class-description">
 <hr>
-<div class="type-signature"><span class="modifiers">public record </span><span class="element-name type-name-label">GenericSwerveModuleInfo</span>(double&nbsp;steerAbsoluteDegrees, double&nbsp;steerRelativeDegrees, double&nbsp;driveRelativePositionMeters, double&nbsp;driveVelocityMetersPerSecond, double&nbsp;steerVelocityDegreesPerSecond, double&nbsp;expectedSteerDegrees)
-<span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></span></div>
-<div class="block">Add your docs here.</div>
+<div class="type-signature"><span class="modifiers">public class </span><span class="element-name type-name-label">GenericSwerveModuleInfo</span>
+<span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
+<div class="block">Mutable container for swerve module telemetry — reused each cycle to avoid per-call allocation.
+ Use <a href="#update(org.frc5010.common.drive.swerve.akit.Module)"><code>update(Module)</code></a> / <a href="#update(swervelib.SwerveModule)"><code>update(SwerveModule)</code></a> to refresh values in-place.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
+<!-- =========== FIELD SUMMARY =========== -->
+<li>
+<section class="field-summary" id="field-summary">
+<h2>Field Summary</h2>
+<div class="caption"><span>Fields</span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Field</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>double</code></div>
+<div class="col-second even-row-color"><code><a href="#driveRelativePositionMeters" class="member-name-link">driveRelativePositionMeters</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>double</code></div>
+<div class="col-second odd-row-color"><code><a href="#driveVelocityMetersPerSecond" class="member-name-link">driveVelocityMetersPerSecond</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>double</code></div>
+<div class="col-second even-row-color"><code><a href="#expectedSteerDegrees" class="member-name-link">expectedSteerDegrees</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>double</code></div>
+<div class="col-second odd-row-color"><code><a href="#steerAbsoluteDegrees" class="member-name-link">steerAbsoluteDegrees</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>double</code></div>
+<div class="col-second even-row-color"><code><a href="#steerRelativeDegrees" class="member-name-link">steerRelativeDegrees</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>double</code></div>
+<div class="col-second odd-row-color"><code><a href="#steerVelocityDegreesPerSecond" class="member-name-link">steerVelocityDegreesPerSecond</a></code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <li>
 <section class="constructor-summary" id="constructor-summary">
@@ -92,18 +121,7 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(double,double,double,double,double,double)" class="member-name-link">GenericSwerveModuleInfo</a><wbr>(double&nbsp;steerAbsoluteDegrees,
- double&nbsp;steerRelativeDegrees,
- double&nbsp;driveRelativePositionMeters,
- double&nbsp;driveVelocityMetersPerSecond,
- double&nbsp;steerVelocityDegreesPerSecond,
- double&nbsp;expectedSteerDegrees)</code></div>
-<div class="col-last even-row-color">
-<div class="block">Creates an instance of a <code>GenericSwerveModuleInfo</code> record class.</div>
-</div>
-<div class="col-constructor-name odd-row-color"><code><a href="#%3Cinit%3E(org.frc5010.common.drive.swerve.akit.Module)" class="member-name-link">GenericSwerveModuleInfo</a><wbr>(<a href="akit/Module.html" title="class in org.frc5010.common.drive.swerve.akit">Module</a>&nbsp;module)</code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(swervelib.SwerveModule)" class="member-name-link">GenericSwerveModuleInfo</a><wbr>(swervelib.SwerveModule&nbsp;module)</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">GenericSwerveModuleInfo</a>()</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -119,99 +137,81 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#driveRelativePositionMeters()" class="member-name-link">driveRelativePositionMeters</a>()</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#update(org.frc5010.common.drive.swerve.akit.Module)" class="member-name-link">update</a><wbr>(<a href="akit/Module.html" title="class in org.frc5010.common.drive.swerve.akit">Module</a>&nbsp;module)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>driveRelativePositionMeters</code> record component.</div>
+<div class="block">Update all fields from an AKit <a href="akit/Module.html" title="class in org.frc5010.common.drive.swerve.akit"><code>Module</code></a> — zero allocation after first call.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#driveVelocityMetersPerSecond()" class="member-name-link">driveVelocityMetersPerSecond</a>()</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#update(swervelib.SwerveModule)" class="member-name-link">update</a><wbr>(swervelib.SwerveModule&nbsp;module)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>driveVelocityMetersPerSecond</code> record component.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#equals(java.lang.Object)" class="member-name-link">equals</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;o)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Indicates whether some other object is "equal to" this one.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#expectedSteerDegrees()" class="member-name-link">expectedSteerDegrees</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>expectedSteerDegrees</code> record component.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final int</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#hashCode()" class="member-name-link">hashCode</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns a hash code value for this object.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#steerAbsoluteDegrees()" class="member-name-link">steerAbsoluteDegrees</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>steerAbsoluteDegrees</code> record component.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#steerRelativeDegrees()" class="member-name-link">steerRelativeDegrees</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>steerRelativeDegrees</code> record component.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#steerVelocityDegreesPerSecond()" class="member-name-link">steerVelocityDegreesPerSecond</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the value of the <code>steerVelocityDegreesPerSecond</code> record component.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toString()" class="member-name-link">toString</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns a string representation of this record class.</div>
+<div class="block">Update all fields from a YAGSL <code>SwerveModule</code> — zero allocation after first call.</div>
 </div>
 </div>
 </div>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
-<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
+<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 </section>
 </li>
 </ul>
 </section>
 <section class="details">
 <ul class="details-list">
+<!-- ============ FIELD DETAIL =========== -->
+<li>
+<section class="field-details" id="field-detail">
+<h2>Field Details</h2>
+<ul class="member-list">
+<li>
+<section class="detail" id="steerAbsoluteDegrees">
+<h3>steerAbsoluteDegrees</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">steerAbsoluteDegrees</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="steerRelativeDegrees">
+<h3>steerRelativeDegrees</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">steerRelativeDegrees</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="driveRelativePositionMeters">
+<h3>driveRelativePositionMeters</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">driveRelativePositionMeters</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="driveVelocityMetersPerSecond">
+<h3>driveVelocityMetersPerSecond</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">driveVelocityMetersPerSecond</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="steerVelocityDegreesPerSecond">
+<h3>steerVelocityDegreesPerSecond</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">steerVelocityDegreesPerSecond</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="expectedSteerDegrees">
+<h3>expectedSteerDegrees</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">expectedSteerDegrees</span></div>
+</section>
+</li>
+</ul>
+</section>
+</li>
 <!-- ========= CONSTRUCTOR DETAIL ======== -->
 <li>
 <section class="constructor-details" id="constructor-detail">
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(swervelib.SwerveModule)">
+<section class="detail" id="&lt;init&gt;()">
 <h3>GenericSwerveModuleInfo</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">GenericSwerveModuleInfo</span><wbr><span class="parameters">(swervelib.SwerveModule&nbsp;module)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="&lt;init&gt;(org.frc5010.common.drive.swerve.akit.Module)">
-<h3>GenericSwerveModuleInfo</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">GenericSwerveModuleInfo</span><wbr><span class="parameters">(<a href="akit/Module.html" title="class in org.frc5010.common.drive.swerve.akit">Module</a>&nbsp;module)</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="&lt;init&gt;(double,double,double,double,double,double)">
-<h3>GenericSwerveModuleInfo</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">GenericSwerveModuleInfo</span><wbr><span class="parameters">(double&nbsp;steerAbsoluteDegrees,
- double&nbsp;steerRelativeDegrees,
- double&nbsp;driveRelativePositionMeters,
- double&nbsp;driveVelocityMetersPerSecond,
- double&nbsp;steerVelocityDegreesPerSecond,
- double&nbsp;expectedSteerDegrees)</span></div>
-<div class="block">Creates an instance of a <code>GenericSwerveModuleInfo</code> record class.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>steerAbsoluteDegrees</code> - the value for the <code>steerAbsoluteDegrees</code> record component</dd>
-<dd><code>steerRelativeDegrees</code> - the value for the <code>steerRelativeDegrees</code> record component</dd>
-<dd><code>driveRelativePositionMeters</code> - the value for the <code>driveRelativePositionMeters</code> record component</dd>
-<dd><code>driveVelocityMetersPerSecond</code> - the value for the <code>driveVelocityMetersPerSecond</code> record component</dd>
-<dd><code>steerVelocityDegreesPerSecond</code> - the value for the <code>steerVelocityDegreesPerSecond</code> record component</dd>
-<dd><code>expectedSteerDegrees</code> - the value for the <code>expectedSteerDegrees</code> record component</dd>
-</dl>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">GenericSwerveModuleInfo</span>()</div>
 </section>
 </li>
 </ul>
@@ -223,110 +223,18 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="toString()">
-<h3>toString</h3>
-<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">toString</span>()</div>
-<div class="block">Returns a string representation of this record class. The representation contains the name of the class, followed by the name and value of each of the record components.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html#toString()" title="class or interface in java.lang" class="external-link">toString</a></code>&nbsp;in class&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></code></dd>
-<dt>Returns:</dt>
-<dd>a string representation of this object</dd>
-</dl>
+<section class="detail" id="update(swervelib.SwerveModule)">
+<h3>update</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">update</span><wbr><span class="parameters">(swervelib.SwerveModule&nbsp;module)</span></div>
+<div class="block">Update all fields from a YAGSL <code>SwerveModule</code> — zero allocation after first call.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="hashCode()">
-<h3>hashCode</h3>
-<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">hashCode</span>()</div>
-<div class="block">Returns a hash code value for this object. The value is derived from the hash code of each of the record components.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a></code>&nbsp;in class&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></code></dd>
-<dt>Returns:</dt>
-<dd>a hash code value for this object</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="equals(java.lang.Object)">
-<h3>equals</h3>
-<div class="member-signature"><span class="modifiers">public final</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">equals</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>&nbsp;o)</span></div>
-<div class="block">Indicates whether some other object is "equal to" this one. The objects are equal if the other object is of the same class and if all the record components are equal. All components in this record class are compared with '=='.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a></code>&nbsp;in class&nbsp;<code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Record.html" title="class or interface in java.lang" class="external-link">Record</a></code></dd>
-<dt>Parameters:</dt>
-<dd><code>o</code> - the object with which to compare</dd>
-<dt>Returns:</dt>
-<dd><code>true</code> if this object is the same as the <code>o</code> argument; <code>false</code> otherwise.</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="steerAbsoluteDegrees()">
-<h3>steerAbsoluteDegrees</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">steerAbsoluteDegrees</span>()</div>
-<div class="block">Returns the value of the <code>steerAbsoluteDegrees</code> record component.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>the value of the <code>steerAbsoluteDegrees</code> record component</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="steerRelativeDegrees()">
-<h3>steerRelativeDegrees</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">steerRelativeDegrees</span>()</div>
-<div class="block">Returns the value of the <code>steerRelativeDegrees</code> record component.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>the value of the <code>steerRelativeDegrees</code> record component</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="driveRelativePositionMeters()">
-<h3>driveRelativePositionMeters</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">driveRelativePositionMeters</span>()</div>
-<div class="block">Returns the value of the <code>driveRelativePositionMeters</code> record component.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>the value of the <code>driveRelativePositionMeters</code> record component</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="driveVelocityMetersPerSecond()">
-<h3>driveVelocityMetersPerSecond</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">driveVelocityMetersPerSecond</span>()</div>
-<div class="block">Returns the value of the <code>driveVelocityMetersPerSecond</code> record component.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>the value of the <code>driveVelocityMetersPerSecond</code> record component</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="steerVelocityDegreesPerSecond()">
-<h3>steerVelocityDegreesPerSecond</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">steerVelocityDegreesPerSecond</span>()</div>
-<div class="block">Returns the value of the <code>steerVelocityDegreesPerSecond</code> record component.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>the value of the <code>steerVelocityDegreesPerSecond</code> record component</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="expectedSteerDegrees()">
-<h3>expectedSteerDegrees</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">expectedSteerDegrees</span>()</div>
-<div class="block">Returns the value of the <code>expectedSteerDegrees</code> record component.</div>
-<dl class="notes">
-<dt>Returns:</dt>
-<dd>the value of the <code>expectedSteerDegrees</code> record component</dd>
-</dl>
+<section class="detail" id="update(org.frc5010.common.drive.swerve.akit.Module)">
+<h3>update</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">update</span><wbr><span class="parameters">(<a href="akit/Module.html" title="class in org.frc5010.common.drive.swerve.akit">Module</a>&nbsp;module)</span></div>
+<div class="block">Update all fields from an AKit <a href="akit/Module.html" title="class in org.frc5010.common.drive.swerve.akit"><code>Module</code></a> — zero allocation after first call. Reads <code>
+ inputs</code> values directly to avoid the allocating <a href="akit/Module.html#getPosition()"><code>Module.getPosition()</code></a> call.</div>
 </section>
 </li>
 </ul>

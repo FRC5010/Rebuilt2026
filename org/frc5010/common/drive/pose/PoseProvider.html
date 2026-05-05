@@ -45,13 +45,13 @@ loadScripts(document, 'script');</script>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
 <li><a href="#nested-class-summary">Nested</a>&nbsp;|&nbsp;</li>
-<li><a href="#field-summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method-summary">Method</a></li>
 </ul>
 <ul class="sub-nav-list">
 <li>Detail:&nbsp;</li>
-<li><a href="#field-detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li>Constr&nbsp;|&nbsp;</li>
 <li><a href="#method-detail">Method</a></li>
 </ul>
@@ -91,6 +91,24 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Interface</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>static final record&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="PoseProvider.PhotonFrameObservation.html" class="type-name-link" title="class in org.frc5010.common.drive.pose">PoseProvider.PhotonFrameObservation</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Logged raw and solved data for a single PhotonVision frame.</div>
+</div>
+<div class="col-first odd-row-color"><code>static final record&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="PoseProvider.PhotonPoseEstimate.html" class="type-name-link" title="class in org.frc5010.common.drive.pose">PoseProvider.PhotonPoseEstimate</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Logged data for one pose-solve method from a PhotonVision frame.</div>
+</div>
+<div class="col-first even-row-color"><code>static enum&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="PoseProvider.PhotonPoseMethod.html" class="type-name-link" title="enum class in org.frc5010.common.drive.pose">PoseProvider.PhotonPoseMethod</a></code></div>
+<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>static final record&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="PoseProvider.PhotonTargetObservation.html" class="type-name-link" title="class in org.frc5010.common.drive.pose">PoseProvider.PhotonTargetObservation</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Logged raw pose-relevant data for a single tracked PhotonVision target.</div>
+</div>
+<div class="col-first even-row-color"><code>static final record&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="PoseProvider.PoseObservation.html" class="type-name-link" title="class in org.frc5010.common.drive.pose">PoseProvider.PoseObservation</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">Represents a robot pose sample used for pose estimation.</div>
@@ -112,27 +130,6 @@ loadScripts(document, 'script');</script>
 </div>
 </section>
 </li>
-<!-- =========== FIELD SUMMARY =========== -->
-<li>
-<section class="field-summary" id="field-summary">
-<h2>Field Summary</h2>
-<div class="caption"><span>Fields</span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Field</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>static final int</code></div>
-<div class="col-second even-row-color"><code><a href="#cameraIndex" class="member-name-link">cameraIndex</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-<div class="col-first odd-row-color"><code>static final edu.wpi.first.wpilibj.Alert</code></div>
-<div class="col-second odd-row-color"><code><a href="#disconnectedAlert" class="member-name-link">disconnectedAlert</a></code></div>
-<div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>static final <a href="VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose">VisionIOInputsAutoLogged</a></code></div>
-<div class="col-second even-row-color"><code><a href="#input" class="member-name-link">input</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
-</div>
-</section>
-</li>
 <!-- ========== METHOD SUMMARY =========== -->
 <li>
 <section class="method-summary" id="method-summary">
@@ -144,30 +141,43 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default double</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getCaptureTime()" class="member-name-link">getCaptureTime</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>int</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getCameraIndex()" class="member-name-link">getCameraIndex</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default double</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getCaptureTime()" class="member-name-link">getCaptureTime</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose">VisionIOInputsAutoLogged</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getInput()" class="member-name-link">getInput</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Returns this provider's own <a href="VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose"><code>VisionIOInputsAutoLogged</code></a> instance.</div>
+</div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="PoseProvider.PoseObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PoseObservation</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getObservations()" class="member-name-link">getObservations</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default edu.wpi.first.math.Matrix&lt;edu.wpi.first.math.numbers.N3,<wbr>edu.wpi.first.math.numbers.N1&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getStdDeviations(org.frc5010.common.drive.pose.PoseProvider.PoseObservation)" class="member-name-link">getStdDeviations</a><wbr>(<a href="PoseProvider.PoseObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PoseObservation</a>&nbsp;observation)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="PoseProvider.ProviderType.html" title="enum class in org.frc5010.common.drive.pose">PoseProvider.ProviderType</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#isConnected()" class="member-name-link">isConnected</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#logInput(java.lang.String)" class="member-name-link">logInput</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;tableName)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default <a href="PoseProvider.PoseObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PoseObservation</a>[]</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getObservationsArray()" class="member-name-link">getObservationsArray</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">
+<div class="block">Returns the raw observations array without wrapping — zero allocation per call.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default edu.wpi.first.math.Matrix&lt;edu.wpi.first.math.numbers.N3,<wbr>edu.wpi.first.math.numbers.N1&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#getStdDeviations(org.frc5010.common.drive.pose.PoseProvider.PoseObservation)" class="member-name-link">getStdDeviations</a><wbr>(<a href="PoseProvider.PoseObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PoseObservation</a>&nbsp;observation)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="PoseProvider.ProviderType.html" title="enum class in org.frc5010.common.drive.pose">PoseProvider.ProviderType</a></code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#getType()" class="member-name-link">getType</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#isConnected()" class="member-name-link">isConnected</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#resetPose(edu.wpi.first.math.geometry.Pose3d)" class="member-name-link">resetPose</a><wbr>(edu.wpi.first.math.geometry.Pose3d&nbsp;initPose)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#logInput(java.lang.String)" class="member-name-link">logInput</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;tableName)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#update()" class="member-name-link">update</a>()</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code>default void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5"><code><a href="#resetPose(edu.wpi.first.math.geometry.Pose3d)" class="member-name-link">resetPose</a><wbr>(edu.wpi.first.math.geometry.Pose3d&nbsp;initPose)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab5">&nbsp;</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#update()" class="member-name-link">update</a>()</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">&nbsp;</div>
 </div>
 </div>
 </div>
@@ -177,49 +187,48 @@ loadScripts(document, 'script');</script>
 </section>
 <section class="details">
 <ul class="details-list">
-<!-- ============ FIELD DETAIL =========== -->
-<li>
-<section class="field-details" id="field-detail">
-<h2>Field Details</h2>
-<ul class="member-list">
-<li>
-<section class="detail" id="input">
-<h3>input</h3>
-<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type"><a href="VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose">VisionIOInputsAutoLogged</a></span>&nbsp;<span class="element-name">input</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="disconnectedAlert">
-<h3>disconnectedAlert</h3>
-<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type">edu.wpi.first.wpilibj.Alert</span>&nbsp;<span class="element-name">disconnectedAlert</span></div>
-</section>
-</li>
-<li>
-<section class="detail" id="cameraIndex">
-<h3>cameraIndex</h3>
-<div class="member-signature"><span class="modifiers">static final</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">cameraIndex</span></div>
-<dl class="notes">
-<dt>See Also:</dt>
-<dd>
-<ul class="see-list">
-<li><a href="../../../../../constant-values.html#org.frc5010.common.drive.pose.PoseProvider.cameraIndex">Constant Field Values</a></li>
-</ul>
-</dd>
-</dl>
-</section>
-</li>
-</ul>
-</section>
-</li>
 <!-- ============ METHOD DETAIL ========== -->
 <li>
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="getInput()">
+<h3>getInput</h3>
+<div class="member-signature"><span class="return-type"><a href="VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose">VisionIOInputsAutoLogged</a></span>&nbsp;<span class="element-name">getInput</span>()</div>
+<div class="block">Returns this provider's own <a href="VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose"><code>VisionIOInputsAutoLogged</code></a> instance.
+
+ <p>Each implementing class must declare and return its own instance. The old pattern of a
+ single <code>public VisionIOInputsAutoLogged input</code> field on the interface was implicitly
+ <code>static final</code> in Java — meaning all cameras shared one object and each camera's <code>
+ updateCameraInfo()</code> overwrote the previous camera's observations.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>the per-instance inputs object</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getCameraIndex()">
+<h3>getCameraIndex</h3>
+<div class="member-signature"><span class="return-type">int</span>&nbsp;<span class="element-name">getCameraIndex</span>()</div>
+</section>
+</li>
+<li>
 <section class="detail" id="getObservations()">
 <h3>getObservations</h3>
 <div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="PoseProvider.PoseObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PoseObservation</a>&gt;</span>&nbsp;<span class="element-name">getObservations</span>()</div>
+</section>
+</li>
+<li>
+<section class="detail" id="getObservationsArray()">
+<h3>getObservationsArray</h3>
+<div class="member-signature"><span class="modifiers">default</span>&nbsp;<span class="return-type"><a href="PoseProvider.PoseObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PoseObservation</a>[]</span>&nbsp;<span class="element-name">getObservationsArray</span>()</div>
+<div class="block">Returns the raw observations array without wrapping — zero allocation per call.</div>
+<dl class="notes">
+<dt>Returns:</dt>
+<dd>The current observations of the robot as a raw array.</dd>
+</dl>
 </section>
 </li>
 <li>

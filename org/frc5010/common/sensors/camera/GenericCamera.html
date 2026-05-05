@@ -97,7 +97,7 @@ implements <a href="../../drive/pose/PoseProvider.html" title="interface in org.
 <h2>Nested Class Summary</h2>
 <div class="inherited-list">
 <h2 id="nested-classes-inherited-from-class-org.frc5010.common.drive.pose.PoseProvider">Nested classes/interfaces inherited from interface&nbsp;org.frc5010.common.drive.pose.<a href="../../drive/pose/PoseProvider.html" title="interface in org.frc5010.common.drive.pose">PoseProvider</a></h2>
-<code><a href="../../drive/pose/PoseProvider.PoseObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PoseObservation</a>, <a href="../../drive/pose/PoseProvider.PoseObservationType.html" title="enum class in org.frc5010.common.drive.pose">PoseProvider.PoseObservationType</a>, <a href="../../drive/pose/PoseProvider.ProviderType.html" title="enum class in org.frc5010.common.drive.pose">PoseProvider.ProviderType</a>, <a href="../../drive/pose/PoseProvider.TargetRotation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.TargetRotation</a>, <a href="../../drive/pose/PoseProvider.VisionIOInputs.html" title="class in org.frc5010.common.drive.pose">PoseProvider.VisionIOInputs</a></code></div>
+<code><a href="../../drive/pose/PoseProvider.PhotonFrameObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PhotonFrameObservation</a>, <a href="../../drive/pose/PoseProvider.PhotonPoseEstimate.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PhotonPoseEstimate</a>, <a href="../../drive/pose/PoseProvider.PhotonPoseMethod.html" title="enum class in org.frc5010.common.drive.pose">PoseProvider.PhotonPoseMethod</a>, <a href="../../drive/pose/PoseProvider.PhotonTargetObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PhotonTargetObservation</a>, <a href="../../drive/pose/PoseProvider.PoseObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PoseObservation</a>, <a href="../../drive/pose/PoseProvider.PoseObservationType.html" title="enum class in org.frc5010.common.drive.pose">PoseProvider.PoseObservationType</a>, <a href="../../drive/pose/PoseProvider.ProviderType.html" title="enum class in org.frc5010.common.drive.pose">PoseProvider.ProviderType</a>, <a href="../../drive/pose/PoseProvider.TargetRotation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.TargetRotation</a>, <a href="../../drive/pose/PoseProvider.VisionIOInputs.html" title="class in org.frc5010.common.drive.pose">PoseProvider.VisionIOInputs</a></code></div>
 </section>
 </li>
 <!-- =========== FIELD SUMMARY =========== -->
@@ -119,40 +119,42 @@ implements <a href="../../drive/pose/PoseProvider.html" title="interface in org.
 <div class="col-last odd-row-color">
 <div class="block">The index of the column in the dashboard</div>
 </div>
-<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color"><code><a href="#name" class="member-name-link">name</a></code></div>
+<div class="col-first even-row-color"><code>protected final <a href="../../drive/pose/VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose">VisionIOInputsAutoLogged</a></code></div>
+<div class="col-second even-row-color"><code><a href="#input" class="member-name-link">input</a></code></div>
 <div class="col-last even-row-color">
+<div class="block">Per-instance inputs — each camera has its own object so observations are not overwritten</div>
+</div>
+<div class="col-first odd-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#name" class="member-name-link">name</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">The name of the camera</div>
 </div>
-<div class="col-first odd-row-color"><code>protected edu.wpi.first.math.geometry.Transform3d</code></div>
-<div class="col-second odd-row-color"><code><a href="#robotToCamera" class="member-name-link">robotToCamera</a></code></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><code>protected edu.wpi.first.math.geometry.Transform3d</code></div>
+<div class="col-second even-row-color"><code><a href="#robotToCamera" class="member-name-link">robotToCamera</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">The robot-to-camera transform</div>
 </div>
-<div class="col-first even-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#updaters" class="member-name-link">updaters</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code>protected <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Runnable.html" title="class or interface in java.lang" class="external-link">Runnable</a>&gt;</code></div>
+<div class="col-second odd-row-color"><code><a href="#updaters" class="member-name-link">updaters</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">The list of updaters that will be called every time the camera is updated</div>
 </div>
-<div class="col-first odd-row-color"><code>protected boolean</code></div>
-<div class="col-second odd-row-color"><code><a href="#updateValues" class="member-name-link">updateValues</a></code></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><code>protected boolean</code></div>
+<div class="col-second even-row-color"><code><a href="#updateValues" class="member-name-link">updateValues</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">Whether or not to update the values</div>
 </div>
-<div class="col-first even-row-color"><code>protected edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout</code></div>
-<div class="col-second even-row-color"><code><a href="#visionLayout" class="member-name-link">visionLayout</a></code></div>
-<div class="col-last even-row-color">
+<div class="col-first odd-row-color"><code>protected edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout</code></div>
+<div class="col-second odd-row-color"><code><a href="#visionLayout" class="member-name-link">visionLayout</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">The display layout to use</div>
 </div>
-<div class="col-first odd-row-color"><code>protected edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab</code></div>
-<div class="col-second odd-row-color"><code><a href="#visionTab" class="member-name-link">visionTab</a></code></div>
-<div class="col-last odd-row-color">
+<div class="col-first even-row-color"><code>protected edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab</code></div>
+<div class="col-second even-row-color"><code><a href="#visionTab" class="member-name-link">visionTab</a></code></div>
+<div class="col-last even-row-color">
 <div class="block">The display tab to use</div>
 </div>
 </div>
-<div class="inherited-list">
-<h3 id="fields-inherited-from-class-org.frc5010.common.drive.pose.PoseProvider">Fields inherited from interface&nbsp;org.frc5010.common.drive.pose.<a href="../../drive/pose/PoseProvider.html" title="interface in org.frc5010.common.drive.pose">PoseProvider</a></h3>
-<code><a href="../../drive/pose/PoseProvider.html#cameraIndex">cameraIndex</a>, <a href="../../drive/pose/PoseProvider.html#disconnectedAlert">disconnectedAlert</a>, <a href="../../drive/pose/PoseProvider.html#input">input</a></code></div>
 </section>
 </li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
@@ -188,10 +190,20 @@ implements <a href="../../drive/pose/PoseProvider.html" title="interface in org.
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns whether or not the camera can view game pieces in simulation mode.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDistanceToTarget(double)" class="member-name-link">getDistanceToTarget</a><wbr>(double&nbsp;targetHeight)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>int</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getCameraIndex()" class="member-name-link">getCameraIndex</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block"> Returns this camera's column index, used for std-dev scaling.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>double</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getDistanceToTarget(double)" class="member-name-link">getDistanceToTarget</a><wbr>(double&nbsp;targetHeight)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">A method to get the distance to the target.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="../../drive/pose/VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose">VisionIOInputsAutoLogged</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getInput()" class="member-name-link">getInput</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Returns this provider's own <a href="../../drive/pose/VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose"><code>VisionIOInputsAutoLogged</code></a> instance.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>edu.wpi.first.math.geometry.Transform3d</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getRobotToCamera()" class="member-name-link">getRobotToCamera</a>()</code></div>
@@ -257,7 +269,7 @@ implements <a href="../../drive/pose/PoseProvider.html" title="interface in org.
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.frc5010.common.drive.pose.PoseProvider">Methods inherited from interface&nbsp;org.frc5010.common.drive.pose.<a href="../../drive/pose/PoseProvider.html" title="interface in org.frc5010.common.drive.pose">PoseProvider</a></h3>
-<code><a href="../../drive/pose/PoseProvider.html#getCaptureTime()">getCaptureTime</a>, <a href="../../drive/pose/PoseProvider.html#getObservations()">getObservations</a>, <a href="../../drive/pose/PoseProvider.html#getStdDeviations(org.frc5010.common.drive.pose.PoseProvider.PoseObservation)">getStdDeviations</a>, <a href="../../drive/pose/PoseProvider.html#getType()">getType</a>, <a href="../../drive/pose/PoseProvider.html#isConnected()">isConnected</a>, <a href="../../drive/pose/PoseProvider.html#logInput(java.lang.String)">logInput</a>, <a href="../../drive/pose/PoseProvider.html#resetPose(edu.wpi.first.math.geometry.Pose3d)">resetPose</a></code></div>
+<code><a href="../../drive/pose/PoseProvider.html#getCaptureTime()">getCaptureTime</a>, <a href="../../drive/pose/PoseProvider.html#getObservations()">getObservations</a>, <a href="../../drive/pose/PoseProvider.html#getObservationsArray()">getObservationsArray</a>, <a href="../../drive/pose/PoseProvider.html#getStdDeviations(org.frc5010.common.drive.pose.PoseProvider.PoseObservation)">getStdDeviations</a>, <a href="../../drive/pose/PoseProvider.html#getType()">getType</a>, <a href="../../drive/pose/PoseProvider.html#isConnected()">isConnected</a>, <a href="../../drive/pose/PoseProvider.html#logInput(java.lang.String)">logInput</a>, <a href="../../drive/pose/PoseProvider.html#resetPose(edu.wpi.first.math.geometry.Pose3d)">resetPose</a></code></div>
 </section>
 </li>
 </ul>
@@ -269,6 +281,13 @@ implements <a href="../../drive/pose/PoseProvider.html" title="interface in org.
 <section class="field-details" id="field-detail">
 <h2>Field Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="input">
+<h3>input</h3>
+<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type"><a href="../../drive/pose/VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose">VisionIOInputsAutoLogged</a></span>&nbsp;<span class="element-name">input</span></div>
+<div class="block">Per-instance inputs — each camera has its own object so observations are not overwritten</div>
+</section>
+</li>
 <li>
 <section class="detail" id="updaters">
 <h3>updaters</h3>
@@ -356,6 +375,35 @@ implements <a href="../../drive/pose/PoseProvider.html" title="interface in org.
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
+<li>
+<section class="detail" id="getInput()">
+<h3>getInput</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="../../drive/pose/VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose">VisionIOInputsAutoLogged</a></span>&nbsp;<span class="element-name">getInput</span>()</div>
+<div class="block">Returns this provider's own <a href="../../drive/pose/VisionIOInputsAutoLogged.html" title="class in org.frc5010.common.drive.pose"><code>VisionIOInputsAutoLogged</code></a> instance.
+
+ <p>Each implementing class must declare and return its own instance. The old pattern of a
+ single <code>public VisionIOInputsAutoLogged input</code> field on the interface was implicitly
+ <code>static final</code> in Java — meaning all cameras shared one object and each camera's <code>
+ updateCameraInfo()</code> overwrote the previous camera's observations. Returns this camera's own per-instance inputs object.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../drive/pose/PoseProvider.html#getInput()">getInput</a></code>&nbsp;in interface&nbsp;<code><a href="../../drive/pose/PoseProvider.html" title="interface in org.frc5010.common.drive.pose">PoseProvider</a></code></dd>
+<dt>Returns:</dt>
+<dd>the per-instance inputs object</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getCameraIndex()">
+<h3>getCameraIndex</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">getCameraIndex</span>()</div>
+<div class="block"> Returns this camera's column index, used for std-dev scaling.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="../../drive/pose/PoseProvider.html#getCameraIndex()">getCameraIndex</a></code>&nbsp;in interface&nbsp;<code><a href="../../drive/pose/PoseProvider.html" title="interface in org.frc5010.common.drive.pose">PoseProvider</a></code></dd>
+</dl>
+</section>
+</li>
 <li>
 <section class="detail" id="update()">
 <h3>update</h3>

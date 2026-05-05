@@ -100,6 +100,16 @@ loadScripts(document, 'script');</script>
 <div class="col-first odd-row-color"><code>boolean</code></div>
 <div class="col-second odd-row-color"><code><a href="#connected" class="member-name-link">connected</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>int</code></div>
+<div class="col-second even-row-color"><code><a href="#droppedResultCount" class="member-name-link">droppedResultCount</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Count of PhotonVision frames dropped by the per-cycle cap</div>
+</div>
+<div class="col-first odd-row-color"><code>edu.wpi.first.math.geometry.Pose3d</code></div>
+<div class="col-second odd-row-color"><code><a href="#estimatedRobotPose" class="member-name-link">estimatedRobotPose</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Latest estimated robot pose from this camera</div>
+</div>
 <div class="col-first even-row-color"><code>boolean</code></div>
 <div class="col-second even-row-color"><code><a href="#hasTarget" class="member-name-link">hasTarget</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
@@ -109,12 +119,34 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color"><code><a href="PoseProvider.TargetRotation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.TargetRotation</a></code></div>
 <div class="col-second even-row-color"><code><a href="#latestTargetRotation" class="member-name-link">latestTargetRotation</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code><a href="PoseProvider.PhotonFrameObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PhotonFrameObservation</a>[]</code></div>
+<div class="col-second odd-row-color"><code><a href="#photonFrameObservations" class="member-name-link">photonFrameObservations</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Per-frame PhotonVision diagnostics for offline pose/filter tuning</div>
+</div>
+<div class="col-first even-row-color"><code>double</code></div>
+<div class="col-second even-row-color"><code><a href="#poseAmbiguity" class="member-name-link">poseAmbiguity</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Pose ambiguity of the best visible target</div>
+</div>
 <div class="col-first odd-row-color"><code><a href="PoseProvider.PoseObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PoseObservation</a>[]</code></div>
 <div class="col-second odd-row-color"><code><a href="#poseObservations" class="member-name-link">poseObservations</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
-<div class="col-first even-row-color"><code>int[]</code></div>
-<div class="col-second even-row-color"><code><a href="#tagIds" class="member-name-link">tagIds</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first even-row-color"><code>int</code></div>
+<div class="col-second even-row-color"><code><a href="#processedResultCount" class="member-name-link">processedResultCount</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Count of PhotonVision frames processed after capping</div>
+</div>
+<div class="col-first odd-row-color"><code>double</code></div>
+<div class="col-second odd-row-color"><code><a href="#totalTagDistance" class="member-name-link">totalTagDistance</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Total summed distance to all visible tags (meters)</div>
+</div>
+<div class="col-first even-row-color"><code>int</code></div>
+<div class="col-second even-row-color"><code><a href="#unreadResultCount" class="member-name-link">unreadResultCount</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Count of unread PhotonVision frames returned this cycle</div>
+</div>
 </div>
 </section>
 </li>
@@ -186,9 +218,52 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="tagIds">
-<h3>tagIds</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int[]</span>&nbsp;<span class="element-name">tagIds</span></div>
+<section class="detail" id="totalTagDistance">
+<h3>totalTagDistance</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">totalTagDistance</span></div>
+<div class="block">Total summed distance to all visible tags (meters)</div>
+</section>
+</li>
+<li>
+<section class="detail" id="poseAmbiguity">
+<h3>poseAmbiguity</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">double</span>&nbsp;<span class="element-name">poseAmbiguity</span></div>
+<div class="block">Pose ambiguity of the best visible target</div>
+</section>
+</li>
+<li>
+<section class="detail" id="estimatedRobotPose">
+<h3>estimatedRobotPose</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">edu.wpi.first.math.geometry.Pose3d</span>&nbsp;<span class="element-name">estimatedRobotPose</span></div>
+<div class="block">Latest estimated robot pose from this camera</div>
+</section>
+</li>
+<li>
+<section class="detail" id="unreadResultCount">
+<h3>unreadResultCount</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">unreadResultCount</span></div>
+<div class="block">Count of unread PhotonVision frames returned this cycle</div>
+</section>
+</li>
+<li>
+<section class="detail" id="processedResultCount">
+<h3>processedResultCount</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">processedResultCount</span></div>
+<div class="block">Count of PhotonVision frames processed after capping</div>
+</section>
+</li>
+<li>
+<section class="detail" id="droppedResultCount">
+<h3>droppedResultCount</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">int</span>&nbsp;<span class="element-name">droppedResultCount</span></div>
+<div class="block">Count of PhotonVision frames dropped by the per-cycle cap</div>
+</section>
+</li>
+<li>
+<section class="detail" id="photonFrameObservations">
+<h3>photonFrameObservations</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="PoseProvider.PhotonFrameObservation.html" title="class in org.frc5010.common.drive.pose">PoseProvider.PhotonFrameObservation</a>[]</span>&nbsp;<span class="element-name">photonFrameObservations</span></div>
+<div class="block">Per-frame PhotonVision diagnostics for offline pose/filter tuning</div>
 </section>
 </li>
 </ul>

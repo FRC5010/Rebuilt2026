@@ -178,17 +178,21 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runSetpoint(edu.wpi.first.math.kinematics.SwerveModuleState)" class="member-name-link">runSetpoint</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runSetpoint(edu.wpi.first.math.kinematics.SwerveModuleState,edu.wpi.first.units.measure.Current)" class="member-name-link">runSetpoint</a><wbr>(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
+ edu.wpi.first.units.measure.Current&nbsp;torqueCurrent)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Runs the module with the specified setpoint state.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runSteerCharacterization(double)" class="member-name-link">runSteerCharacterization</a><wbr>(double&nbsp;output)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#runSteerCharacterization(double)" class="member-name-link">runSteerCharacterization</a><wbr>(double&nbsp;output)</code></div>
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Runs the module with the specified output while controlling to zero degrees.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#stop()" class="member-name-link">stop</a>()</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Disables all outputs to motors.</div>
 </div>
 </div>
@@ -231,10 +235,17 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
+<section class="detail" id="runSetpoint(edu.wpi.first.math.kinematics.SwerveModuleState,edu.wpi.first.units.measure.Current)">
+<h3>runSetpoint</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">runSetpoint</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state,
+ edu.wpi.first.units.measure.Current&nbsp;torqueCurrent)</span></div>
+<div class="block">Runs the module with the specified setpoint state. Mutates the state to optimize it.</div>
+</section>
+</li>
+<li>
 <section class="detail" id="runSetpoint(edu.wpi.first.math.kinematics.SwerveModuleState)">
 <h3>runSetpoint</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">runSetpoint</span><wbr><span class="parameters">(edu.wpi.first.math.kinematics.SwerveModuleState&nbsp;state)</span></div>
-<div class="block">Runs the module with the specified setpoint state. Mutates the state to optimize it.</div>
 </section>
 </li>
 <li>
