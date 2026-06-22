@@ -120,7 +120,7 @@ public class LauncherCommands {
     autoHammerTimeState = stateMachine.addState("AUTO-HAMMER-TIME", autoHammerTimeStateCommand());
     escapeHammerTimeState =
         stateMachine.addState("ESCAPE-HAMMER-TIME", escapeHammerTimeStateCommand());
-    stateMachine.setInitialState(hammerTimeState);
+    stateMachine.setInitialState(idleState);
     idleState.switchTo(lowState).when(() -> launcher.isRequested(LauncherState.LOW_SPEED));
     idleState.switchTo(prepState).when(() -> launcher.isRequested(LauncherState.PREP));
     idleState.switchTo(presetState).when(() -> launcher.isRequested(LauncherState.PRESET));
@@ -196,9 +196,9 @@ public class LauncherCommands {
   public void configureButtonBindings(Controller driver, Controller operator) {
 
     // driver.createAButton().onTrue(shouldPrepCommand());
-    driver.createBButton().whileTrue(shouldPrepCommand()).onFalse(shouldLowCommand());
+    driver.createBButton().whileTrue(turretForwardPresetStateCommand()).onFalse(shouldLowCommand());
 
-    driver.createAButton().onTrue(shouldLowCommand()).onFalse(shouldLowCommand());
+    driver.createAButton().onTrue(shouldIdleCommand()).onFalse(shouldIdleCommand());
 
     operator
         .createLeftPovButton()
@@ -207,7 +207,7 @@ public class LauncherCommands {
         .createRightPovButton()
         .onTrue(Commands.runOnce(() -> ShotCalculator.incrementFlywheelMultiplier(0.01)));
 
-    operator.createAButton().whileTrue(towerPresetStateCommand()).onFalse(shouldLowCommand());
+    operator.createAButton().whileTrue(shouldIdleCommand()).onFalse(shouldIdleCommand());
 
     operator
         .createBButton()
@@ -215,10 +215,7 @@ public class LauncherCommands {
         .onFalse(shouldLowCommand());
 
     operator.createXButton().whileTrue(leftCornerPresetStateCommand()).onFalse(shouldLowCommand());
-    operator
-        .createYButton()
-        .whileTrue(turretForwardPresetStateCommand())
-        .onFalse(shouldLowCommand());
+    operator.createYButton().whileTrue(shouldPrepCommand()).onFalse(shouldLowCommand());
 
     operator.createBackButton().whileTrue(zeroHoodSequence());
 
