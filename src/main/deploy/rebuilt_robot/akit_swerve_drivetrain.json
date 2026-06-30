@@ -43,6 +43,19 @@
         "s": 4.154401722318193,
         "v": 0.12648375113784652,
         "a": 0.004058324259193265
+      },
+      "sim": {
+        "closedLoopOutput": "TorqueCurrentFOC",
+        "feedBack": {
+          "p": 5,
+          "i": 0,
+          "d": 0
+        },
+        "feedForward": {
+          "s": 17.3,
+          "v": 4.7,
+          "a": 2.95
+        }
       }
     },
     "steerMotorControl": {

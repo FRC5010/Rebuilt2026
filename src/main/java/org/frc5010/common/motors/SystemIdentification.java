@@ -35,6 +35,7 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import org.frc5010.common.arch.GenericSubsystem;
 import org.frc5010.common.sensors.encoder.GenericEncoder;
+import org.littletonrobotics.junction.Logger;
 import yams.motorcontrollers.SmartMotorController;
 
 /** Add your docs here. */
@@ -264,6 +265,11 @@ public class SystemIdentification {
                   SmartDashboard.putNumber("Characterization/Feedforward/kS", kS);
                   SmartDashboard.putNumber("Characterization/Feedforward/kV", kV);
                   SmartDashboard.putNumber("Characterization/Feedforward/kA", kA);
+                  Logger.recordOutput("Characterization/Feedforward/kS", kS);
+                  Logger.recordOutput("Characterization/Feedforward/kV", kV);
+                  Logger.recordOutput("Characterization/Feedforward/kA", kA);
+                  Logger.recordOutput(
+                      "Characterization/Feedforward/sampleCount", velocitySamples.size());
                 }));
   }
 
@@ -336,6 +342,14 @@ public class SystemIdentification {
                   SmartDashboard.putNumber("Characterization/TorqueCurrentFeedforward/kS", kS);
                   SmartDashboard.putNumber("Characterization/TorqueCurrentFeedforward/kV", kV);
                   SmartDashboard.putNumber("Characterization/TorqueCurrentFeedforward/kA", kA);
+                  // Also log directly so values land in the wpilog even if NT doesn't flush
+                  // before disable tears down the publisher.
+                  Logger.recordOutput("Characterization/TorqueCurrentFeedforward/kS", kS);
+                  Logger.recordOutput("Characterization/TorqueCurrentFeedforward/kV", kV);
+                  Logger.recordOutput("Characterization/TorqueCurrentFeedforward/kA", kA);
+                  Logger.recordOutput(
+                      "Characterization/TorqueCurrentFeedforward/sampleCount",
+                      velocitySamples.size());
                 }));
   }
 

@@ -239,7 +239,13 @@ public class AkitSwerveDrive extends SwerveDriveFunctions {
     runVelocity(speeds, new Current[] {Amps.zero(), Amps.zero(), Amps.zero(), Amps.zero()});
   }
 
-  /** Runs the drive in a straight line with the specified drive output. */
+  /**
+   * Runs all drive motors open-loop while pointing each module tangent to a circle around the
+   * chassis center, so the chassis spins in place. Used by the drive feedforward characterization
+   * routines — the 3-parameter fit (kS + kV·ω + kA·α) separates rotational inertia into kA so the
+   * spin orientation gives the same kS / kV as a straight-line ramp would. Spin orientation lets
+   * the routine run on a real robot without needing several meters of clear straight line.
+   */
   public void runCharacterization(double output) {
     for (int i = 0; i < 4; i++) {
       modules[i].runCharacterization(output, config);
