@@ -31,7 +31,6 @@ import org.frc5010.common.drive.swerve.SwerveDriveFunctions;
 import org.frc5010.common.drive.swerve.akit.AkitSwerveDrive;
 import org.frc5010.common.drive.swerve.akit.GyroIOPigeon2;
 import org.frc5010.common.drive.swerve.akit.GyroIOSim;
-import org.frc5010.common.drive.swerve.akit.ModuleIOSim;
 import org.frc5010.common.drive.swerve.akit.ModuleIOSpark;
 import org.frc5010.common.drive.swerve.akit.ModuleIOSparkTalon;
 import org.frc5010.common.drive.swerve.akit.ModuleIOTalonFXReal;
@@ -105,35 +104,25 @@ public class AKitSwerveDrivetrainJson implements DrivetrainPropertiesJson {
       // to it (like turnAbsolutePosition after recent commits) actually update.
       config.ODOMETRY_FREQUENCY = 250.0;
 
-      if ("TalonFX".equals(type)) {
-        TalonFXOdometryThread.createInstance(config);
-        driveFunctions =
-            new AkitSwerveDrive(
-                config,
-                new GyroIOSim(SwerveDriveFunctions.driveSimulation.getGyroSimulation()),
-                new ModuleIOTalonFXSim(
-                    config, config.FrontLeft, SwerveDriveFunctions.driveSimulation.getModules()[0]),
-                new ModuleIOTalonFXSim(
-                    config,
-                    config.FrontRight,
-                    SwerveDriveFunctions.driveSimulation.getModules()[1]),
-                new ModuleIOTalonFXSim(
-                    config, config.BackLeft, SwerveDriveFunctions.driveSimulation.getModules()[2]),
-                new ModuleIOTalonFXSim(
-                    config, config.BackRight, SwerveDriveFunctions.driveSimulation.getModules()[3]),
-                SwerveDriveFunctions.driveSimulation::setSimulationWorldPose);
-      } else {
-        TalonFXOdometryThread.createInstance(config);
-        driveFunctions =
-            new AkitSwerveDrive(
-                config,
-                new GyroIOSim(SwerveDriveFunctions.driveSimulation.getGyroSimulation()),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                new ModuleIOSim(),
-                SwerveDriveFunctions.driveSimulation::setSimulationWorldPose);
-      }
+      // Simulation always drives the maple-sim physics model through the TalonFX
+      // sim module IO, regardless of the real-robot `type`. ModuleIOTalonFXSim is
+      // the only sim IO that attaches motor controllers to the maple
+      // SwerveDriveSimulation; plain ModuleIOSim would leave the simulated chassis
+      // (and its gyro) frozen while modules reported phantom motion.
+      TalonFXOdometryThread.createInstance(config);
+      driveFunctions =
+          new AkitSwerveDrive(
+              config,
+              new GyroIOSim(SwerveDriveFunctions.driveSimulation.getGyroSimulation()),
+              new ModuleIOTalonFXSim(
+                  config, config.FrontLeft, SwerveDriveFunctions.driveSimulation.getModules()[0]),
+              new ModuleIOTalonFXSim(
+                  config, config.FrontRight, SwerveDriveFunctions.driveSimulation.getModules()[1]),
+              new ModuleIOTalonFXSim(
+                  config, config.BackLeft, SwerveDriveFunctions.driveSimulation.getModules()[2]),
+              new ModuleIOTalonFXSim(
+                  config, config.BackRight, SwerveDriveFunctions.driveSimulation.getModules()[3]),
+              SwerveDriveFunctions.driveSimulation::setSimulationWorldPose);
     } else {
       config.ODOMETRY_FREQUENCY = config.getCANBus().isNetworkFD() ? 250.0 : 100.0;
       if ("SparkTalon".equals(type)) {
