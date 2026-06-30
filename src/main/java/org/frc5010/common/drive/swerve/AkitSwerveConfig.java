@@ -20,10 +20,12 @@ import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerFeedbackType;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants.SteerMotorArrangement;
 import com.ctre.phoenix6.swerve.SwerveModuleConstantsFactory;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import org.frc5010.common.config.UnitsParser;
 import org.frc5010.common.config.json.devices.DrivetrainConstantsJson;
+import org.frc5010.common.config.json.devices.MotorSystemIdJson;
 import org.frc5010.common.drive.SwerveDriveConfig;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
@@ -139,25 +141,10 @@ public class AkitSwerveConfig extends SwerveDriveConfig {
                       .getRotorToMechanismRatio())
               .withCouplingGearRatio(constants.coupleRatio)
               .withWheelRadius(UnitsParser.parseDistance(constants.wheelDiameter).div(2))
-              .withSteerMotorGains(
-                  new Slot0Configs()
-                      .withKP(constants.steerMotorControl.feedBack.p)
-                      .withKI(constants.steerMotorControl.feedBack.i)
-                      .withKD(constants.steerMotorControl.feedBack.d)
-                      .withKS(constants.steerMotorControl.feedForward.s)
-                      .withKV(constants.steerMotorControl.feedForward.v)
-                      .withKA(constants.steerMotorControl.feedForward.a)
-                      .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign))
-              .withDriveMotorGains(
-                  new Slot0Configs()
-                      .withKP(constants.driveMotorControl.feedBack.p)
-                      .withKI(constants.driveMotorControl.feedBack.i)
-                      .withKD(constants.driveMotorControl.feedBack.d)
-                      .withKS(constants.driveMotorControl.feedForward.s)
-                      .withKV(constants.driveMotorControl.feedForward.v)
-                      .withKA(constants.driveMotorControl.feedForward.a))
-              .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.TorqueCurrentFOC)
-              .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.TorqueCurrentFOC)
+              .withSteerMotorGains(steerSlot0Configs(constants.steerMotorControl))
+              .withDriveMotorGains(driveSlot0Configs(constants.driveMotorControl))
+              .withSteerMotorClosedLoopOutput(steerClosedLoopOutput(constants.steerMotorControl))
+              .withDriveMotorClosedLoopOutput(driveClosedLoopOutput(constants.driveMotorControl))
               .withSlipCurrent(UnitsParser.parseAmps(constants.slipCurrent))
               .withSpeedAt12Volts(UnitsParser.parseVelocity(constants.maxDriveSpeed))
               .withDriveMotorType(DriveMotorArrangement.TalonFX_Integrated)
@@ -237,6 +224,98 @@ public class AkitSwerveConfig extends SwerveDriveConfig {
               constants.invertRightSide,
               constants.modules.get("backRight").steerMotorSetup.inverted,
               constants.modules.get("backRight").encoderInverted);
+    }
+
+    // --- Sim defaults (applied when running in sim and JSON does not override). --------------
+    //
+    // Real hardware uses TorqueCurrentFOC with the gains parsed from JSON. Maple-sim's motor model
+    // doesn't track those gains cleanly (amps-shaped JSON numbers either bang-bang or wildly
+    // under-drive when interpreted as volts, and saturate the slip-current limit when kept as
+    // amps), so sim defaults to Voltage closed-loop with these reference gains. Each motor's
+    // optional {@code sim} sub-block in JSON can override any of feedBack / feedForward /
+    // closedLoopOutput.
+    private static final MotorSystemIdJson.FeedBack DEFAULT_STEER_SIM_FB = makeFB(70, 0, 4.5);
+    private static final MotorSystemIdJson.FeedForward DEFAULT_STEER_SIM_FF = makeFF(0, 1.91, 0);
+    private static final MotorSystemIdJson.FeedBack DEFAULT_DRIVE_SIM_FB = makeFB(0.05, 0, 0);
+    // kV ≈ 12 V / 16.7 wheel rev/s (Kraken X60 free speed ÷ 6:1) — feedforward delivers ~85% of
+    // max-speed authority on its own.
+    private static final MotorSystemIdJson.FeedForward DEFAULT_DRIVE_SIM_FF = makeFF(0.1, 0.72, 0);
+    private static final ClosedLoopOutputType DEFAULT_SIM_OUTPUT = ClosedLoopOutputType.Voltage;
+    private static final ClosedLoopOutputType DEFAULT_REAL_OUTPUT =
+        ClosedLoopOutputType.TorqueCurrentFOC;
+
+    private static MotorSystemIdJson.FeedBack makeFB(double p, double i, double d) {
+      MotorSystemIdJson.FeedBack fb = new MotorSystemIdJson.FeedBack();
+      fb.p = p;
+      fb.i = i;
+      fb.d = d;
+      return fb;
+    }
+
+    private static MotorSystemIdJson.FeedForward makeFF(double s, double v, double a) {
+      MotorSystemIdJson.FeedForward ff = new MotorSystemIdJson.FeedForward();
+      ff.s = s;
+      ff.v = v;
+      ff.a = a;
+      return ff;
+    }
+
+    private static Slot0Configs steerSlot0Configs(MotorSystemIdJson motor) {
+      return buildSlot0(motor, DEFAULT_STEER_SIM_FB, DEFAULT_STEER_SIM_FF)
+          .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign);
+    }
+
+    private static Slot0Configs driveSlot0Configs(MotorSystemIdJson motor) {
+      return buildSlot0(motor, DEFAULT_DRIVE_SIM_FB, DEFAULT_DRIVE_SIM_FF);
+    }
+
+    private static Slot0Configs buildSlot0(
+        MotorSystemIdJson motor,
+        MotorSystemIdJson.FeedBack simDefaultFB,
+        MotorSystemIdJson.FeedForward simDefaultFF) {
+      MotorSystemIdJson.FeedBack fb = motor.feedBack;
+      MotorSystemIdJson.FeedForward ff = motor.feedForward;
+      if (RobotBase.isSimulation()) {
+        MotorSystemIdJson.Sim sim = motor.sim;
+        fb = (sim != null && sim.feedBack != null) ? sim.feedBack : simDefaultFB;
+        ff = (sim != null && sim.feedForward != null) ? sim.feedForward : simDefaultFF;
+      }
+      return new Slot0Configs()
+          .withKP(fb.p)
+          .withKI(fb.i)
+          .withKD(fb.d)
+          .withKS(ff.s)
+          .withKV(ff.v)
+          .withKA(ff.a);
+    }
+
+    private static ClosedLoopOutputType steerClosedLoopOutput(MotorSystemIdJson motor) {
+      return resolveClosedLoopOutput(motor);
+    }
+
+    private static ClosedLoopOutputType driveClosedLoopOutput(MotorSystemIdJson motor) {
+      return resolveClosedLoopOutput(motor);
+    }
+
+    private static ClosedLoopOutputType resolveClosedLoopOutput(MotorSystemIdJson motor) {
+      if (RobotBase.isSimulation()) {
+        if (motor.sim != null && motor.sim.closedLoopOutput != null) {
+          return parseClosedLoopOutput(motor.sim.closedLoopOutput, DEFAULT_SIM_OUTPUT);
+        }
+        return DEFAULT_SIM_OUTPUT;
+      }
+      return DEFAULT_REAL_OUTPUT;
+    }
+
+    private static ClosedLoopOutputType parseClosedLoopOutput(
+        String spec, ClosedLoopOutputType fallback) {
+      if ("voltage".equalsIgnoreCase(spec)) return ClosedLoopOutputType.Voltage;
+      if ("torquecurrentfoc".equalsIgnoreCase(spec)
+          || "torque_current".equalsIgnoreCase(spec)
+          || "torquecurrent".equalsIgnoreCase(spec)) {
+        return ClosedLoopOutputType.TorqueCurrentFOC;
+      }
+      return fallback;
     }
   }
 }

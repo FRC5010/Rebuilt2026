@@ -18,14 +18,11 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
-import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -105,20 +102,15 @@ public final class PhoenixUtil {
 
   /**
    * Regulates a {@link SwerveModuleConstants} object for simulation. If running on a real robot,
-   * the input object is returned unchanged. Otherwise, simulation-specific adjustments are made:
-   * disable encoder offsets, disable motor/encoder inversions, switch closed-loop output to
-   * Voltage, install sim-tuned Voltage PID gains for both steer and drive, and adjust friction
-   * voltages and steer inertia.
+   * the input object is returned unchanged. Otherwise, applies sim-only adjustments: zero out
+   * encoder offsets, disable motor/encoder inversions, and tweak friction voltages and steer
+   * inertia for the maple-sim motor model.
    *
-   * <p>Real-robot control is {@code TorqueCurrentFOC} with JSON-tuned amps/rotation gains. Those
-   * gains have the wrong units for Voltage closed-loop and the wrong magnitudes for the maple-sim
-   * motor model, so sim overrides both the output type and the gains. The AdvantageKit reference
-   * Voltage steer gains (kP=70 V/rotation, kV=1.91 V·s/rotation) match this code path's lineage and
-   * track cleanly under the maple-sim physics. Drive uses light Voltage gains where the kV
-   * feedforward dominates.
-   *
-   * <p>The steer gear ratio is intentionally NOT overridden; it flows through from JSON so the
-   * controller's mechanism-frame math matches what maple-sim is physically simulating.
+   * <p>Closed-loop output type and PID gains are NOT set here — those are chosen at config build
+   * time in {@code AkitSwerveConfig}, which respects the optional {@code MotorSystemIdJson.Sim}
+   * override per motor (with Voltage + AdvantageKit-reference gains as the fallback). Everything
+   * regulated here is something that is always wrong in sim regardless of tuning (e.g. a CANcoder
+   * offset that lines up the physical mechanism doesn't apply to a sim that starts at zero).
    *
    * @param moduleConstants module constants to regulate
    * @return regulated module constants
@@ -128,37 +120,16 @@ public final class PhoenixUtil {
     // Skip regulation if running on a real robot
     if (RobotBase.isReal()) return moduleConstants;
 
-    // Apply simulation-specific adjustments to module constants
     return moduleConstants
-        // Disable encoder offsets
+        // Sim mechanism starts at zero, so the real-robot CANcoder offset shouldn't apply.
         .withEncoderOffset(0)
-        // Disable motor inversions for drive and steer motors
+        // Motor/encoder inversions calibrated against physical wiring don't apply in sim.
         .withDriveMotorInverted(false)
         .withSteerMotorInverted(false)
-        // Disable CanCoder inversion
         .withEncoderInverted(false)
-        // Use Voltage closed-loop in sim. JSON gains are TorqueCurrentFOC amps; reusing them under
-        // Voltage would treat amps as volts and either saturate or wildly under-drive.
-        .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-        .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
-        // Sim-tuned steer Voltage gains (AdvantageKit reference values for sim).
-        .withSteerMotorGains(
-            new Slot0Configs()
-                .withKP(70)
-                .withKI(0)
-                .withKD(4.5)
-                .withKS(0)
-                .withKV(1.91)
-                .withKA(0)
-                .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign))
-        // Sim-tuned drive Voltage gains. kV ≈ 12 V / 16.7 wheel rev/s (Kraken X60 free speed
-        // 6000 RPM ÷ 6:1 reduction) so the feedforward alone delivers ~85% of max-speed authority.
-        .withDriveMotorGains(
-            new Slot0Configs().withKP(0.05).withKI(0).withKD(0).withKS(0.1).withKV(0.72).withKA(0))
-        // Adjust friction voltages
+        // Tune friction and inertia for the maple-sim motor model.
         .withDriveFrictionVoltage(Volts.of(0.1))
         .withSteerFrictionVoltage(Volts.of(0.05))
-        // Adjust steer inertia
         .withSteerInertia(KilogramSquareMeters.of(0.05));
   }
 }

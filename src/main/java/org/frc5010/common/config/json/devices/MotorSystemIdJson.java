@@ -24,6 +24,23 @@ public class MotorSystemIdJson {
     public double a = 0;
   }
 
+  /**
+   * Optional simulation-specific overrides for this motor. When running in sim, present fields
+   * replace the real-robot gains and closed-loop output type; null fields fall back to whatever sim
+   * defaults the consumer (e.g. {@code AkitSwerveConfig}) provides.
+   */
+  public static class Sim {
+    /**
+     * Sim PID feedback gains. Units match {@code closedLoopOutput} (volts/rotation or
+     * amps/rotation).
+     */
+    public FeedBack feedBack;
+    /** Sim feedforward gains. Units match {@code closedLoopOutput}. */
+    public FeedForward feedForward;
+    /** Closed-loop output type. Expected: "Voltage" or "TorqueCurrentFOC". */
+    public String closedLoopOutput;
+  }
+
   public UnitValueJson closedLoopRamp = new UnitValueJson(0.25, TimeUnit.SECONDS.toString());
   public UnitValueJson openLoopRamp = new UnitValueJson(0.25, TimeUnit.SECONDS.toString());
   public FeedBack feedBack;
@@ -33,4 +50,7 @@ public class MotorSystemIdJson {
       new UnitValueJson(0, LinearAccelerationUnit.METERS_PER_SECOND_SQUARED.toString());
   public FeedForward feedForward = new FeedForward();
   public String controlMode = "CLOSED_LOOP";
+
+  /** Optional simulation overrides; null means "use consumer-side sim defaults". */
+  public Sim sim;
 }
