@@ -172,9 +172,12 @@ public abstract class ModuleIOTalonFX implements ModuleIO {
   @Override
   public void updateInputs(ModuleIOInputs inputs) {
     // Refresh all signals
+    // drivePosition is refreshed here (not just on the odometry thread) so the periodic-loop
+    // value stays fresh — otherwise inputs.drivePositionRad never changes from its initial 0,
+    // breaking wheel-derived chassis velocity in the pose estimator.
     var driveStatus =
         BaseStatusSignal.refreshAll(
-            driveVelocity, driveAcceleration, driveAppliedVolts, driveCurrent);
+            drivePosition, driveVelocity, driveAcceleration, driveAppliedVolts, driveCurrent);
     // Refresh turnAbsolutePosition alongside turn motor signals so it is always up-to-date.
     // In simulation the odometry thread does not run, so signals registered only there would
     // stay permanently at 0 — causing tank-drive behavior and stuck module angles in sim.

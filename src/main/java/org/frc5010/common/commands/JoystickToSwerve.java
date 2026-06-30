@@ -96,10 +96,12 @@ public class JoystickToSwerve extends Command {
 
     // convert to chassis speed class
     ChassisSpeeds chassisSpeeds;
-    //
-    // System.out.println(swerveDrive.getGyroRate());
+    // Rotation skew compensation: predict the heading ~10 ms ahead so the field-to-robot frame
+    // transform matches the heading at the moment the command actually takes effect. Use plus()
+    // (not minus()) — adding omega*dt looks forward in time. The previous minus() was a sign
+    // bug; it was masked when sim gyro rate was 57× too small.
     double gyroRate = Units.degreesToRadians(swerveDrive.getGyroRate()) * 0.01;
-    Rotation2d correctedRotation = swerveDrive.getHeading().minus(new Rotation2d(gyroRate));
+    Rotation2d correctedRotation = swerveDrive.getHeading().plus(new Rotation2d(gyroRate));
 
     if (fieldOrientedDrive.getAsBoolean()) {
       Alliance alliance = allianceSupplier.get();

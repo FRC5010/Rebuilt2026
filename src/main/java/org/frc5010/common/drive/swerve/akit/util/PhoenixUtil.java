@@ -25,6 +25,7 @@ import com.ctre.phoenix6.signals.StaticFeedforwardSignValue;
 import com.ctre.phoenix6.sim.CANcoderSimState;
 import com.ctre.phoenix6.sim.TalonFXSimState;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
+import com.ctre.phoenix6.swerve.SwerveModuleConstants.ClosedLoopOutputType;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -104,10 +105,20 @@ public final class PhoenixUtil {
 
   /**
    * Regulates a {@link SwerveModuleConstants} object for simulation. If running on a real robot,
-   * the input object is returned unchanged. Otherwise, simulation-specific adjustments are made to
-   * the module constants. The following adjustments are made: - Disable encoder offsets - Disable
-   * motor inversions for drive and steer motors - Disable CanCoder inversion - Adjust steer motor
-   * PID gains for simulation - Adjust friction voltages - Adjust steer inertia
+   * the input object is returned unchanged. Otherwise, simulation-specific adjustments are made:
+   * disable encoder offsets, disable motor/encoder inversions, switch closed-loop output to
+   * Voltage, install sim-tuned Voltage PID gains for both steer and drive, and adjust friction
+   * voltages and steer inertia.
+   *
+   * <p>Real-robot control is {@code TorqueCurrentFOC} with JSON-tuned amps/rotation gains. Those
+   * gains have the wrong units for Voltage closed-loop and the wrong magnitudes for the maple-sim
+   * motor model, so sim overrides both the output type and the gains. The AdvantageKit reference
+   * Voltage steer gains (kP=70 V/rotation, kV=1.91 V·s/rotation) match this code path's lineage and
+   * track cleanly under the maple-sim physics. Drive uses light Voltage gains where the kV
+   * feedforward dominates.
+   *
+   * <p>The steer gear ratio is intentionally NOT overridden; it flows through from JSON so the
+   * controller's mechanism-frame math matches what maple-sim is physically simulating.
    *
    * @param moduleConstants module constants to regulate
    * @return regulated module constants
@@ -126,7 +137,11 @@ public final class PhoenixUtil {
         .withSteerMotorInverted(false)
         // Disable CanCoder inversion
         .withEncoderInverted(false)
-        // Adjust steer motor PID gains for simulation
+        // Use Voltage closed-loop in sim. JSON gains are TorqueCurrentFOC amps; reusing them under
+        // Voltage would treat amps as volts and either saturate or wildly under-drive.
+        .withSteerMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
+        .withDriveMotorClosedLoopOutput(ClosedLoopOutputType.Voltage)
+        // Sim-tuned steer Voltage gains (AdvantageKit reference values for sim).
         .withSteerMotorGains(
             new Slot0Configs()
                 .withKP(70)
@@ -136,7 +151,10 @@ public final class PhoenixUtil {
                 .withKV(1.91)
                 .withKA(0)
                 .withStaticFeedforwardSign(StaticFeedforwardSignValue.UseClosedLoopSign))
-        .withSteerMotorGearRatio(16.0)
+        // Sim-tuned drive Voltage gains. kV ≈ 12 V / 16.7 wheel rev/s (Kraken X60 free speed
+        // 6000 RPM ÷ 6:1 reduction) so the feedforward alone delivers ~85% of max-speed authority.
+        .withDriveMotorGains(
+            new Slot0Configs().withKP(0.05).withKI(0).withKD(0).withKS(0.1).withKV(0.72).withKA(0))
         // Adjust friction voltages
         .withDriveFrictionVoltage(Volts.of(0.1))
         .withSteerFrictionVoltage(Volts.of(0.05))
