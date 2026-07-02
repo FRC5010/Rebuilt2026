@@ -240,15 +240,39 @@ public class LauncherIOReal implements LauncherIO { // -0.030679615757712823
         double kS = yamsFf != null ? yamsFf.getKs() : 12.12;
         double kV = yamsFf != null ? yamsFf.getKv() : 3.06;
         double kA = yamsFf != null ? yamsFf.getKa() : 2.0;
+
+        // On the real robot SmartTurretController drives the TalonFX in TorqueCurrentFOC, so PID
+        // and feedforward are in amps. In simulation it switches to the Voltage-domain requests
+        // (MotionMagicExpoVoltage / PositionVoltage) because the torque-current closed loop runs
+        // away at free speed under the YAMS-driven Phoenix sim plant. The sim gains below are
+        // therefore Volts-scale: kP in V/mech-rot, kV sized so 12 V ≈ mechanism free speed
+        // (KrakenX44 7530 rpm / 30:1 ≈ 4.18 rot/s → kV ≈ 2.87 V·s/rot).
+        double seekKp = 1050;
+        double seekKd = 144.886;
+        double trackKp = 1050;
+        double trackKd = 144.886;
+        double ffKs = kS;
+        double ffKv = kV;
+        double ffKa = kA;
+        if (RobotBase.isSimulation()) {
+          seekKp = 40;
+          seekKd = 0.5;
+          trackKp = 40;
+          trackKd = 0.5;
+          ffKs = 0.05;
+          ffKv = 2.87;
+          ffKa = 0.0;
+        }
+
         SmartTurretConfig smartConfig =
             new SmartTurretConfig.Builder()
                 .withTalonFX(talonFXRaw)
                 .withYAMSController(turret.getMotorController())
                 .withGearRatio(30.0)
                 .withMotionConstraints(maxVelMechRotPerSec, maxAccelMechRotPerSecSq)
-                .withSeekingPID(1050, 0, 144.886) // Initial values from turret.json
-                .withTrackingPID(1050, 0, 144.886) // Start same, tune separately
-                .withFeedforward(kS, kV, kA)
+                .withSeekingPID(seekKp, 0, seekKd)
+                .withTrackingPID(trackKp, 0, trackKd)
+                .withFeedforward(ffKs, ffKv, ffKa)
                 .withSeekingThreshold(Degrees.of(5).in(Rotations))
                 .withHysteresisBuffer(Degrees.of(12).in(Rotations))
                 .withSoftLimits(lowerLimitRot, upperLimitRot)

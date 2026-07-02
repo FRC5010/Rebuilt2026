@@ -6,7 +6,9 @@ import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.MotionMagicExpoTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.controls.PositionTorqueCurrentFOC;
+import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.hardware.ParentDevice;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.math.MathUtil;
@@ -14,6 +16,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.wpilibj.RobotBase;
 import java.util.concurrent.atomic.AtomicReference;
 import org.littletonrobotics.junction.Logger;
 
@@ -68,6 +71,17 @@ public class SmartTurretController {
       new MotionMagicExpoTorqueCurrentFOC(0).withSlot(0);
   private final PositionTorqueCurrentFOC trackingRequest =
       new PositionTorqueCurrentFOC(0).withSlot(1);
+
+  // Voltage-domain requests used in simulation. Torque-current closed loop does not behave
+  // under the YAMS-driven Phoenix sim plant (the onboard loop never decelerates and the turret
+  // runs away at free speed), so sim uses the Voltage equivalents — same slots, same profile.
+  // Slot gains must then be Volts-scale, which LauncherIOReal supplies when isSimulation().
+  private final MotionMagicExpoVoltage simSeekingRequest =
+      new MotionMagicExpoVoltage(0).withSlot(0);
+  private final PositionVoltage simTrackingRequest = new PositionVoltage(0).withSlot(1);
+
+  /** True when running in simulation — selects Voltage-domain control requests. */
+  private final boolean useVoltageRequests = RobotBase.isSimulation();
 
   // Thread-safe target from 20 ms loop to 200 Hz step loop.
   private final AtomicReference<TurretTarget> target =
@@ -205,7 +219,11 @@ public class SmartTurretController {
 
     switch (currentState) {
       case SEEKING:
-        talonFX.setControl(seekingRequest.withPosition(currentTarget.positionMechRot()));
+        if (useVoltageRequests) {
+          talonFX.setControl(simSeekingRequest.withPosition(currentTarget.positionMechRot()));
+        } else {
+          talonFX.setControl(seekingRequest.withPosition(currentTarget.positionMechRot()));
+        }
         break;
 
       case TRACKING:
@@ -221,11 +239,19 @@ public class SmartTurretController {
           ksFeedforward = Math.signum(signedError) * config.getKS();
         }
 
-        talonFX.setControl(
-            trackingRequest
-                .withPosition(currentTarget.positionMechRot())
-                .withVelocity(RadiansPerSecond.of(currentTarget.velocityRadPerSec))
-                .withFeedForward(ksFeedforward));
+        if (useVoltageRequests) {
+          talonFX.setControl(
+              simTrackingRequest
+                  .withPosition(currentTarget.positionMechRot())
+                  .withVelocity(RadiansPerSecond.of(currentTarget.velocityRadPerSec))
+                  .withFeedForward(ksFeedforward));
+        } else {
+          talonFX.setControl(
+              trackingRequest
+                  .withPosition(currentTarget.positionMechRot())
+                  .withVelocity(RadiansPerSecond.of(currentTarget.velocityRadPerSec))
+                  .withFeedForward(ksFeedforward));
+        }
 
         break;
     }
