@@ -476,6 +476,10 @@ public class LauncherIOReal implements LauncherIO { // -0.030679615757712823
     hood.getMotor().setDutyCycle(-1.0);
   }
 
+  public void runHoodDownSlowly() {
+    hood.getMotor().setDutyCycle(Constants.Launcher.HOOD_ZEROING_DUTY_CYCLE);
+  }
+
   public void stopHood() {
     hood.getMotor().setDutyCycle(0.0);
   }
