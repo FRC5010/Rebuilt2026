@@ -57,7 +57,6 @@ import org.frc5010.common.drive.swerve.SwerveDriveFunctions;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
-import swervelib.simulation.ironmaple.simulation.SimulatedArena;
 
 public class AkitSwerveDrive extends SwerveDriveFunctions {
   private final AkitSwerveConfig config;
@@ -562,11 +561,11 @@ public class AkitSwerveDrive extends SwerveDriveFunctions {
   }
 
   public void updateSimulation() {
-    SimulatedArena.getInstance().simulationPeriodic();
+    // The arena is stepped once per loop by GenericDrivetrain.simulationPeriodic(), which also
+    // logs the game pieces (FieldSimulation/GPA and /GPB). Stepping it again here ran the field
+    // physics at 2x speed, and the extra "Fuel" entry duplicated GPA half a loop out of sync.
     Logger.recordOutput(
         "FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
-    Logger.recordOutput(
-        "FieldSimulation/Fuel", SimulatedArena.getInstance().getGamePiecesArrayByType("Fuel"));
   }
 
   @Override

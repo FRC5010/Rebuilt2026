@@ -16,8 +16,6 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.networktables.StructArrayPublisher;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -275,13 +273,11 @@ public abstract class GenericDrivetrain extends GenericSubsystem {
     }
   }
 
-  StructArrayPublisher<Pose3d> gamePiecePoses =
-      NetworkTableInstance.getDefault()
-          .getStructArrayTopic("GamePieceSim", Pose3d.struct)
-          .publish();
-
   @Override
   public void simulationPeriodic() {
+    // Single authoritative arena step per robot loop. Subclass hooks (e.g.
+    // AkitSwerveDrive.updateSimulation) must NOT step the arena again — double-stepping runs
+    // the field physics at 2x speed and desyncs game-piece poses from the robot cycle.
     SimulatedArena.getInstance().simulationPeriodic();
     int count = 0;
     List<Pose3d> gpas =
@@ -296,8 +292,7 @@ public abstract class GenericDrivetrain extends GenericSubsystem {
     }
     Pose3d[] gpaArray =
         SimulatedArena.getInstance().getGamePiecesArrayByType(Constants.Simulation.gamePieceA);
-    Logger.recordOutput("FieldSim/GPA", gpaArray);
-    gamePiecePoses.accept(gpaArray);
+    Logger.recordOutput("FieldSimulation/GPA", gpaArray);
     count = 0;
     List<Pose3d> gpbs =
         SimulatedArena.getInstance().getGamePiecesByType(Constants.Simulation.gamePieceB).stream()
@@ -310,8 +305,7 @@ public abstract class GenericDrivetrain extends GenericSubsystem {
     }
     Pose3d[] gpbArray =
         SimulatedArena.getInstance().getGamePiecesArrayByType(Constants.Simulation.gamePieceB);
-    Logger.recordOutput("FieldSim/GPB", gpbArray);
-    gamePiecePoses.accept(gpbArray);
+    Logger.recordOutput("FieldSimulation/GPB", gpbArray);
   }
 
   protected void initializeSimulation(GenericDrivetrainConstants constants) {
