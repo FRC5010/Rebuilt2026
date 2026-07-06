@@ -64,9 +64,9 @@ import yams.units.EasyCRTConfig;
 
 /** Add your docs here. */
 public class LauncherIOReal implements LauncherIO { // -0.030679615757712823
-  protected static final Angle HARD_STOP = Radians.of(2.9437091319525455);
-  protected static final double encoder40Offset = -0.46923828125;
-  protected static final double encoder36Offset = 0.129638671875;
+  protected static final Angle HARD_STOP = Radians.of(2.9544469974677448);
+  protected static final double encoder40Offset = 0.078857421875;
+  protected static final double encoder36Offset = -0.466552734375;
   private static final double MIN_DYNAMIC_TURRET_TOLERANCE_DEGREES = 2.0;
   private static final double MIN_DYNAMIC_TURRET_SHUTTLE_TOLERANCE_DEGREES = 4.0;
   private static final double MAX_DYNAMIC_TURRET_SHUTTLE_TOLERANCE_DEGREES = 20.0;
