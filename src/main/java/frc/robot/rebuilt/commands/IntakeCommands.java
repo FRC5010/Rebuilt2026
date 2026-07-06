@@ -122,7 +122,7 @@ public class IntakeCommands {
     operator.createBackButton().onTrue(Commands.run(() -> intake.setHopperDeployed()));
 
     controller.createXButton().onTrue(operatorHopperDownCommand());
-    //operator.createRightBumper().onTrue(shouldAngled()).onFalse(shouldIntaking());
+    // operator.createRightBumper().onTrue(shouldAngled()).onFalse(shouldIntaking());
 
     intakeSpeedSupplier =
         () -> {

@@ -473,9 +473,9 @@ public class LauncherCommands {
   }
 
   /**
-   * Slowly runs the hood downward until the motor current spikes against the hard stop, then
-   * resets the hood position to its minimum. The current must stay above the stall threshold
-   * for a debounce period so the startup inrush doesn't trigger a false zero. If the command is
+   * Slowly runs the hood downward until the motor current spikes against the hard stop, then resets
+   * the hood position to its minimum. The current must stay above the stall threshold for a
+   * debounce period so the startup inrush doesn't trigger a false zero. If the command is
    * interrupted before the stall is detected, the hood stops without re-zeroing.
    */
   public static Command zeroHoodOnStallSequence() {
