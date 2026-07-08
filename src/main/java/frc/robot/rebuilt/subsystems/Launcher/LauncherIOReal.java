@@ -18,6 +18,7 @@ import static edu.wpi.first.units.Units.Seconds;
 import static edu.wpi.first.units.Units.Volts;
 
 import com.ctre.phoenix6.CANBus;
+import com.ctre.phoenix6.configs.SoftwareLimitSwitchConfigs;
 import com.ctre.phoenix6.controls.MotionMagicTorqueCurrentFOC;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
@@ -479,10 +480,6 @@ public class LauncherIOReal implements LauncherIO { // -0.030679615757712823
     LEDStrip.changeSegmentPattern(ConfigConstants.ALL_LEDS, LEDStrip.getSolidPattern(Color.kGreen));
   }
 
-  public void runHoodDown() {
-    hood.getMotor().setDutyCycle(-1.0);
-  }
-
   public void runHoodDownSlowly() {
     hood.getMotor().setDutyCycle(Constants.Launcher.HOOD_ZEROING_DUTY_CYCLE);
   }
@@ -834,6 +831,49 @@ public class LauncherIOReal implements LauncherIO { // -0.030679615757712823
   @Override
   public void zeroTurret() {
     turret.getMotor().setEncoderPosition(HARD_STOP);
+  }
+
+  @Override
+  public void beginTurretZeroing() {
+    if (smartTurretController != null) {
+      smartTurretController.stop();
+      // Lift both firmware soft limits: a mis-zeroed encoder (the reason for re-zeroing)
+      // can read anywhere, so either limit could block the sweep to the hard stop.
+      setTurretSoftLimitsEnabled(false);
+    }
+  }
+
+  @Override
+  public void runTurretTowardHardStop() {
+    turret.getMotor().setDutyCycle(Constants.Launcher.TURRET_ZEROING_DUTY_CYCLE);
+  }
+
+  @Override
+  public void stopTurret() {
+    turret.getMotor().setDutyCycle(0.0);
+  }
+
+  @Override
+  public boolean isTurretStalled() {
+    return Math.abs(turret.getMotor().getStatorCurrent().in(Amps))
+        > Constants.Launcher.TURRET_STALL_CURRENT_THRESHOLD;
+  }
+
+  @Override
+  public void endTurretZeroing() {
+    if (smartTurretController != null) {
+      setTurretSoftLimitsEnabled(true);
+      smartTurretController.reset(turret.getAngle().in(Rotations), 0);
+    }
+  }
+
+  private void setTurretSoftLimitsEnabled(boolean enabled) {
+    TalonFX talon = smartTurretController.getTalonFX();
+    SoftwareLimitSwitchConfigs limits = new SoftwareLimitSwitchConfigs();
+    talon.getConfigurator().refresh(limits);
+    limits.ForwardSoftLimitEnable = enabled;
+    limits.ReverseSoftLimitEnable = enabled;
+    talon.getConfigurator().apply(limits);
   }
 
   @Override

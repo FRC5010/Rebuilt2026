@@ -64,10 +64,6 @@ public class Rebuilt extends GenericRobot {
     autocommands = new AutoCommands(subsystems);
     // OrchestraManager.loadMusic("raiders");
     RobotController.setBrownoutVoltage(Volts.of(4.6));
-
-    if (operator.isPresent()) {
-      operator.get().createStartButton().onTrue(launcher.zeroTurretCommand());
-    }
   }
 
   @Override

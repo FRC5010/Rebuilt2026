@@ -131,8 +131,6 @@ public interface LauncherIO {
 
   public Command getTurretSysIdCommand(GenericSubsystem launcher);
 
-  public void runHoodDown();
-
   public void runHoodDownSlowly();
 
   public void stopHood();
@@ -179,6 +177,23 @@ public interface LauncherIO {
   }
 
   public void zeroTurret();
+
+  /** Prepares the turret for open-loop zeroing: suspends closed-loop control and soft limits. */
+  public default void beginTurretZeroing() {}
+
+  /** Runs the turret open-loop toward its hard stop for zeroing. */
+  public default void runTurretTowardHardStop() {}
+
+  /** Stops open-loop turret motion. */
+  public default void stopTurret() {}
+
+  /** Whether the turret motor current indicates it is stalled against the hard stop. */
+  public default boolean isTurretStalled() {
+    return false;
+  }
+
+  /** Restores turret soft limits and re-syncs the closed-loop controller after zeroing. */
+  public default void endTurretZeroing() {}
 
   public default boolean isTurretAtZero() {
     return false;

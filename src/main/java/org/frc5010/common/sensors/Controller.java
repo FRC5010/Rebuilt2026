@@ -8,6 +8,8 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.GenericHID.HIDType;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
 import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import java.util.HashMap;
@@ -353,6 +355,21 @@ public class Controller {
    */
   public void setRumble(double power) {
     joystick.setRumble(RumbleType.kBothRumble, power);
+  }
+
+  /**
+   * Creates a command that rumbles the controller at the given power for the given duration, then
+   * stops. Schedule it separately (e.g. via ScheduleCommand) if it must outlive the command that
+   * triggered it.
+   *
+   * @param power the rumble power [0, 1]
+   * @param seconds how long to rumble
+   * @return the rumble pulse command
+   */
+  public Command rumblePulseCommand(double power, double seconds) {
+    return Commands.startEnd(() -> setRumble(power), () -> setRumble(0))
+        .withTimeout(seconds)
+        .ignoringDisable(true);
   }
 
   /**

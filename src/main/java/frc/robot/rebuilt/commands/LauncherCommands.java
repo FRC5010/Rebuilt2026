@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
-import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
@@ -13,9 +12,11 @@ import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.rebuilt.Constants;
 import frc.robot.rebuilt.FieldConstants;
@@ -210,20 +211,15 @@ public class LauncherCommands {
 
     operator.createAButton().whileTrue(towerPresetStateCommand()).onFalse(shouldLowCommand());
 
-    operator
-        .createBButton()
-        .whileTrue(rightCornerPresetStateCommandr())
-        .onFalse(shouldLowCommand());
-
-    operator.createXButton().whileTrue(leftCornerPresetStateCommand()).onFalse(shouldLowCommand());
+    // Hold to slowly sweep the turret CCW into its hard stop, then the turret angle resets
+    // to the hard-stop value and the operator controller rumbles. Releasing before the
+    // stall aborts without re-zeroing.
+    operator.createBButton().whileTrue(zeroTurretOnStallSequence(operator));
 
     // Hold to slowly run the hood down until it stalls against the hard stop, then the
-    // hood position resets to its minimum. Releasing before the stall aborts without zeroing.
-    // (This replaced the turret-forward preset, which is still available as the
-    // "towerForwardPreset" named command.)
-    operator.createYButton().whileTrue(zeroHoodOnStallSequence());
-
-    operator.createBackButton().whileTrue(zeroHoodSequence());
+    // hood position resets to its minimum and the operator controller rumbles. Releasing
+    // before the stall aborts without zeroing.
+    operator.createYButton().whileTrue(zeroHoodOnStallSequence(operator));
 
     // This allowed auto-hammer time
     // Trigger isTrenchTrigger = new Trigger(() -> launcher.isNearTrench());
@@ -471,12 +467,13 @@ public class LauncherCommands {
    * debounce period so the startup inrush doesn't trigger a false zero. If the command is
    * interrupted before the stall is detected, the hood stops without re-zeroing.
    */
-  public static Command zeroHoodOnStallSequence() {
+  public static Command zeroHoodOnStallSequence(Controller rumbleController) {
     Debouncer stallDebouncer = new Debouncer(Constants.Launcher.HOOD_STALL_DEBOUNCE_SECONDS);
     return Commands.run(() -> launcher.runHoodDownSlowly())
         .until(() -> stallDebouncer.calculate(launcher.isHoodStalled()))
         .andThen(Commands.runOnce(() -> launcher.stopHood()))
         .andThen(Commands.runOnce(() -> launcher.zeroHood()))
+        .andThen(new ScheduleCommand(rumbleController.rumblePulseCommand(1.0, 0.5)))
         .andThen(
             Commands.run(
                     () -> {
@@ -498,24 +495,49 @@ public class LauncherCommands {
             });
   }
 
-  public static Command zeroHoodSequence() {
-    return Commands.run(() -> launcher.runHoodDown())
-        .withTimeout(Seconds.of(0.75))
-        .andThen(Commands.runOnce(() -> launcher.stopHood()))
-        .andThen(Commands.runOnce(() -> launcher.zeroHood()))
+  /**
+   * Slowly sweeps the turret toward its hard stop until the motor current spikes, then resets the
+   * turret angle to the hard-stop value and rumbles the operator's controller. The turret's
+   * closed-loop controller and firmware soft limits are suspended for the sweep and always
+   * restored afterward. If the command is interrupted before the stall is detected, the turret
+   * stops without re-zeroing. Only runs in teleop while enabled and with the intake deployed
+   * (the retracted hopper arm interferes with turret rotation).
+   */
+  public static Command zeroTurretOnStallSequence(Controller rumbleController) {
+    Debouncer stallDebouncer = new Debouncer(Constants.Launcher.TURRET_STALL_DEBOUNCE_SECONDS);
+    return Commands.run(() -> launcher.runTurretTowardHardStop(), launcher)
+        .until(() -> stallDebouncer.calculate(launcher.isTurretStalled()))
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  launcher.stopTurret();
+                  launcher.zeroTurret();
+                }))
+        .andThen(new ScheduleCommand(rumbleController.rumblePulseCommand(1.0, 0.5)))
         .andThen(
             Commands.run(
                     () -> {
-                      org.frc5010.common.subsystems.LEDStrip.changeSegmentPattern(
-                          org.frc5010.common.config.ConfigConstants.ALL_LEDS,
-                          org.frc5010.common.subsystems.LEDStrip.getRainbowPattern(50.0));
+                      LEDStrip.changeSegmentPattern(
+                          ConfigConstants.ALL_LEDS, LEDStrip.getRainbowPattern(50.0));
                     })
                 .withTimeout(0.5)
                 .ignoringDisable(true))
-        .beforeStarting(() -> frc.robot.rebuilt.Rebuilt.isZeroingBurst = true)
+        .beforeStarting(
+            () -> {
+              stallDebouncer.calculate(false);
+              frc.robot.rebuilt.Rebuilt.isZeroingBurst = true;
+              launcher.beginTurretZeroing();
+            })
         .finallyDo(
             () -> {
+              launcher.stopTurret();
+              launcher.endTurretZeroing();
               frc.robot.rebuilt.Rebuilt.isZeroingBurst = false;
-            });
+            })
+        .onlyIf(
+            () ->
+                DriverStation.isTeleopEnabled()
+                    && !intake.isCurrent(IntakeState.RETRACTING)
+                    && !intake.isCurrent(IntakeState.RETRACTED));
   }
 }
