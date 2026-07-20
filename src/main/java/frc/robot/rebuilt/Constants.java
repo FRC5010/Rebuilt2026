@@ -28,6 +28,12 @@ public class Constants {
     /** Time the hood current must stay above the stall threshold, to ignore startup inrush. */
     public static final double HOOD_STALL_DEBOUNCE_SECONDS = 0.2;
 
+    public static final double TURRET_STALL_CURRENT_THRESHOLD = 20.0;
+    /** Duty cycle used to slowly run the turret CCW toward the hard stop while zeroing. */
+    public static final double TURRET_ZEROING_DUTY_CYCLE = 0.10;
+    /** Time the turret current must stay above the stall threshold, to ignore startup inrush. */
+    public static final double TURRET_STALL_DEBOUNCE_SECONDS = 0.2;
+
     public static final double HOOD_LEGACY_START_ANGLE_DEGREES = 30.0;
     public static final double HOOD_CORRECTED_START_ANGLE_DEGREES = 12.723;
     public static final double HOOD_CORRECTED_END_ANGLE_DEGREES = 45.723;
@@ -56,6 +62,8 @@ public class Constants {
     public static final double SPINDEXER_SPEED = 0.90;
     public static final double TRANSFER_SPEED = 1.0;
     public static final double TRANSFER_CHURN = 0.25;
+    /** Deadzone for the operator sticks that manually run the spindexer and transfer. */
+    public static final double OPERATOR_STICK_DEADZONE = 0.1;
   }
 
   public static class Intake {

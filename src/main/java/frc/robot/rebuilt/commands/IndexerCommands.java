@@ -7,6 +7,7 @@ import frc.robot.rebuilt.Constants;
 import frc.robot.rebuilt.subsystems.Indexer.Indexer;
 import frc.robot.rebuilt.subsystems.Launcher.Launcher;
 import java.util.Map;
+import java.util.function.DoubleSupplier;
 import org.frc5010.common.arch.GenericSubsystem;
 import org.frc5010.common.config.ConfigConstants;
 import org.frc5010.common.sensors.Controller;
@@ -46,6 +47,36 @@ public class IndexerCommands {
             Commands.either(
                 shouldForceCommand(), shouldChurnCommand(), () -> launcher.isOKToFire()))
         .onFalse(shouldChurnCommand());
+
+    // Manual operator control: left stick Y runs the spindexer, right stick Y runs the
+    // transfer, proportionally in either direction. Active only while a stick is outside
+    // its deadzone; an indexer state request fired meanwhile interrupts manual control.
+    operator.setLeftYAxis(
+        operator.createLeftYAxis().negate().deadzone(Constants.Indexer.OPERATOR_STICK_DEADZONE));
+    operator.setRightYAxis(
+        operator.createRightYAxis().negate().deadzone(Constants.Indexer.OPERATOR_STICK_DEADZONE));
+    new Trigger(() -> operator.getLeftYAxis() != 0.0 || operator.getRightYAxis() != 0.0)
+        .whileTrue(manualIndexerCommand(operator::getLeftYAxis, operator::getRightYAxis));
+  }
+
+  /**
+   * Runs the spindexer and transfer directly from the supplied speeds until interrupted, then
+   * stops both and returns the indexer to IDLE.
+   */
+  public static Command manualIndexerCommand(
+      DoubleSupplier spindexerSpeed, DoubleSupplier transferSpeed) {
+    return Commands.run(
+            () -> {
+              indexer.runSpindexer(spindexerSpeed.getAsDouble());
+              indexer.runTransferFront(transferSpeed.getAsDouble());
+            },
+            indexer)
+        .finallyDo(
+            () -> {
+              indexer.runSpindexer(0);
+              indexer.runTransferFront(0);
+              indexer.setCurrentState(IndexerState.IDLE);
+            });
   }
 
   private void configureTriggerStates() {

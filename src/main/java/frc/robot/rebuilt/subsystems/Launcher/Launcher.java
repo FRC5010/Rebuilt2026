@@ -417,10 +417,6 @@ public class Launcher extends GenericSubsystem {
         });
   }
 
-  public void runHoodDown() {
-    io.runHoodDown();
-  }
-
   public void runHoodDownSlowly() {
     io.runHoodDownSlowly();
   }
@@ -451,6 +447,26 @@ public class Launcher extends GenericSubsystem {
 
   public void zeroTurret() {
     io.zeroTurret();
+  }
+
+  public void beginTurretZeroing() {
+    io.beginTurretZeroing();
+  }
+
+  public void runTurretTowardHardStop() {
+    io.runTurretTowardHardStop();
+  }
+
+  public void stopTurret() {
+    io.stopTurret();
+  }
+
+  public boolean isTurretStalled() {
+    return io.isTurretStalled();
+  }
+
+  public void endTurretZeroing() {
+    io.endTurretZeroing();
   }
 
   public boolean isTurretAtZero() {

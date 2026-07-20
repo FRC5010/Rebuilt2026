@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.Degrees;
 import edu.wpi.first.wpilibj.RobotState;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ScheduleCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.rebuilt.Constants;
 import frc.robot.rebuilt.subsystems.intake.Intake;
@@ -118,10 +119,13 @@ public class IntakeCommands {
     leftTrigger.onTrue(shouldIntaking());
 
     controller.createRightBumper().onTrue(shouldRetracting());
-    operator.createStartButton().onTrue(Commands.run(() -> intake.setHopperRetracted()));
-    operator.createBackButton().onTrue(Commands.run(() -> intake.setHopperDeployed()));
 
     controller.createXButton().onTrue(operatorHopperDownCommand());
+
+    // Hold to run the hopper into its deploy hard stop; when the stall is debounced the
+    // hopper re-zeros and the operator controller rumbles. Releasing before the stall
+    // aborts without re-zeroing.
+    operator.createXButton().whileTrue(rezeroHopperCommand(operator));
     // operator.createRightBumper().onTrue(shouldAngled()).onFalse(shouldIntaking());
 
     intakeSpeedSupplier =
@@ -269,6 +273,29 @@ public class IntakeCommands {
                 .until(hopperHardStopped::getAsBoolean)
                 .withTimeout(1.5))
         .andThen(Commands.runOnce(() -> intake.runHopper(0)));
+  }
+
+  /**
+   * Operator hold-to-re-zero: drives the hopper into its deploy hard stop until the stall is
+   * debounced, then unconditionally re-zeros the hopper (even if it was already marked zeroed)
+   * and rumbles the given controller. Releasing early stops the hopper without re-zeroing.
+   */
+  public static Command rezeroHopperCommand(Controller rumbleController) {
+    Trigger hopperHardStopped =
+        new Trigger(() -> intake.isHopperHardStopDetected())
+            .debounce(Constants.Intake.HOPPER_STALL_TIME);
+
+    return Commands.run(() -> intake.runHopper(Constants.Intake.HOPPER_FIRST_DEPLOY_DUTY), intake)
+        .until(hopperHardStopped::getAsBoolean)
+        .andThen(
+            Commands.runOnce(
+                () -> {
+                  intake.runHopper(0);
+                  markHopperZeroed();
+                  intake.setCurrentState(IntakeState.DEPLOYED);
+                }))
+        .andThen(new ScheduleCommand(rumbleController.rumblePulseCommand(1.0, 0.5)))
+        .finallyDo(() -> intake.runHopper(0));
   }
 
   private static Command homeUnzeroedHopperCommand() {
