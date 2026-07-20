@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.RPM;
 import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -221,10 +222,12 @@ public class LauncherCommands {
         .onFalse(shouldLowCommand());
 
     operator.createXButton().whileTrue(leftCornerPresetStateCommand()).onFalse(shouldLowCommand());
-    operator
-        .createYButton()
-        .whileTrue(turretForwardPresetStateCommand())
-        .onFalse(shouldLowCommand());
+
+    // Hold to slowly run the hood down until it stalls against the hard stop, then the
+    // hood position resets to its minimum. Releasing before the stall aborts without zeroing.
+    // (This replaced the turret-forward preset, which is still available as the
+    // "towerForwardPreset" named command.)
+    operator.createYButton().whileTrue(zeroHoodOnStallSequence());
 
     operator.createBackButton().whileTrue(zeroHoodSequence());
 
@@ -466,6 +469,39 @@ public class LauncherCommands {
 
   public static LauncherState getCurrentState() {
     return launcher.getCurrentState();
+  }
+
+  /**
+   * Slowly runs the hood downward until the motor current spikes against the hard stop, then resets
+   * the hood position to its minimum. The current must stay above the stall threshold for a
+   * debounce period so the startup inrush doesn't trigger a false zero. If the command is
+   * interrupted before the stall is detected, the hood stops without re-zeroing.
+   */
+  public static Command zeroHoodOnStallSequence() {
+    Debouncer stallDebouncer = new Debouncer(Constants.Launcher.HOOD_STALL_DEBOUNCE_SECONDS);
+    return Commands.run(() -> launcher.runHoodDownSlowly())
+        .until(() -> stallDebouncer.calculate(launcher.isHoodStalled()))
+        .andThen(Commands.runOnce(() -> launcher.stopHood()))
+        .andThen(Commands.runOnce(() -> launcher.zeroHood()))
+        .andThen(
+            Commands.run(
+                    () -> {
+                      org.frc5010.common.subsystems.LEDStrip.changeSegmentPattern(
+                          org.frc5010.common.config.ConfigConstants.ALL_LEDS,
+                          org.frc5010.common.subsystems.LEDStrip.getRainbowPattern(50.0));
+                    })
+                .withTimeout(0.5)
+                .ignoringDisable(true))
+        .beforeStarting(
+            () -> {
+              stallDebouncer.calculate(false);
+              frc.robot.rebuilt.Rebuilt.isZeroingBurst = true;
+            })
+        .finallyDo(
+            () -> {
+              launcher.stopHood();
+              frc.robot.rebuilt.Rebuilt.isZeroingBurst = false;
+            });
   }
 
   public static Command zeroHoodSequence() {

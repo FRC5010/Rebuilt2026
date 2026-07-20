@@ -10,7 +10,7 @@
       "uom": "inches"
     },
     "wheelDiameter": {
-      "val": 0.1002156588,
+      "val": 0.098492,
       "uom": "meters"
     },
     "maxDriveSpeed": {
@@ -166,7 +166,7 @@
         "uom": "m"
       },
       "y": {
-        "val": 1.0,
+        "val": 0.5,
         "uom": "m"
       },
       "rotation": {

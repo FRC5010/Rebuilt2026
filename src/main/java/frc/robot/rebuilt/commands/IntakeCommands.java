@@ -118,12 +118,11 @@ public class IntakeCommands {
     leftTrigger.onTrue(shouldIntaking());
 
     controller.createRightBumper().onTrue(shouldRetracting());
-    controller.createStartButton().onTrue(Commands.run(() -> intake.setHopperRetracted()));
-    controller.createBackButton().onTrue(Commands.run(() -> intake.setHopperDeployed()));
+    operator.createStartButton().onTrue(Commands.run(() -> intake.setHopperRetracted()));
+    operator.createBackButton().onTrue(Commands.run(() -> intake.setHopperDeployed()));
 
-    operator.createDownPovButton().onTrue(operatorHopperDownCommand());
     controller.createXButton().onTrue(operatorHopperDownCommand());
-    operator.createRightBumper().onTrue(shouldAngled()).onFalse(shouldIntaking());
+    // operator.createRightBumper().onTrue(shouldAngled()).onFalse(shouldIntaking());
 
     intakeSpeedSupplier =
         () -> {
