@@ -28,6 +28,8 @@ import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.lib.BLine.FollowPath;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -97,6 +99,8 @@ public abstract class GenericDrivetrain extends GenericSubsystem {
   protected double previousLeftXInput = 0.0, previousLeftYInput = 0.0, previousRightXInput = 0.0;
   protected Alert canErrorAlert = new Alert("CAN Tx/Rx is being FLAKY!", AlertType.kError);
   protected Alert robotPositionAlert = new Alert("Robot position is off field", AlertType.kError);
+  @Getter
+  protected FollowPath.Builder pathBuilder;
 
   /**
    * Constructor

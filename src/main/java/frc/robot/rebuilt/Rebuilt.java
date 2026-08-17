@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.rebuilt.commands.AutoCommands;
+import frc.robot.rebuilt.commands.BLine;
 import frc.robot.rebuilt.commands.ClimbCommands;
 import frc.robot.rebuilt.commands.IndexerCommands;
 import frc.robot.rebuilt.commands.IntakeCommands;
@@ -29,6 +30,7 @@ import org.frc5010.common.drive.GenericDrivetrain;
 import org.frc5010.common.sensors.Controller;
 import org.frc5010.common.utils.OrchestraManager;
 import org.frc5010.common.utils.geometry.AllianceFlipUtil;
+import frc.robot.lib.BLine.*;
 
 /** This is an example robot class. */
 /** Long's correction: Main robot class that initializes subsystems and commands */
@@ -49,6 +51,7 @@ public class Rebuilt extends GenericRobot {
   public static boolean isZeroingBurst = false;
   private boolean isButtonsConfigured = false;
   private boolean isAltButtonsConfigured = false;
+  private BLine bline;
 
   public Rebuilt(String directory) {
     super(directory);
@@ -67,6 +70,7 @@ public class Rebuilt extends GenericRobot {
     intakecommands = new IntakeCommands(subsystems);
     indexerCommands = new IndexerCommands(subsystems);
     autocommands = new AutoCommands(subsystems);
+    bline = new BLine(drivetrain, selectableCommand);
     // OrchestraManager.loadMusic("raiders");
     RobotController.setBrownoutVoltage(Volts.of(4.6));
 
@@ -152,6 +156,8 @@ public class Rebuilt extends GenericRobot {
   @Override
   public Command generateAutoCommand(Command autoCommand) {
     return drivetrain.generateAutoCommand(autoCommand);
+
+
   }
 
   @Override
@@ -159,6 +165,7 @@ public class Rebuilt extends GenericRobot {
   public void buildAutoCommands() {
     super.buildAutoCommands();
     selectableCommand.addOption("Do Nothing", Commands.none());
+    bline.addAutoCommands();
     drivetrain.addAutoCommands(selectableCommand);
     autocommands.configureCharacterizationCommands(selectableCommand);
   }
