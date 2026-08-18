@@ -221,11 +221,6 @@
           "visible": true
         }
       },
-      "/SmartDashboard/Auto Modes": {
-        "window": {
-          "visible": true
-        }
-      },
       "/SmartDashboard/DrivePoseEstimator/Pose Field": {
         "CARPET0": {
           "length": 0.44999998807907104,
@@ -1124,6 +1119,11 @@
           "visible": true
         }
       },
+      "/SmartDashboard/Rebuilt/Auto Modes": {
+        "window": {
+          "visible": true
+        }
+      },
       "/SmartDashboard/VisionSystemSim-main/Sim Field": {
         "bottom": 1914,
         "height": 8.069275856018066,
@@ -1330,7 +1330,6 @@
       "Subscribers": {
         "open": true
       }
-    },
-    "visible": true
+    }
   }
 }
