@@ -139,7 +139,7 @@ public class DrivePoseEstimator extends GenericSubsystem {
   private boolean updatingPoseAcceptor = false;
 
   private static double CONFIDENCE_RESET_THRESHOLD = 0.025;
-  private boolean activateAcceptorUpdates = true;
+  private boolean activateAcceptorUpdates = false;
   private boolean poseAcceptable = false;
 
   private DrivePoseEstimatorInputsAutoLogged inputs = new DrivePoseEstimatorInputsAutoLogged();

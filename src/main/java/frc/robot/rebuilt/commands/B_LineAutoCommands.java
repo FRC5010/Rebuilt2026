@@ -18,7 +18,8 @@ public class B_LineAutoCommands {
     FollowPath.registerEventTrigger("iForcePreset", IndexerCommands.shouldForceCommand());
     FollowPath.registerEventTrigger("hubPreset", LauncherCommands.leftCornerPresetStateCommand());
     FollowPath.registerEventTrigger("towerPreset", LauncherCommands.towerPresetStateCommand());
-    FollowPath.registerEventTrigger("towerForwardPreset", LauncherCommands.turretForwardPresetStateCommand());
+    FollowPath.registerEventTrigger(
+        "towerForwardPreset", LauncherCommands.turretForwardPresetStateCommand());
     FollowPath.registerEventTrigger("WaitUntilIntaking", IntakeCommands.waitUntilIntaking());
     // INDEXER
     FollowPath.registerEventTrigger("indexerChurn", IndexerCommands.shouldChurnCommand());

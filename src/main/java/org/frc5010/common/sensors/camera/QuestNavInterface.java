@@ -261,7 +261,7 @@ public class QuestNavInterface implements PoseProvider {
 
   @Override
   public ProviderType getType() {
-    return ProviderType.ENVIRONMENT_BASED;
+    return ProviderType.FIELD_BASED;
   }
 
   public int fiducialId() {
