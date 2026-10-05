@@ -1330,6 +1330,7 @@
       "Subscribers": {
         "open": true
       }
-    }
+    },
+    "visible": true
   }
 }

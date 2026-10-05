@@ -15,17 +15,16 @@ public class BLine {
   }
 
   public void addAutoCommands() {
-    chooser.addOption("myFirstAuto", myFirstAuto());
+    chooser.addOption("B-Line Right 2056 Double HP", buildAuto("Right_2056_Double_HP.bline"));
+    chooser.addOption("B-Line Quals 73", buildAuto("Quals_73.bline"));
+    chooser.addOption("B-Line Left 2056 Double HP", buildAuto("Left_2056_Double_HP.bline"));
   }
 
-  public Command myFirstAuto() {
-    Path firstStraight = new Path("Left-Trench-To-Center");
-
-    Command firstAuto =
-        drivetrain.getPathBuilder().withPoseReset(drivetrain::resetPose).build(firstStraight);
-
-    // Builder options persist. Clear this before building any later path command.
+  private Command buildAuto(String pathName) {
+    Path path = new Path(pathName);
+    Command auto = drivetrain.getPathBuilder().withPoseReset(drivetrain::resetPose).build(path);
+    // Builder options persist — clear the pose reset before building the next path.
     drivetrain.getPathBuilder().withPoseReset(ignored -> {});
-    return firstAuto;
+    return auto;
   }
 }

@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.lib.BLine.*;
 import frc.robot.rebuilt.commands.AutoCommands;
 import frc.robot.rebuilt.commands.BLine;
+import frc.robot.rebuilt.commands.B_LineAutoCommands;
 import frc.robot.rebuilt.commands.ClimbCommands;
 import frc.robot.rebuilt.commands.IndexerCommands;
 import frc.robot.rebuilt.commands.IntakeCommands;
@@ -142,6 +143,7 @@ public class Rebuilt extends GenericRobot {
   public void initAutoCommands() {
     NamedCommandsReg.createNamedCommands();
     drivetrain.setAutoBuilder();
+    new B_LineAutoCommands().configureBlineAutoCommands();
   }
 
   // @Override
