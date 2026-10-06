@@ -16,9 +16,9 @@ public class BLine {
 
   public void addAutoCommands() {
     // Competition autos (ported from PathPlanner)
-    addAuto("Right 2056 Double HP", "Right_2056_Double_HP.bline");
-    addAuto("Quals 73", "Quals_73.bline");
-    addAuto("Left 2056 Double HP", "Left_2056_Double_HP.bline");
+    addAuto("Bline : Right 2056 Double HP", "Right_2056_Double_HP.bline");
+    addAuto("Bline : Quals 73", "Quals_73.bline");
+    addAuto("Bline : Left 2056 Double HP", "Left_2056_Double_HP.bline");
 
     // Simple test autos (validate B-Line on the real robot, simple -> complex)
     addAuto("Test: Straight 2m", "straight-2m-2");
