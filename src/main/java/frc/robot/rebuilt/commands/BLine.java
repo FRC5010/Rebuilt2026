@@ -15,9 +15,36 @@ public class BLine {
   }
 
   public void addAutoCommands() {
-    chooser.addOption("B-Line Right 2056 Double HP", buildAuto("Right_2056_Double_HP.bline"));
-    chooser.addOption("B-Line Quals 73", buildAuto("Quals_73.bline"));
-    chooser.addOption("B-Line Left 2056 Double HP", buildAuto("Left_2056_Double_HP.bline"));
+    // Competition autos (ported from PathPlanner)
+    addAuto("Right 2056 Double HP", "Right_2056_Double_HP.bline");
+    addAuto("Quals 73", "Quals_73.bline");
+    addAuto("Left 2056 Double HP", "Left_2056_Double_HP.bline");
+
+    // Simple test autos (validate B-Line on the real robot, simple -> complex)
+    addAuto("Test: Straight 2m", "straight-2m-2");
+    addAuto("Test: Straight + Left Turn", "straight-left-turn");
+    addAuto("Test: Square", "square");
+    addAuto("Test: Straight + Intake", "straight-intake");
+    addAuto("Test: Shoot", "shoot");
+    addAuto("Test: Intake + Shoot", "Intake-Shoot");
+  }
+
+  /**
+   * Adds one auto to the chooser. If its path file can't be found or loaded, it logs a warning and
+   * skips it instead of crashing the whole robot program at startup.
+   */
+  private void addAuto(String label, String pathName) {
+    try {
+      chooser.addOption(label, buildAuto(pathName));
+    } catch (Exception e) {
+      System.err.println(
+          "[BLine] Skipped auto \""
+              + label
+              + "\" — could not load path \""
+              + pathName
+              + "\": "
+              + e.getMessage());
+    }
   }
 
   private Command buildAuto(String pathName) {
