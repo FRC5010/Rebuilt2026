@@ -183,8 +183,9 @@ public class LauncherCommands {
     // state commands from other parts of the code.
     Trigger inPrep = new Trigger(() -> launcher.isCurrent(LauncherState.PREP));
     inPrep
+        .and(() -> launcher.isRequested(LauncherState.PREP))
+        .negate()
         .and(readyToFireTrigger.negate())
-        .and(churnWhileFiring.negate())
         .onTrue(IndexerCommands.shouldIdleCommand());
   }
 
