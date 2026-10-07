@@ -25,7 +25,7 @@
       "default_auto_velocity_merge_tolerance_meters_per_sec": 0.3
     }
   },
-  "active_path_file_name": "Intake-Shoot.json",
+  "active_path_file_name": "straight-intake.json",
   "active_path_group_id": "group-2755a41e-1b71-48ea-9aac-04b9f2ab2d57",
   "path_groups": [
     {
@@ -89,20 +89,12 @@
     }
   ],
   "paths": {
-    "idk.json": {
-      "display_name": "IDK",
+    "Quals_73.bline.json": {
+      "display_name": "Quals 73.bline",
       "editor_metadata": null
     },
-    "straight-intake.json": {
-      "display_name": "Straight - Intake",
-      "editor_metadata": null
-    },
-    "straight-2m.json": {
-      "display_name": "Straight - 2m",
-      "editor_metadata": null
-    },
-    "Right-2056-FirstCycle.json": {
-      "display_name": "Right-2056-FirstCycle",
+    "straight-2m-2.json": {
+      "display_name": "Straight-2m",
       "editor_metadata": null
     },
     "Right-Center-To-Left-Trench.json": {
@@ -187,20 +179,16 @@
         ]
       }
     },
-    "rt-ctr-rb.json": {
-      "display_name": "RT-CTR-RB",
+    "LT-CTR-LB-Depo.json": {
+      "display_name": "LT-CTR-LB-Depo",
       "editor_metadata": null
     },
-    "straight-2m-2.json": {
-      "display_name": "Straight-2m",
+    "Right_2056_Double_HP.bline.json": {
+      "display_name": "Right 2056 Double HP.bline",
       "editor_metadata": null
     },
     "square.json": {
       "display_name": "Square",
-      "editor_metadata": null
-    },
-    "Intake-Shoot.json": {
-      "display_name": "Intake-Shoot",
       "editor_metadata": null
     },
     "Right-Trench-To-Center.json": {
@@ -259,32 +247,44 @@
         ]
       }
     },
-    "Right_2056_Double_HP.bline.json": {
-      "display_name": "Right 2056 Double HP.bline",
+    "straight-left-turn.json": {
+      "display_name": "Straight-Left Turn",
       "editor_metadata": null
     },
-    "shoot.json": {
-      "display_name": "Shoot",
+    "straight-2m.json": {
+      "display_name": "Straight - 2m",
       "editor_metadata": null
     },
-    "Quals_73.bline.json": {
-      "display_name": "Quals 73.bline",
+    "straight-intake.json": {
+      "display_name": "Straight - Intake",
       "editor_metadata": null
     },
-    "LT-CTR-LB-Depo-2.json": {
-      "display_name": "LT CTR LB Depo",
+    "Intake-Shoot.json": {
+      "display_name": "Intake-Shoot",
       "editor_metadata": null
     },
     "Left_2056_Double_HP.bline.json": {
       "display_name": "Left 2056 Double HP.bline",
       "editor_metadata": null
     },
-    "straight-left-turn.json": {
-      "display_name": "Straight-Left Turn",
+    "rt-ctr-rb.json": {
+      "display_name": "RT-CTR-RB",
       "editor_metadata": null
     },
-    "LT-CTR-LB-Depo.json": {
-      "display_name": "LT-CTR-LB-Depo",
+    "idk.json": {
+      "display_name": "IDK",
+      "editor_metadata": null
+    },
+    "shoot.json": {
+      "display_name": "Shoot",
+      "editor_metadata": null
+    },
+    "Right-2056-FirstCycle.json": {
+      "display_name": "Right-2056-FirstCycle",
+      "editor_metadata": null
+    },
+    "LT-CTR-LB-Depo-2.json": {
+      "display_name": "LT CTR LB Depo",
       "editor_metadata": null
     }
   },
