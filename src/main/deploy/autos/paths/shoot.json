@@ -14,13 +14,13 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.13261,
+      "t_ratio": 0.63562,
       "lib_key": "launcherPrep"
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.99851,
-      "lib_key": "indexerFeed"
+      "t_ratio": 0.21922,
+      "lib_key": "indexerChurn"
     },
     {
       "type": "waypoint",
@@ -38,7 +38,7 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 1.75,
+        "value": 1.25,
         "start_ordinal": 0,
         "end_ordinal": 1
       }
