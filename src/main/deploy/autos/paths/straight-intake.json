@@ -14,13 +14,13 @@
     },
     {
       "type": "event_trigger",
-      "t_ratio": 0.39936,
+      "t_ratio": 0.3199,
       "lib_key": "intakeIntake"
     },
     {
       "type": "waypoint",
       "translation_target": {
-        "x_meters": 7.0152,
+        "x_meters": 7.51,
         "y_meters": 0.67,
         "intermediate_handoff_radius_meters": 0.45
       },
@@ -33,7 +33,7 @@
   "constraints": {
     "max_velocity_meters_per_sec": [
       {
-        "value": 2.5,
+        "value": 1.75,
         "start_ordinal": 0,
         "end_ordinal": 1
       }
