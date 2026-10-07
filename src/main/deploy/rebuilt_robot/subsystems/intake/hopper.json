@@ -5,7 +5,7 @@
     "motorType": "KrakenX44",
     "canId": 15,
     "logLevel": "LOW",
-    "inverted": true,
+    "inverted": false,
     "currentLimit": {
       "val": 60,
       "uom": "amps"
