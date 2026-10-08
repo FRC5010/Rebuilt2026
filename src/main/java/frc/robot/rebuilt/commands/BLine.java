@@ -1,8 +1,10 @@
 package frc.robot.rebuilt.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.lib.BLine.FollowPath;
 import frc.robot.lib.BLine.Path;
 import org.frc5010.common.drive.GenericDrivetrain;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 public class BLine {
@@ -12,6 +14,14 @@ public class BLine {
   public BLine(GenericDrivetrain drivetrain, LoggedDashboardChooser<Command> chooser) {
     this.drivetrain = drivetrain;
     this.chooser = chooser;
+    FollowPath.setDoubleLoggingConsumer(
+        value -> Logger.recordOutput(value.getFirst(), value.getSecond()));
+    FollowPath.setBooleanLoggingConsumer(
+        value -> Logger.recordOutput(value.getFirst(), value.getSecond()));
+    FollowPath.setPoseLoggingConsumer(
+        value -> Logger.recordOutput(value.getFirst(), value.getSecond()));
+    FollowPath.setTranslationListLoggingConsumer(
+        value -> Logger.recordOutput(value.getFirst(), value.getSecond()));
   }
 
   public void addAutoCommands() {
