@@ -7,11 +7,9 @@ import static edu.wpi.first.units.Units.RotationsPerSecond;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
-import frc.robot.rebuilt.subsystems.Climb.Climb;
 
 public class Constants {
   public static final String INDEXER = Indexer.class.getSimpleName();
-  public static final String CLIMB = Climb.class.getSimpleName();
   public static final String INTAKE = Intake.class.getSimpleName();
   public static final String LAUNCHER = Launcher.class.getSimpleName();
   /** Defines the maxinum distance for the climb */
@@ -25,6 +23,10 @@ public class Constants {
     public static final double TURRET_ANGLE_TOLERANCE_DEGREES = 5.0;
     public static final Angle HOPPER_EXTENSION_BUFFER_BEFORE_AIM = Degrees.of(10);
     public static final double HOOD_STALL_CURRENT_THRESHOLD = 20.0;
+    /** Duty cycle used to slowly run the hood downward while zeroing against the hard stop. */
+    public static final double HOOD_ZEROING_DUTY_CYCLE = -0.15;
+    /** Time the hood current must stay above the stall threshold, to ignore startup inrush. */
+    public static final double HOOD_STALL_DEBOUNCE_SECONDS = 0.2;
 
     public static final double HOOD_LEGACY_START_ANGLE_DEGREES = 30.0;
     public static final double HOOD_CORRECTED_START_ANGLE_DEGREES = 12.723;

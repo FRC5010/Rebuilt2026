@@ -133,6 +133,8 @@ public interface LauncherIO {
 
   public void runHoodDown();
 
+  public void runHoodDownSlowly();
+
   public void stopHood();
 
   public Boolean isHoodStalled();
