@@ -192,12 +192,18 @@ public class TurretKsMapCommand extends Command {
     controller.stop();
     if (currentState == State.DONE) {
       Logger.recordOutput(PREFIX + "Status", "Complete");
-      System.out.println("[TurretKsMap] Mapping complete. Results:");
-      for (int i = 0; i < testPositions.length; i++) {
-        double pos = testPositions[i];
+      System.out.println("[TurretKsMap] Mapping complete. Paste into config:");
+      System.out.println("// kS positive direction (amps)");
+      for (double pos : testPositions) {
         System.out.printf(
-            "  %.1f deg: kS+ = %.3f A, kS- = %.3f A%n",
-            pos * 360, resultMapPositive.get(pos), resultMapNegative.get(pos));
+            "ksMapPositive.put(%.4f, %.3f); // %.1f deg%n",
+            pos, resultMapPositive.get(pos), pos * 360);
+      }
+      System.out.println("// kS negative direction (amps)");
+      for (double pos : testPositions) {
+        System.out.printf(
+            "ksMapNegative.put(%.4f, %.3f); // %.1f deg%n",
+            pos, resultMapNegative.get(pos), pos * 360);
       }
     } else {
       Logger.recordOutput(PREFIX + "Status", "Interrupted at index " + currentIndex);

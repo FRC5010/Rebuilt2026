@@ -7,6 +7,7 @@ import frc.robot.rebuilt.subsystems.Launcher.Launcher;
 import frc.robot.rebuilt.subsystems.intake.Intake;
 import java.util.Map;
 import org.frc5010.common.arch.GenericSubsystem;
+import org.frc5010.common.config.ConfigConstants;
 import org.frc5010.common.drive.GenericDrivetrain;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -38,6 +39,10 @@ public class AutoCommands {
                 subsystems.get(org.frc5010.common.config.ConfigConstants.DRIVETRAIN),
             2.0,
             0.5));
+    selectableCommand.addOption(
+        "PRO: Odometry 10ft Drive Test",
+        new OdometryDriveTestCommand(
+            (GenericDrivetrain) subsystems.get(ConfigConstants.DRIVETRAIN)));
     selectableCommand.addOption(
         "PRO: Turret Quasistatic (kS, kV)",
         ((Launcher) subsystems.get(Constants.LAUNCHER)).getTurretQuasistaticCommand());
