@@ -26,9 +26,11 @@ public class BLine {
 
   public void addAutoCommands() {
     // Competition autos
-    addAuto("Bline : Right 2056 Double HP", "Right_2056_Double_HP.bline");
-    addAuto("Bline : Quals 73", "Quals_73.bline");
-    addAuto("Bline : Left 2056 Double HP", "Left_2056_Double_HP.bline");
+    addAuto("Bline : Quals 73", "Quals_73");
+    addAuto("Bline : Left 2056 Double HP", "Left_2056_Double_HP");
+    addAuto("Bline : Right 2056 Double HP", "Right_2056_Double_HP");
+    addAuto("Bline : Left 5010 Double", "left-5010-double");
+    addAuto("Bline : Right 5010 Double HP", "Right_5010_Double_HP");
 
     // Simple test autos
     addAuto("Test: Straight 2m", "straight-2m-2");

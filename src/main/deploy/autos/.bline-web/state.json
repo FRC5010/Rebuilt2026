@@ -25,7 +25,6 @@
       "default_auto_velocity_merge_tolerance_meters_per_sec": 0.3
     }
   },
-  "active_path_file_name": "shoot.json",
   "active_path_group_id": "group-2755a41e-1b71-48ea-9aac-04b9f2ab2d57",
   "path_groups": [
     {
@@ -45,9 +44,11 @@
       "group_id": "group-776bb2c3-06d0-4661-984c-ff222059d2c9",
       "display_name": "Rebuilt 2026 Autos",
       "path_file_names": [
-        "Quals_73.bline.json",
-        "Left_2056_Double_HP.bline.json",
-        "Right_2056_Double_HP.bline.json"
+        "Quals_73.json",
+        "Left_2056_Double_HP.json",
+        "Right_2056_Double_HP.json",
+        "left-5010-double.json",
+        "Right_5010_Double_HP.json"
       ]
     },
     {
@@ -89,16 +90,20 @@
     }
   ],
   "paths": {
-    "straight-2m-2.json": {
-      "display_name": "Straight-2m",
+    "Right_2056_Double_HP.json": {
+      "display_name": "Right 2056 Double HP",
       "editor_metadata": null
     },
-    "Left_2056_Double_HP.bline.json": {
-      "display_name": "Left 2056 Double HP.bline",
+    "straight-2m.json": {
+      "display_name": "Straight - 2m",
       "editor_metadata": null
     },
-    "Quals_73.bline.json": {
-      "display_name": "Quals 73.bline",
+    "straight-intake.json": {
+      "display_name": "Straight - Intake",
+      "editor_metadata": null
+    },
+    "Right_5010_Double_HP.json": {
+      "display_name": "Right 5010 Double HP",
       "editor_metadata": null
     },
     "Right-Center-To-Left-Trench.json": {
@@ -183,6 +188,50 @@
         ]
       }
     },
+    "Left_2056_Double_HP.json": {
+      "display_name": "Left 2056 Double HP",
+      "editor_metadata": null
+    },
+    "LT-CTR-LB-Depo.json": {
+      "display_name": "LT-CTR-LB-Depo",
+      "editor_metadata": null
+    },
+    "rt-ctr-rb.json": {
+      "display_name": "RT-CTR-RB",
+      "editor_metadata": null
+    },
+    "straight-2m-2.json": {
+      "display_name": "Straight-2m",
+      "editor_metadata": null
+    },
+    "shoot.json": {
+      "display_name": "Shoot",
+      "editor_metadata": null
+    },
+    "left-5010-double.json": {
+      "display_name": "Left 5010 Double",
+      "editor_metadata": null
+    },
+    "Intake-Shoot.json": {
+      "display_name": "Intake-Shoot",
+      "editor_metadata": null
+    },
+    "straight-left-turn.json": {
+      "display_name": "Straight-Left Turn",
+      "editor_metadata": null
+    },
+    "Right-2056-FirstCycle.json": {
+      "display_name": "Right-2056-FirstCycle",
+      "editor_metadata": null
+    },
+    "Quals_73.json": {
+      "display_name": "Quals 73",
+      "editor_metadata": null
+    },
+    "square.json": {
+      "display_name": "Square",
+      "editor_metadata": null
+    },
     "Right-Trench-To-Center.json": {
       "display_name": "Right-Trench-To-Center",
       "editor_metadata": {
@@ -239,52 +288,8 @@
         ]
       }
     },
-    "straight-intake.json": {
-      "display_name": "Straight - Intake",
-      "editor_metadata": null
-    },
-    "Right-2056-FirstCycle.json": {
-      "display_name": "Right-2056-FirstCycle",
-      "editor_metadata": null
-    },
-    "Right_2056_Double_HP.bline.json": {
-      "display_name": "Right 2056 Double HP.bline",
-      "editor_metadata": null
-    },
     "LT-CTR-LB-Depo-2.json": {
       "display_name": "LT CTR LB Depo",
-      "editor_metadata": null
-    },
-    "square.json": {
-      "display_name": "Square",
-      "editor_metadata": null
-    },
-    "idk.json": {
-      "display_name": "IDK",
-      "editor_metadata": null
-    },
-    "straight-left-turn.json": {
-      "display_name": "Straight-Left Turn",
-      "editor_metadata": null
-    },
-    "rt-ctr-rb.json": {
-      "display_name": "RT-CTR-RB",
-      "editor_metadata": null
-    },
-    "straight-2m.json": {
-      "display_name": "Straight - 2m",
-      "editor_metadata": null
-    },
-    "shoot.json": {
-      "display_name": "Shoot",
-      "editor_metadata": null
-    },
-    "LT-CTR-LB-Depo.json": {
-      "display_name": "LT-CTR-LB-Depo",
-      "editor_metadata": null
-    },
-    "Intake-Shoot.json": {
-      "display_name": "Intake-Shoot",
       "editor_metadata": null
     }
   },
