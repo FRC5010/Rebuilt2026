@@ -18,6 +18,7 @@ public class Constants {
   }
 
   public static class Launcher {
+    public static final double SHOOT_TRIGGER_THRESHOLD = 0.25;
     public static final double SHOOTER_TOLERANCE_RPM = 50.0;
     public static final double HOOD_ANGLE_TOLERANCE_DEGREES = 3.5;
     public static final double TURRET_ANGLE_TOLERANCE_DEGREES = 5.0;

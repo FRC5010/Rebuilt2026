@@ -203,10 +203,11 @@ public class LauncherCommands {
 
   public void configureButtonBindings(Controller driver, Controller operator) {
 
-    // driver.createAButton().onTrue(shouldPrepCommand());
-    driver.createBButton().whileTrue(shouldPrepCommand()).onFalse(shouldLowCommand());
-
-    driver.createAButton().onTrue(shouldLowCommand()).onFalse(shouldLowCommand());
+    // Hold RT to aim/prep and shoot; releasing drops the launcher back to LOW.
+    driver.setRightTrigger(driver.createRightTrigger());
+    new Trigger(() -> driver.getRightTrigger() > Constants.Launcher.SHOOT_TRIGGER_THRESHOLD)
+        .whileTrue(shouldPrepCommand())
+        .onFalse(shouldLowCommand());
 
     operator
         .createLeftPovButton()
