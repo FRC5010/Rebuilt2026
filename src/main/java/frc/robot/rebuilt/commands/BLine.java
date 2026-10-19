@@ -30,7 +30,7 @@ public class BLine {
     addAuto("Bline : Left 2056 Double HP", "Left_2056_Double_HP");
     addAuto("Bline : Right 2056 Double HP", "Right_2056_Double_HP");
     addAuto("Bline : Left 5010 Double", "left-5010-double");
-    addAuto("Bline : Right 5010 Double HP", "Right_5010_Double_HP");
+    addAuto("Bline : Right 5010 Double", "Right_5010_Double");
 
     // Simple test autos
     addAuto("Test: Straight 2m", "straight-2m-2");
