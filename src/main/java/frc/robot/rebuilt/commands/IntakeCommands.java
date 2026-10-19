@@ -103,39 +103,23 @@ public class IntakeCommands {
   }
 
   public void configureButtonBindings(Controller controller, Controller operator) {
-    controller.setRightTrigger(
-        controller.createRightTrigger().limit(Constants.Intake.INTAKE_MAX_IN));
-    Trigger rightTrigger =
-        new Trigger(() -> controller.getRightTrigger() > Constants.Intake.INTAKE_DEADZONE);
-    controller.setLeftTrigger(
-        controller
-            .createLeftTrigger()
-            .limit(Constants.Intake.INTAKE_MAX_IN)); // Axis are positive only hence IN
+    // Driver: LT deploys the intake, LB retracts it. RT is the shoot trigger (LauncherCommands).
+    controller.setLeftTrigger(controller.createLeftTrigger());
     Trigger leftTrigger =
         new Trigger(() -> controller.getLeftTrigger() > Constants.Intake.INTAKE_DEADZONE);
 
-    rightTrigger.onTrue(shouldIntaking());
     leftTrigger.onTrue(shouldIntaking());
 
-    controller.createRightBumper().onTrue(shouldRetracting());
+    controller.createLeftBumper().onTrue(shouldRetracting());
     // Must be runOnce: a run() never ends and would re-write the encoder position every loop.
     operator.createStartButton().onTrue(Commands.runOnce(() -> intake.setHopperRetracted()));
     operator.createBackButton().onTrue(Commands.runOnce(() -> intake.setHopperDeployed()));
 
-    controller.createXButton().onTrue(operatorHopperDownCommand());
     // operator.createRightBumper().onTrue(shouldAngled()).onFalse(shouldIntaking());
 
     intakeSpeedSupplier =
         () -> {
-          double rightTriggerSpeed = controller.getRightTrigger();
-          double leftTriggerSpeed = controller.getLeftTrigger();
-          double speed = Constants.Intake.INTAKE_IN; // Default speed if neither trigger is pressed
-          if (rightTriggerSpeed > Constants.Intake.INTAKE_DEADZONE
-              || leftTriggerSpeed > Constants.Intake.INTAKE_DEADZONE) {
-            speed =
-                rightTriggerSpeed
-                    - leftTriggerSpeed; // Positive for intaking, negative for outtaking
-          }
+          double speed = Constants.Intake.INTAKE_IN;
           if (RobotState.isAutonomous()) {
             speed = Constants.Intake.INTAKE_AUTO; // Intake in speed in auto
           }
