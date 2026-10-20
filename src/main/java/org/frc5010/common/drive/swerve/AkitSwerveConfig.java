@@ -25,6 +25,7 @@ import frc.robot.Constants;
 import org.frc5010.common.config.UnitsParser;
 import org.frc5010.common.config.json.devices.DrivetrainConstantsJson;
 import org.frc5010.common.drive.SwerveDriveConfig;
+import org.frc5010.common.drive.swerve.akit.util.PhoenixUtil;
 import yams.gearing.GearBox;
 import yams.gearing.MechanismGearing;
 
@@ -179,8 +180,11 @@ public class AkitSwerveConfig extends SwerveDriveConfig {
               .withEncoderInitialConfigs(encoderInitialConfigs)
               .withSteerInertia(UnitsParser.parseMomentOfInertia(constants.steerInertia))
               .withDriveInertia(UnitsParser.parseMomentOfInertia(constants.driveInertia))
-              .withSteerFrictionVoltage(constants.steerMotorControl.feedForward.s)
-              .withDriveFrictionVoltage(constants.driveMotorControl.feedForward.s);
+              // Friction voltages are only read by the simulation. They are sim parameters in
+              // volts,
+              // not the real robot's kS (TorqueCurrentFOC amps in the JSON).
+              .withSteerFrictionVoltage(PhoenixUtil.SIM_STEER_FRICTION_VOLTAGE)
+              .withDriveFrictionVoltage(PhoenixUtil.SIM_DRIVE_FRICTION_VOLTAGE);
       trackWidth = UnitsParser.parseDistance(constants.trackWidth);
       wheelBase = UnitsParser.parseDistance(constants.wheelBase);
       Distance kFrontLeftXPos = trackWidth.div(2);

@@ -37,6 +37,21 @@ import swervelib.simulation.ironmaple.simulation.motorsims.SimulatedBattery;
 import swervelib.simulation.ironmaple.simulation.motorsims.SimulatedMotorController;
 
 public final class PhoenixUtil {
+  /**
+   * Friction voltage used for the drive motors in simulation (module IO and maple-sim physics).
+   *
+   * <p>This is a simulation parameter, in volts. It must NOT be derived from the real robot's
+   * characterised kS: those JSON gains are TorqueCurrentFOC amps (~4 A), and treating them as volts
+   * leaves a ~4 V dead-band that makes the sim drive undershoot low commanded speeds.
+   */
+  public static final Voltage SIM_DRIVE_FRICTION_VOLTAGE = Volts.of(0.1);
+
+  /**
+   * Friction voltage used for the steer motors in simulation. See {@link
+   * #SIM_DRIVE_FRICTION_VOLTAGE}.
+   */
+  public static final Voltage SIM_STEER_FRICTION_VOLTAGE = Volts.of(0.05);
+
   /** Attempts to run the command until no error is produced. */
   public static void tryUntilOk(int maxAttempts, Supplier<StatusCode> command) {
     for (int i = 0; i < maxAttempts; i++) {
@@ -156,8 +171,8 @@ public final class PhoenixUtil {
         .withDriveMotorGains(
             new Slot0Configs().withKP(0.05).withKI(0).withKD(0).withKS(0.1).withKV(0.72).withKA(0))
         // Adjust friction voltages
-        .withDriveFrictionVoltage(Volts.of(0.1))
-        .withSteerFrictionVoltage(Volts.of(0.05))
+        .withDriveFrictionVoltage(SIM_DRIVE_FRICTION_VOLTAGE)
+        .withSteerFrictionVoltage(SIM_STEER_FRICTION_VOLTAGE)
         // Adjust steer inertia
         .withSteerInertia(KilogramSquareMeters.of(0.05));
   }
