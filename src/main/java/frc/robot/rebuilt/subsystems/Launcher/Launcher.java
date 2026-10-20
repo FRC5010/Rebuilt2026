@@ -252,8 +252,21 @@ public class Launcher extends GenericSubsystem {
   public void setCurrentState(LauncherState state) {
     inputs.stateCurrent = state;
   }
-  /** Sets the launcher's requested state to transition to */
+  /**
+   * Sets the launcher's requested state to transition to. While the trench guard is holding the
+   * hood down, a new request is remembered and applied when the guard releases instead of
+   * overriding the hold.
+   */
   public void setRequestedState(LauncherState state) {
+    boolean holding =
+        inputs.stateCurrent == LauncherState.AUTO_HAMMERTIME
+            || inputs.stateRequested == LauncherState.AUTO_HAMMERTIME;
+    boolean guardTransition =
+        state == LauncherState.AUTO_HAMMERTIME || state == LauncherState.ESCAPE_HAMMERTIME;
+    if (holding && !guardTransition) {
+      inputs.preTrenchState = state == LauncherState.PRESET ? LauncherState.LOW_SPEED : state;
+      return;
+    }
     inputs.stateRequested = state;
   }
 
@@ -265,13 +278,23 @@ public class Launcher extends GenericSubsystem {
     return inputs.preTrenchState;
   }
 
+  /**
+   * True while the hood has to be held down for a trench. The guard only applies while the hood is
+   * raised (PREP or PRESET) or already being held, so a stationary robot next to a trench can still
+   * shoot. Remembers the state to return to once the hood is released.
+   */
   public boolean isNearTrench() {
+    LauncherState current = getCurrentState();
+    boolean hoodRaised = current == LauncherState.PREP || current == LauncherState.PRESET;
+    boolean holding =
+        current == LauncherState.AUTO_HAMMERTIME
+            || inputs.stateRequested == LauncherState.AUTO_HAMMERTIME;
+    if (!hoodRaised && !holding) {
+      return false;
+    }
     boolean nearTrench = io.isNearTrench();
-    if (nearTrench && (getCurrentState() != LauncherState.AUTO_HAMMERTIME)) {
-      inputs.preTrenchState = getCurrentState();
-      if (getCurrentState() == LauncherState.PRESET) {
-        inputs.preTrenchState = LauncherState.LOW_SPEED;
-      }
+    if (nearTrench && hoodRaised) {
+      inputs.preTrenchState = current == LauncherState.PRESET ? LauncherState.LOW_SPEED : current;
     }
     return nearTrench;
   }

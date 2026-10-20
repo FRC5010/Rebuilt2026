@@ -18,9 +18,10 @@ simulation of the real robot code (October 2026, branch `b-line-implementation` 
 
 ## Code-level issues (affect every auto)
 
-- [ ] No code protects the hood in auto. `Launcher.setHoodAngle` documents a trench override but only
-      forwards the request, and the auto-hammertime trigger in `LauncherCommands.configureButtonBindings`
-      is commented out. Decide whether to restore a guard or rely on path design.
+- [x] No code protected the hood in auto. Fixed: `TrenchGuard` (velocity-aware, see `docs/AUTO_AUDIT.md`)
+      drives the existing AUTO_HAMMERTIME state in teleop and auto. Sim result below. Still to do on the
+      robot: measure the hood drop time (`TrenchGuard.HOOD_DROP_TIME_S`, 0.7 s from the sim) and check the
+      beam clearance angle.
 - [ ] `B_LineAutoCommands.java` registers `intakeRetracted` and `intakeRetracting` to
       `IntakeCommands.shouldIntaking()`. Unused by current paths, but any path using them would deploy
       the intake. Should be `shouldRetracted()` / `shouldRetracting()` (as in `NamedCommandsReg`).
@@ -29,6 +30,29 @@ simulation of the real robot code (October 2026, branch `b-line-implementation` 
       (0.1 V drive / 0.05 V steer), guarded by `AkitSwerveSimFrictionTest`. Sim Square end miss
       0.218 m -> 0.002 m.
 - [ ] Measure real hood travel time (PREP -> LOW and LOW -> PREP) and update the 0.7 s lead used here.
+
+## Effect of the trench guard (simulation, branch `b-line-implementation`)
+
+Worst hood angle under a beam, same sim, before -> after the guard (17.2 deg = down):
+
+| Auto | Before | After |
+| --- | --- | --- |
+| BLine `Right_5010_Double` pass 3 | 33.0 | 21.6 (Blue), 21.0 (Red) |
+| BLine `left-5010-double` pass 3 | 34.5 | 13-19 over four runs |
+| BLine `Right_2056_Double_HP` pass 2 | 33.8 | 17.6 (Blue), 21.0 (Red) |
+| BLine `Intake-Shoot` (parks in far trench) | 37.4 | 16.2 |
+| PP `Orbit Right` | 25-31 | 14-19 |
+| PP `Orbit Right 2 Swipe no HP` | 25-31 | 15-17 |
+| PP `2X-TR-CTR-BUMP-DEP` | 25 | 13-14 |
+| PP `TL-QTR-SS-QTRH-DEP-SS` (never lowers) | 28+ | 15-21 |
+| PP `Follow Right Trench HP` | parked, 32 for 8 s | 18-19 |
+| PP `Left 2056 double HP` | 32 | 14, 25 (two runs) |
+
+Not yet cured: autos that start moving from rest within about 1 m of the beam (the `Follow ...`, `Quals 110`,
+`Right 5010 Double*` family, 14 passes in the static guarded model). The guard cannot react before the robot
+moves; lower the hood earlier in the auto. Some BLine passes sit at 21-22 deg (MARGINAL) for the same
+reason. The checkboxes below are still the right list of autos to fix; `Right_*`/`left-*` BLine items now only
+need the move for margin.
 
 ## BLine autos (`src/main/deploy/autos/paths`)
 

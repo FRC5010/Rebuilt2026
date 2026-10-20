@@ -9,7 +9,8 @@ autonomous routine, for both B-Line paths (`src/main/deploy/autos/paths`) and Pa
 | Check | Command | Runs in `./gradlew test`? |
 | --- | --- | --- |
 | Unit tests (hood model, geometry, both analyzers on synthetic fixtures) | `./gradlew test --tests 'frc.robot.rebuilt.audit.*'` | yes |
-| Static ratchet over every real auto | `AutoAuditBaselineTest` | yes |
+| Static ratchets over every real auto (without and with the trench guard) | `AutoAuditBaselineTest` | yes |
+| Trench guard geometry and lookahead | `TrenchGuardTest`, `GuardedTimelineTest` | yes |
 | Sim friction regression | `AkitSwerveSimFrictionTest` | yes |
 | Headless full-robot simulation of one auto | `tools/auto-audit/run-sim-audit.sh` | no (opt-in, about 25 s per auto) |
 
@@ -33,13 +34,32 @@ angle with `HoodModel` and noting every "stay" with the robot centre under a tre
 * The hood curves in `HoodModel` come from the simulation, not hardware. Measure PREP-to-LOW and
   LOW-to-PREP on the robot and update them; the whole audit then re-calibrates.
 
+## The trench guard
+
+The robot now holds the hood down by itself (`TrenchGuard`, bound in `LauncherCommands`): when the hood is
+raised (PREP/PRESET) and the robot is under a trench, or its field velocity would carry it under one within
+`(HOOD_DROP_TIME_S + REACTION_LATENCY_S)` seconds, the launcher goes to AUTO_HAMMERTIME. A stationary robot
+outside a trench is never flagged, so a driver can park next to the beam and shoot. Lookahead distance is
+`v * 0.8 s + fade * 0.5 * 2 m/s^2 * (0.8 s)^2`, where `fade` ramps from 0 to 1 over 0 to 1 m/s. Requests made
+while the hold is active (including auto `launcherPrep`) are remembered and applied when the guard releases
+(0.25 s after the robot is clear). The binding is created at construction, so it also protects autonomous
+(button bindings are only created at teleop init).
+
+The audit therefore has two views of every auto:
+
+* `static` (unguarded): what the auto relies on the guard for. Keeping it small keeps the autos robust if
+  the guard is ever disabled or the hood is slower than modelled.
+* `staticGuarded`: `GuardedTimeline` applies the guard to the ideal timeline. This is the expected on-robot
+  result. The remaining entries are autos that start moving from rest within about 1 m of the beam; the guard
+  sees no velocity until the robot moves, so these need an earlier `launcherLow` in the auto itself.
+
 ## Workflow for fixing an issue
 
 1. Edit the auto (for example, move `launcherLow` earlier).
 2. `./gradlew test --tests 'frc.robot.rebuilt.audit.*'`. The output lists `FIXED since baseline`
    entries for passes that no longer violate. A pass that newly violates fails the build.
 3. `AUDIT_UPDATE_BASELINE=1 ./gradlew test --tests 'frc.robot.rebuilt.audit.AutoAuditBaselineTest'`
-   rewrites the static section of `src/test/resources/auto-audit/baseline.json`. Commit the smaller file;
+   rewrites the static and staticGuarded sections of `src/test/resources/auto-audit/baseline.json`. Commit the smaller file;
    the diff is the list of fixes. Tick the item in `HOOD_TRENCH_AUDIT.md`.
 4. Confirm in simulation: `tools/auto-audit/run-sim-audit.sh --update-baseline "Right 5010 Double"`
    (PathPlanner auto name or B-Line path name, such as `Right_5010_Double`).
@@ -60,7 +80,7 @@ simulated time. Set `AUDIT_OUT=/path/file.csv` for a per-tick trace (pose, hood 
 
 **What is enforced.** B-Line sim results are repeatable (the worst hood angle under a beam differed by at
 most 0.4 deg between identical runs), so they are checked against the `sim` section of the baseline
-(violation = hood above 22 deg under a beam). PathPlanner sim results are *not* repeatable (39 of 60 autos
+(violation = hood above 22 deg under a beam; with the trench guard the section is empty). PathPlanner sim results are *not* repeatable (39 of 60 autos
 reproduced within 0.5 deg, but others differed by 5-17 deg between identical runs, because the sim robot
 lags its trajectory and PathPlanner ends paths and fires markers on trajectory time). They are printed as a
 stress test and not enforced; the deterministic static analysis is the PathPlanner gate. Use `--repeat N`
@@ -70,7 +90,7 @@ run-to-run variation was not isolated.
 ## Files
 
 * `src/test/java/frc/robot/rebuilt/audit/` : `HoodModel`, `TrenchGeometry`, `TrenchAudit`, `PathPlannerAudit`,
-  `BLineAudit`, `AuditBaseline`, the tests, and `AutoAuditSimTest`
+  `BLineAudit`, `GuardedTimeline`, `AuditBaseline`, the tests, and `AutoAuditSimTest`
 * `src/test/resources/auto-audit/fixtures/` : synthetic autos with known answers
 * `src/test/resources/auto-audit/baseline.json` : known violations (the ratchet)
 * `tools/auto-audit/run-sim-audit.sh`

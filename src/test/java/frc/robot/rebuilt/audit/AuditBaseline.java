@@ -19,6 +19,8 @@ import java.util.TreeMap;
  * <ul>
  *   <li>{@code static}: per kind ("pathplanner" / "bline") and auto, the pass numbers (1-based
  *       trench stays) whose hood angle is above the down threshold in the static analysis
+ *   <li>{@code staticGuarded}: the same, after applying the robot's trench guard ({@link
+ *       GuardedTimeline}); this is what the robot is expected to do
  *   <li>{@code sim}: per kind, autos whose headless simulation shows the hood above {@link
  *       #SIM_THRESHOLD_DEG} under a trench beam
  * </ul>
@@ -35,6 +37,7 @@ public final class AuditBaseline {
       new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 
   public final Map<String, Map<String, List<Integer>>> staticViolations = new TreeMap<>();
+  public final Map<String, Map<String, List<Integer>>> guardedViolations = new TreeMap<>();
   public final Map<String, List<String>> simViolations = new TreeMap<>();
 
   public static AuditBaseline load() throws IOException {
@@ -45,6 +48,12 @@ public final class AuditBaseline {
       b.staticViolations.putAll(
           MAPPER.convertValue(
               root.get("static"),
+              new TypeReference<TreeMap<String, TreeMap<String, List<Integer>>>>() {}));
+    }
+    if (root.has("staticGuarded")) {
+      b.guardedViolations.putAll(
+          MAPPER.convertValue(
+              root.get("staticGuarded"),
               new TypeReference<TreeMap<String, TreeMap<String, List<Integer>>>>() {}));
     }
     if (root.has("sim")) {
@@ -63,6 +72,7 @@ public final class AuditBaseline {
             + " Regenerate with AUDIT_UPDATE_BASELINE=1 (see docs/AUTO_AUDIT.md) and commit the"
             + " diff.");
     root.set("static", MAPPER.valueToTree(staticViolations));
+    root.set("staticGuarded", MAPPER.valueToTree(guardedViolations));
     root.set("sim", MAPPER.valueToTree(simViolations));
     Files.createDirectories(FILE.getParent());
     Files.writeString(FILE, MAPPER.writeValueAsString(root) + "\n");
@@ -70,6 +80,17 @@ public final class AuditBaseline {
 
   public List<Integer> staticFor(String kind, String name) {
     return staticViolations.getOrDefault(kind, Map.of()).getOrDefault(name, List.of());
+  }
+
+  public List<Integer> guardedFor(String kind, String name) {
+    return guardedViolations.getOrDefault(kind, Map.of()).getOrDefault(name, List.of());
+  }
+
+  public void setGuarded(String kind, String name, List<Integer> passes) {
+    Map<String, List<Integer>> m = guardedViolations.computeIfAbsent(kind, k -> new TreeMap<>());
+    if (passes.isEmpty()) m.remove(name);
+    else m.put(name, new ArrayList<>(passes));
+    if (m.isEmpty()) guardedViolations.remove(kind);
   }
 
   public boolean simKnown(String kind, String name) {

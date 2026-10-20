@@ -109,6 +109,68 @@ public class AutoAuditBaselineTest {
     }
   }
 
+  /** Same analysis with the robot's trench guard applied: the expected on-robot result. */
+  static Map<String, Map<String, List<Stay>>> analyzeAllGuarded(
+      Map<String, Map<String, AutoTimeline>> timelines) throws IOException {
+    Map<String, Map<String, List<Stay>>> out = new TreeMap<>();
+    for (var kind : timelines.entrySet()) {
+      for (var auto : kind.getValue().entrySet()) {
+        out.computeIfAbsent(kind.getKey(), k -> new TreeMap<>())
+            .put(
+                auto.getKey(),
+                TrenchAudit.stays(GuardedTimeline.apply(auto.getValue()), TrenchGeometry.CENTER));
+      }
+    }
+    return out;
+  }
+
+  @Test
+  @DisabledIfEnvironmentVariable(named = "AUDIT_UPDATE_BASELINE", matches = "1")
+  public void noNewHoodTrenchViolationsWithTheGuard() throws IOException {
+    AuditBaseline baseline = AuditBaseline.load();
+    Map<String, Map<String, AutoTimeline>> tls = new TreeMap<>();
+    analyzeAll(tls);
+    Map<String, Map<String, List<Stay>>> guarded = analyzeAllGuarded(tls);
+    List<String> fresh = new ArrayList<>();
+    List<String> stale = new ArrayList<>();
+    int remaining = 0;
+    for (var kind : guarded.entrySet()) {
+      for (var auto : kind.getValue().entrySet()) {
+        List<Integer> now = TrenchAudit.violationPasses(auto.getValue());
+        List<Integer> known = baseline.guardedFor(kind.getKey(), auto.getKey());
+        remaining += now.size();
+        for (int pass : now) {
+          if (!known.contains(pass)) {
+            fresh.add(
+                String.format(
+                    "%s '%s' pass %d: %s",
+                    kind.getKey(), auto.getKey(), pass, auto.getValue().get(pass - 1)));
+          }
+        }
+        for (int pass : known) {
+          if (!now.contains(pass)) {
+            stale.add(String.format("%s '%s' pass %d", kind.getKey(), auto.getKey(), pass));
+          }
+        }
+      }
+    }
+    System.out.printf(
+        "[auto-audit] with the trench guard: %d trench passes still above the hood threshold%n",
+        remaining);
+    if (!stale.isEmpty()) {
+      System.out.println("[auto-audit] guarded FIXED since baseline: " + stale);
+    }
+    assertTrue(
+        fresh.isEmpty(),
+        "New hood-above-threshold trench passes even with the trench guard:\n  "
+            + String.join("\n  ", fresh));
+    if ("1".equals(System.getenv("AUDIT_STRICT_BASELINE"))) {
+      assertTrue(
+          stale.isEmpty(),
+          "Fixed but still in baseline.json (staticGuarded):\n  " + String.join("\n  ", stale));
+    }
+  }
+
   @Test
   public void writesReport() throws IOException {
     AuditBaseline baseline = AuditBaseline.load();
@@ -151,6 +213,13 @@ public class AutoAuditBaselineTest {
     for (var kind : analyzeAll(tls).entrySet()) {
       for (var auto : kind.getValue().entrySet()) {
         baseline.setStatic(
+            kind.getKey(), auto.getKey(), TrenchAudit.violationPasses(auto.getValue()));
+      }
+    }
+    baseline.guardedViolations.clear();
+    for (var kind : analyzeAllGuarded(tls).entrySet()) {
+      for (var auto : kind.getValue().entrySet()) {
+        baseline.setGuarded(
             kind.getKey(), auto.getKey(), TrenchAudit.violationPasses(auto.getValue()));
       }
     }

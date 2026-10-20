@@ -26,6 +26,9 @@ public class Constants {
     public static final Angle HOPPER_EXTENSION_BUFFER_BEFORE_AIM = Degrees.of(10);
     public static final double HOOD_STALL_CURRENT_THRESHOLD = 20.0;
 
+    /** Time the trench guard waits after the robot is clear before it releases the hood. */
+    public static final double TRENCH_RELEASE_DEBOUNCE_S = 0.25;
+
     public static final double HOOD_LEGACY_START_ANGLE_DEGREES = 30.0;
     public static final double HOOD_CORRECTED_START_ANGLE_DEGREES = 12.723;
     public static final double HOOD_CORRECTED_END_ANGLE_DEGREES = 45.723;
