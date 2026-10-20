@@ -29,6 +29,9 @@ public class Constants {
     /** Time the hood current must stay above the stall threshold, to ignore startup inrush. */
     public static final double HOOD_STALL_DEBOUNCE_SECONDS = 0.2;
 
+    /** Time the trench guard waits after the robot is clear before it releases the hood. */
+    public static final double TRENCH_RELEASE_DEBOUNCE_S = 0.25;
+
     public static final double HOOD_LEGACY_START_ANGLE_DEGREES = 30.0;
     public static final double HOOD_CORRECTED_START_ANGLE_DEGREES = 12.723;
     public static final double HOOD_CORRECTED_END_ANGLE_DEGREES = 45.723;

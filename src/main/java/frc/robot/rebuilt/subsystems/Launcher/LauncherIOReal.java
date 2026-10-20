@@ -402,7 +402,6 @@ public class LauncherIOReal implements LauncherIO { // -0.030679615757712823
     inputs.turretVelocity =
         turret.getMotorController().getMechanismVelocity().in(Degrees.per(Second));
     inputs.flyWheelMotorOutput = flyWheel.getMotor().getStatorCurrent().in(Amps);
-    isNearTrench();
   }
 
   /** Configuring the shot calculator with limits and constraints */
@@ -637,12 +636,18 @@ public class LauncherIOReal implements LauncherIO { // -0.030679615757712823
     return flyWheel.sysId(Volts.of(8), Volts.of(0.5).per(Seconds), Seconds.of(8));
   }
 
+  /**
+   * True when the robot is under a trench, or is moving toward one fast enough that the hood must
+   * start coming down now. See {@link TrenchGuard}.
+   */
   public boolean isNearTrench() {
     Pose2d current = drivetrain.getPoseEstimator().getCurrentPose();
-    double currentX = current.getX();
-    double currentY = current.getY();
-
-    return FieldRegions.isNearTrench(currentX, currentY);
+    ChassisSpeeds fieldVelocity = drivetrain.getFieldVelocity();
+    return TrenchGuard.shouldLowerHood(
+        current.getX(),
+        current.getY(),
+        fieldVelocity.vxMetersPerSecond,
+        fieldVelocity.vyMetersPerSecond);
   }
 
   public Optional<Translation2d> determineTarget() {
