@@ -31,6 +31,7 @@ import org.frc5010.common.drive.pose.PoseProvider.PoseObservation;
 import org.frc5010.common.drive.pose.PoseProvider.PoseObservationType;
 import org.frc5010.common.drive.pose.PoseProvider.ProviderType;
 import org.frc5010.common.subsystems.LEDStripSegment;
+import org.frc5010.common.telemetry.DashboardSettings;
 import org.frc5010.common.telemetry.DisplayBoolean;
 import org.frc5010.common.vision.AprilTags;
 import org.frc5010.common.vision.VisionConstants;
@@ -170,34 +171,36 @@ public class DrivePoseEstimator extends GenericSubsystem {
     this.poseTracker = poseTracker;
     field2d = poseTracker.getField();
 
-    ShuffleboardTab tab = Shuffleboard.getTab("Pose");
-    DashBoard.display("Pose (X,Y)", this::getFormattedPose);
-    DashBoard.display(
-        "Pose Degrees", () -> getCurrentPose().getRotation().getMeasure().toShortString());
+    if (DashboardSettings.isVerbose()) {
+      ShuffleboardTab tab = Shuffleboard.getTab("Pose");
+      DashBoard.display("Pose (X,Y)", this::getFormattedPose);
+      DashBoard.display(
+          "Pose Degrees", () -> getCurrentPose().getRotation().getMeasure().toShortString());
 
-    tab.addDoubleArray("Robot Pose3d", () -> getCurrentPose3dArray())
-        .withPosition(11, 2)
-        .withSize(4, 2);
+      tab.addDoubleArray("Robot Pose3d", () -> getCurrentPose3dArray())
+          .withPosition(11, 2)
+          .withSize(4, 2);
 
-    DashBoard.display("Pose Field", field2d);
+      DashBoard.display("Pose Field", field2d);
 
-    tab.addStringArray(
-            "Providers Active",
-            () -> {
-              String[] providerActive = new String[poseProviders.size()];
-              for (int i = 0; i < poseProviders.size(); i++) {
-                providerActive[i] =
-                    poseProviders.get(i).getClass().getSimpleName()
-                        + ": "
-                        + poseProviders.get(i).isConnected();
-              }
-              return providerActive;
-            })
-        .withSize(6, 2)
-        .withPosition(0, 5);
-    // tab.addBoolean("April Tag Visible", () -> aprilTagVisible).withPosition(6, 5);
-    tab.addBoolean("Acceptor Updating", () -> updatingPoseAcceptor).withPosition(8, 5);
-    tab.addString("Estimator State", () -> state.name());
+      tab.addStringArray(
+              "Providers Active",
+              () -> {
+                String[] providerActive = new String[poseProviders.size()];
+                for (int i = 0; i < poseProviders.size(); i++) {
+                  providerActive[i] =
+                      poseProviders.get(i).getClass().getSimpleName()
+                          + ": "
+                          + poseProviders.get(i).isConnected();
+                }
+                return providerActive;
+              })
+          .withSize(6, 2)
+          .withPosition(0, 5);
+      // tab.addBoolean("April Tag Visible", () -> aprilTagVisible).withPosition(6, 5);
+      tab.addBoolean("Acceptor Updating", () -> updatingPoseAcceptor).withPosition(8, 5);
+      tab.addString("Estimator State", () -> state.name());
+    }
 
     for (AprilTag at : AprilTags.aprilTagFieldLayout.getTags()) {
       if (at.pose.getX() != 0 && at.pose.getY() != 0 && at.pose.getZ() != 0) {

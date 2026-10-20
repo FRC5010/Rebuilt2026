@@ -9,10 +9,10 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rectangle2d;
 import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.rebuilt.FieldConstants;
 import java.util.Optional;
 import org.frc5010.common.utils.geometry.AllianceFlipUtil;
+import org.littletonrobotics.junction.Logger;
 
 /** Add your docs here. */
 public class FieldRegions {
@@ -139,11 +139,11 @@ public class FieldRegions {
     Boolean inLowerMidField = lowerMidField.contains(currentPose.getTranslation());
     Boolean inOppUpperField = oppUpperField.contains(currentPose.getTranslation());
     Boolean inOppLowerField = oppLowerField.contains(currentPose.getTranslation());
-    SmartDashboard.putBoolean("In Alliance Field", inAllianceField);
-    SmartDashboard.putBoolean("In Upper Mid Field", inUpperMidField);
-    SmartDashboard.putBoolean("In Lower Mid Field", inLowerMidField);
-    SmartDashboard.putBoolean("In Opp Upper Field", inOppUpperField);
-    SmartDashboard.putBoolean("In Opp Lower Field", inOppLowerField);
+    Logger.recordOutput("FieldRegions/In Alliance Field", inAllianceField);
+    Logger.recordOutput("FieldRegions/In Upper Mid Field", inUpperMidField);
+    Logger.recordOutput("FieldRegions/In Lower Mid Field", inLowerMidField);
+    Logger.recordOutput("FieldRegions/In Opp Upper Field", inOppUpperField);
+    Logger.recordOutput("FieldRegions/In Opp Lower Field", inOppLowerField);
     if (inAllianceField) {
       return Optional.of(FieldConstants.Hub.topCenterPoint.toTranslation2d());
     } else if (inUpperMidField) {

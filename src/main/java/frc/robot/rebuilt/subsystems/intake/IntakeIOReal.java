@@ -13,7 +13,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.rebuilt.Constants;
@@ -174,10 +173,10 @@ public class IntakeIOReal implements IntakeIO {
         ((currentX > lowerOppTrenchLeftX && currentX < lowerOppTrenchRightX)
             && currentY < lowerTrenchY);
 
-    SmartDashboard.putBoolean("Near Top Opp Alliance", nearOppAllianceTop);
-    SmartDashboard.putBoolean("Near Top Alliance", nearAllianceTop);
-    SmartDashboard.putBoolean("Near Bottom Opp Alliance", nearOppAllianceBottom);
-    SmartDashboard.putBoolean("Near Bottom Alliance", nearAllianceBottom);
+    Logger.recordOutput("Intake/Near Top Opp Alliance", nearOppAllianceTop);
+    Logger.recordOutput("Intake/Near Top Alliance", nearAllianceTop);
+    Logger.recordOutput("Intake/Near Bottom Opp Alliance", nearOppAllianceBottom);
+    Logger.recordOutput("Intake/Near Bottom Alliance", nearAllianceBottom);
 
     if (nearAllianceTop || nearOppAllianceTop || nearAllianceBottom || nearOppAllianceBottom)
       return true;

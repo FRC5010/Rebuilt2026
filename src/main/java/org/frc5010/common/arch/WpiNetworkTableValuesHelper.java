@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.frc5010.common.telemetry.DashboardSettings;
 
 /** Registers values with the network tables */
 public class WpiNetworkTableValuesHelper implements WpiHelperInterface {
@@ -31,8 +32,13 @@ public class WpiNetworkTableValuesHelper implements WpiHelperInterface {
     registered.add(wpiHelper);
   }
 
-  /** Adds registered Sendables to the Network Tables */
+  /**
+   * Adds registered Sendables to the Network Tables. Skipped when verbose dashboard output is off
+   * (see {@link DashboardSettings}), because every registered Sendable is polled each loop by
+   * SmartDashboard.updateValues().
+   */
   public static void loadRegisteredToNetworkTables() {
+    if (!DashboardSettings.isVerbose()) return;
     registered.stream().forEach(it -> SmartDashboard.putData(it));
   }
 

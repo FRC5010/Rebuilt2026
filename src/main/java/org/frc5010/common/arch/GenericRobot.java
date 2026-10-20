@@ -23,6 +23,7 @@ import org.frc5010.common.drive.GenericDrivetrain;
 import org.frc5010.common.sensors.Controller;
 import org.frc5010.common.subsystems.Color;
 import org.frc5010.common.subsystems.LEDStrip;
+import org.frc5010.common.telemetry.DashboardSettings;
 import org.frc5010.common.telemetry.DisplayString;
 import org.frc5010.common.telemetry.DisplayValuesHelper;
 import org.frc5010.common.telemetry.WpiDataLogging;
@@ -127,7 +128,9 @@ public abstract class GenericRobot extends GenericMechanism implements GenericDe
             driver.ifPresent(it -> it.setSingleControllerMode(true));
           }
         });
-    SmartDashboard.putData("Robot Visual", mechVisual);
+    if (DashboardSettings.isVerbose()) {
+      SmartDashboard.putData("Robot Visual", mechVisual);
+    }
 
     DriverStation.silenceJoystickConnectionWarning(true);
     allianceDisplay = DashBoard.makeDisplayString("Alliance");

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.frc5010.common.drive.pose.PoseProvider;
 import org.frc5010.common.drive.pose.VisionIOInputsAutoLogged;
+import org.frc5010.common.telemetry.DashboardSettings;
 import org.frc5010.common.vision.VisionConstants;
 
 /** A generic camera interface */
@@ -47,17 +48,21 @@ public abstract class GenericCamera implements PoseProvider {
     this.colIndex = colIndex;
     this.name = name;
     this.robotToCamera = robotToCamera;
-    visionTab = Shuffleboard.getTab(VisionConstants.SBTabVisionDisplay);
-    visionLayout =
-        visionTab
-            .getLayout("Camera " + this.name, BuiltInLayouts.kGrid)
-            .withSize(2, 5)
-            .withPosition(this.colIndex, 0);
-    visionLayout.addBoolean("Has Target", this::hasValidTarget);
-    visionLayout.addDouble("Target Yaw", this::getTargetYaw);
-    visionLayout.addDouble("Target Pitch", this::getTargetPitch);
-    visionLayout.addDouble("Target Area", this::getTargetArea);
-    visionLayout.addDouble("Latency", this::getCaptureTime);
+    // Shuffleboard polls every widget each loop; skip the vision tab unless verbose output is on.
+    // visionTab and visionLayout stay null in that case.
+    if (DashboardSettings.isVerbose()) {
+      visionTab = Shuffleboard.getTab(VisionConstants.SBTabVisionDisplay);
+      visionLayout =
+          visionTab
+              .getLayout("Camera " + this.name, BuiltInLayouts.kGrid)
+              .withSize(2, 5)
+              .withPosition(this.colIndex, 0);
+      visionLayout.addBoolean("Has Target", this::hasValidTarget);
+      visionLayout.addDouble("Target Yaw", this::getTargetYaw);
+      visionLayout.addDouble("Target Pitch", this::getTargetPitch);
+      visionLayout.addDouble("Target Area", this::getTargetArea);
+      visionLayout.addDouble("Latency", this::getCaptureTime);
+    }
   }
 
   /** {@inheritDoc} Returns this camera's own per-instance inputs object. */

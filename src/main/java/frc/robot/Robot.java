@@ -7,8 +7,10 @@ package frc.robot;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import org.frc5010.common.telemetry.DashboardSettings;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -95,6 +97,13 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
+    // Must be set before RobotContainer is created: the robot and its subsystems build their
+    // dashboard widgets in their constructors.
+    DashboardSettings.setVerbose(Constants.VERBOSE_DASHBOARD);
+    // LiveWindow telemetry is only used in Test mode with the old SmartDashboard; skip its
+    // per-loop updates.
+    LiveWindow.disableAllTelemetry();
+
     // Instantiate our RobotContainer. This will perform all our button bindings,
     // and put our
     // autonomous chooser on the dashboard.

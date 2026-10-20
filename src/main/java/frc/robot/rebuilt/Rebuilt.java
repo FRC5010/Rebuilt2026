@@ -7,7 +7,6 @@ package frc.robot.rebuilt;
 import static edu.wpi.first.units.Units.Volts;
 
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.rebuilt.commands.AutoCommands;
@@ -16,6 +15,7 @@ import frc.robot.rebuilt.commands.IntakeCommands;
 import frc.robot.rebuilt.commands.LauncherCommands;
 import frc.robot.rebuilt.commands.NamedCommandsReg;
 import frc.robot.rebuilt.commands.TestCommands;
+import frc.robot.rebuilt.subsystems.DriverDisplay.DriverDashboard;
 import frc.robot.rebuilt.subsystems.DriverDisplay.HubStatus;
 import frc.robot.rebuilt.subsystems.Indexer.Indexer;
 import frc.robot.rebuilt.subsystems.Launcher.FieldRegions;
@@ -27,6 +27,7 @@ import org.frc5010.common.drive.GenericDrivetrain;
 import org.frc5010.common.sensors.Controller;
 import org.frc5010.common.utils.OrchestraManager;
 import org.frc5010.common.utils.geometry.AllianceFlipUtil;
+import org.littletonrobotics.junction.Logger;
 
 /** This is an example robot class. */
 /** Long's correction: Main robot class that initializes subsystems and commands */
@@ -37,6 +38,7 @@ public class Rebuilt extends GenericRobot {
   public static Indexer indexer;
   public static Intake intake;
   public static Launcher launcher;
+  public static DriverDashboard driverDashboard;
   public static LauncherCommands launcherCommands;
   public static AutoCommands autocommands;
   public static IntakeCommands intakecommands;
@@ -56,6 +58,9 @@ public class Rebuilt extends GenericRobot {
     intake = new Intake();
     launcher = new Launcher(subsystems);
     drivetrain = (GenericDrivetrain) subsystems.get(ConfigConstants.DRIVETRAIN);
+    driverDashboard =
+        new DriverDashboard(
+            () -> drivetrain.getPoseEstimator().getCurrentPose(), launcher::getTurretAngleActual);
     /** creates command containers */
     testCommands = new TestCommands(subsystems);
     launcherCommands = new LauncherCommands(subsystems);
@@ -78,7 +83,7 @@ public class Rebuilt extends GenericRobot {
   @Override
   public void disabledPeriodic() {
     super.disabledPeriodic();
-    SmartDashboard.putBoolean("Orchestra Playing", OrchestraManager.isPlaying());
+    Logger.recordOutput("Orchestra/Playing", OrchestraManager.isPlaying());
     if (launcher != null && !isZeroingBurst) {
       if (launcher.isTurretAtZero()) {
         org.frc5010.common.subsystems.LEDStrip.changeSegmentPattern(

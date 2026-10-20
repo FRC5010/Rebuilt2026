@@ -30,6 +30,14 @@ public final class Constants {
               ? Mode.REPLAY
               : SIM_MODE;
 
+  /**
+   * When false, the library skips its verbose SmartDashboard/Shuffleboard widgets and the driver
+   * dashboard shows only what {@code DriverDashboard} publishes. Set to true when tuning on the
+   * practice field and you want the full set of library widgets back. Debug values are always
+   * available through AdvantageKit under {@code /AdvantageKit}.
+   */
+  public static final boolean VERBOSE_DASHBOARD = false;
+
   public static enum Mode {
     /** Running on a real robot. */
     REAL,

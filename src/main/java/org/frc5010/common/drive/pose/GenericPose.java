@@ -13,9 +13,9 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.math.numbers.N5;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.frc5010.common.drive.pose.DrivePoseEstimator.VisionConsumer;
 import org.frc5010.common.sensors.gyro.GenericGyro;
+import org.littletonrobotics.junction.Logger;
 
 /** Base class for all pose estimators */
 public abstract class GenericPose {
@@ -139,7 +139,7 @@ public abstract class GenericPose {
     double angleZ = getGyroAngleZ();
     double radianZ = Math.toRadians(angleZ);
     Rotation2d rotation2d = new Rotation2d(radianZ);
-    SmartDashboard.putNumber("Angle Gyro from Pose", rotation2d.getDegrees());
+    Logger.recordOutput("Pose/Angle Gyro from Pose", rotation2d.getDegrees());
     return rotation2d;
   }
 

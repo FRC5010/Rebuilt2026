@@ -43,7 +43,9 @@ public class SimulatedFiducialTargetCamera extends SimulatedCamera {
       double fov) {
     super(name, colIndex, fieldLayout, cameraToRobot, poseSupplier, width, height, fov);
     targetFiducialIds = fiducialIds;
-    visionLayout.addDouble("Target ID", () -> target.map(it -> it.getFiducialId()).orElse(-1));
+    if (visionLayout != null) {
+      visionLayout.addDouble("Target ID", () -> target.map(it -> it.getFiducialId()).orElse(-1));
+    }
   }
 
   /** Update the simulated camera */

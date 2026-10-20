@@ -14,13 +14,13 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.Supplier;
 import org.frc5010.common.arch.GenericCommand;
 import org.frc5010.common.constants.GenericPID;
 import org.frc5010.common.drive.swerve.GenericSwerveDrivetrain;
 import org.frc5010.common.telemetry.DisplayDouble;
 import org.frc5010.common.telemetry.DisplayValuesHelper;
+import org.littletonrobotics.junction.Logger;
 
 /** A command that will automatically drive the robot to a particular position */
 public class DriveToPoseSupplier extends GenericCommand {
@@ -322,17 +322,17 @@ public class DriveToPoseSupplier extends GenericCommand {
                 + thetaController.getSetpoint().velocity * Math.min(ffInclusionFactor * 5, 1.0),
             swerveSubsystem.getHeading());
 
-    SmartDashboard.putNumber("X Speed", chassisSpeeds.vxMetersPerSecond);
-    SmartDashboard.putNumber("Y Speed", chassisSpeeds.vyMetersPerSecond);
-    SmartDashboard.putNumber(
-        "Distance Velocity Setpoint", distanceController.getSetpoint().velocity);
-    SmartDashboard.putNumber("Theta Speed", chassisSpeeds.omegaRadiansPerSecond);
-    SmartDashboard.putBoolean("Distance Controller At Setpoint", distanceController.atGoal());
-    SmartDashboard.putNumber("VelocityError", distanceController.getVelocityError());
-    SmartDashboard.putNumber("PositionError", distanceController.getPositionError());
-    SmartDashboard.putNumber("Theta Error", thetaController.getPositionError());
+    Logger.recordOutput("DriveToPose/X Speed", chassisSpeeds.vxMetersPerSecond);
+    Logger.recordOutput("DriveToPose/Y Speed", chassisSpeeds.vyMetersPerSecond);
+    Logger.recordOutput(
+        "DriveToPose/Distance Velocity Setpoint", distanceController.getSetpoint().velocity);
+    Logger.recordOutput("DriveToPose/Theta Speed", chassisSpeeds.omegaRadiansPerSecond);
+    Logger.recordOutput("DriveToPose/Distance Controller At Setpoint", distanceController.atGoal());
+    Logger.recordOutput("DriveToPose/VelocityError", distanceController.getVelocityError());
+    Logger.recordOutput("DriveToPose/PositionError", distanceController.getPositionError());
+    Logger.recordOutput("DriveToPose/Theta Error", thetaController.getPositionError());
 
-    SmartDashboard.putBoolean("Theta Controller at Setpoint", thetaController.atGoal());
+    Logger.recordOutput("DriveToPose/Theta Controller at Setpoint", thetaController.atGoal());
     swerveSubsystem.drive(chassisSpeeds);
   }
 
@@ -340,7 +340,7 @@ public class DriveToPoseSupplier extends GenericCommand {
   @Override
   public void stop(boolean interrupted) {
     onTargetCounter = 0;
-    SmartDashboard.putBoolean("DriveToPositionInterrupted", interrupted);
+    Logger.recordOutput("DriveToPose/DriveToPositionInterrupted", interrupted);
     swerveSubsystem.drive(new ChassisSpeeds(0, 0, 0));
   }
 

@@ -15,10 +15,10 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import org.littletonrobotics.junction.Logger;
 
 /**
  * Swerve setpoint generator based on a version created by FRC team 254.
@@ -470,7 +470,7 @@ public class SwerveSetpointGenerator5010 {
       forceYFF[m] = wheelForces[m].getY();
     }
     if (Double.isNaN(retSpeeds.vxMetersPerSecond)) {
-      SmartDashboard.putBoolean("Swerve Bad", true);
+      Logger.recordOutput("Swerve/Swerve Bad", true);
     }
     return new SwerveSetpoint(
         retSpeeds,
