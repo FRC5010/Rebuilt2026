@@ -24,8 +24,10 @@ simulation of the real robot code (October 2026, branch `b-line-implementation` 
 - [ ] `B_LineAutoCommands.java` registers `intakeRetracted` and `intakeRetracting` to
       `IntakeCommands.shouldIntaking()`. Unused by current paths, but any path using them would deploy
       the intake. Should be `shouldRetracted()` / `shouldRetracting()` (as in `NamedCommandsReg`).
-- [ ] Sim only: `AkitSwerveConfig.java:182` feeds the real robot's kS (amps) into the sim as a friction
-      voltage (4.15 V). Makes the sim drive undershoot at low speed. Use ~0.1 V drive / 0.05 V steer.
+- [x] Sim only: `AkitSwerveConfig` fed the real robot's kS (amps) into the sim as a friction voltage
+      (4.15 V), so the sim drive undershot low speeds. Fixed: sim constants in `PhoenixUtil`
+      (0.1 V drive / 0.05 V steer), guarded by `AkitSwerveSimFrictionTest`. Sim Square end miss
+      0.218 m -> 0.002 m.
 - [ ] Measure real hood travel time (PREP -> LOW and LOW -> PREP) and update the 0.7 s lead used here.
 
 ## BLine autos (`src/main/deploy/autos/paths`)
@@ -127,11 +129,16 @@ on the path rather than as a named command right before a path starts.
 
 ## How to re-check after a fix
 
-- Static check (ideal path following, no simulator needed): the scripts
-  `pp_static4.py` (PathPlanner) and the BLine analysis were run from the session scratch directory and are not
-  in the repo. Ask to re-run them, or add them under `tools/`.
-- Simulation: a JUnit harness that runs the real robot headless, selects an auto, steps time, and records
-  pose, launcher state and hood angle every 20 ms. Not in the repo; ask to add it under `src/test`.
+Tests and tooling are now in the repo; see `docs/AUTO_AUDIT.md`.
+
+- `./gradlew test --tests 'frc.robot.rebuilt.audit.*'` runs the static analysis. New hood-up trench passes
+  fail the build; passes that no longer violate are printed as `FIXED since baseline`.
+- `AUDIT_UPDATE_BASELINE=1 ./gradlew test --tests 'frc.robot.rebuilt.audit.AutoAuditBaselineTest'` rewrites
+  `src/test/resources/auto-audit/baseline.json`; commit the smaller file and tick the item above.
+  `build/auto-audit/report.md` is a generated checklist of every auto.
+- `tools/auto-audit/run-sim-audit.sh <auto>` confirms in the headless simulation.
+- The baseline also covers autos that were not part of the review above (older PathPlanner autos
+  unchanged since 4/15); treat those as unreviewed findings.
 - Pass criterion: hood <= 17.2 deg for the whole time the robot centre is inside a trench stay, with at
   least ~0.7 s between `launcherLow` and trench entry, and no `launcherPrep` until the robot has cleared
   the trench by about 0.5 s.
