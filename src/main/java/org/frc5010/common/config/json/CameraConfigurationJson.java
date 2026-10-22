@@ -10,6 +10,8 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.wpilibj.RobotBase;
+import frc.robot.Constants;
+import frc.robot.Constants.Mode;
 import java.util.ArrayList;
 import java.util.List;
 import org.frc5010.common.arch.GenericRobot;
@@ -331,6 +333,9 @@ public class CameraConfigurationJson {
       case "quest":
         {
           QuestNavInterface questNav = new QuestNavInterface(robotToCamera);
+          if (Constants.CURRENT_MODE == Mode.SIM) {
+            questNav.withSimulation(robot.getSimulatedPoseSupplier());
+          }
 
           if (drivetrain != null) {
             // FIX: Undo this

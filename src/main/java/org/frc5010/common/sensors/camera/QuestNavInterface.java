@@ -28,7 +28,15 @@ import org.frc5010.common.drive.GenericDrivetrain;
 import org.frc5010.common.drive.pose.PoseProvider;
 import org.frc5010.common.drive.pose.VisionIOInputsAutoLogged;
 
-/** Add your docs here. */
+/**
+ * {@link PoseProvider} backed by a Meta Quest headset running QuestNav.
+ *
+ * <p>Headset poses are converted to robot poses through the configured robot-to-quest transform and
+ * fed to the pose estimator as environment-based observations. While disabled the estimator keeps
+ * soft-resetting this provider to its current pose, so the headset follows whatever start pose auto
+ * (or a manual reset) sets. In simulation, {@link #withSimulation(Supplier)} attaches a {@link
+ * QuestNavSim} so the same code path runs against a fake headset.
+ */
 public class QuestNavInterface implements PoseProvider {
 
   /** Per-instance inputs — each QuestNav has its own object */
@@ -48,10 +56,10 @@ public class QuestNavInterface implements PoseProvider {
   private static boolean initialReset = false;
 
   // Soft reset state — applied in code without sending a command to the headset
-  private Transform3d softResetTransform = new Transform3d();
-
-  // I guess this works
-  private static Pose2d latestPoseState = null;
+  // Raw pose at reset time and the pose it should map to; later poses are the motion since reset,
+  // applied in the target pose's frame.
+  private Pose3d softResetBase = new Pose3d();
+  private Pose3d softResetTarget = new Pose3d();
 
   private Translation2d _calculatedOffsetToRobotCenter = new Translation2d();
   private int _calculatedOffsetToRobotCenterCount = 0;
@@ -62,6 +70,16 @@ public class QuestNavInterface implements PoseProvider {
   private PoseObservation[] questObsArray = new PoseObservation[0];
   /** Pre-allocated stdDev matrix — mutated in getStdDeviations() to avoid per-call allocation */
   private final Matrix<N3, N1> stdDevMatrix = VecBuilder.fill(0.0, 0.0, 0.0);
+
+  /** Translation std dev (meters) trusted from a tracking headset. */
+  private static final double TRANSLATION_STD_DEV = 0.02;
+  /** Heading std dev (radians, ~5 degrees) trusted from a tracking headset. */
+  private static final double HEADING_STD_DEV = Math.toRadians(5);
+  /** Minimum (1 - cos(angle)) for an offset sample to be usable; the estimate blows up near 0. */
+  private static final double MIN_ONE_MINUS_COS = 0.1;
+
+  /** Simulated headset; only present when running in simulation. */
+  private QuestNavSim sim = null;
 
   public QuestNavInterface(Transform3d robotToQuest) {
     super();
@@ -90,12 +108,37 @@ public class QuestNavInterface implements PoseProvider {
     return questPose.transformBy(robotToQuest.inverse());
   }
 
+  /** Maps a raw (hard-reset layer) robot pose through the current soft reset. */
+  private Pose3d applySoftReset(Pose3d processedRobotPose) {
+    return softResetTarget.transformBy(new Transform3d(softResetBase, processedRobotPose));
+  }
+
   private Pose3d getQuestPoseFromRobotPose(Pose3d robotPose) {
     return robotPose.transformBy(robotToQuest);
   }
 
   public void withRobotSpeedSupplier(Supplier<ChassisSpeeds> robotSpeed) {
     robotVelocity = robotSpeed;
+  }
+
+  /**
+   * Attaches a simulated headset that publishes frames for this interface to consume.
+   *
+   * @param trueRobotPoseSupplier the simulated robot's ground-truth field pose
+   * @return this interface, for chaining
+   */
+  public QuestNavInterface withSimulation(Supplier<Pose2d> trueRobotPoseSupplier) {
+    sim = new QuestNavSim(robotToQuest, questNav.getLibVersion(), trueRobotPoseSupplier);
+    return this;
+  }
+
+  /**
+   * Returns the simulated headset, present only when running in simulation.
+   *
+   * @return the simulated headset, if any
+   */
+  public Optional<QuestNavSim> getSim() {
+    return Optional.ofNullable(sim);
   }
 
   /**
@@ -110,28 +153,24 @@ public class QuestNavInterface implements PoseProvider {
   }
 
   public Optional<Pose3d> getRobotPose() {
-    if (RobotBase.isReal()) {
-      if (latestPoseFrame == null) {
-        return Optional.empty();
-      }
-      return Optional.of(getProcessedRobotPose().transformBy(softResetTransform));
-    } else {
+    if (latestPoseFrame == null) {
       return Optional.empty();
     }
+    return Optional.of(applySoftReset(getProcessedRobotPose()));
   }
 
   public Rotation3d getRotation() {
     if (latestPoseFrame == null) {
       return new Rotation3d();
     }
-    return getProcessedRobotPose().transformBy(softResetTransform).getRotation();
+    return applySoftReset(getProcessedRobotPose()).getRotation();
   }
 
   public Translation3d getPosition() {
     if (latestPoseFrame == null) {
       return new Translation3d();
     }
-    return getProcessedRobotPose().transformBy(softResetTransform).getTranslation();
+    return applySoftReset(getProcessedRobotPose()).getTranslation();
   }
 
   private void updateObservations() {
@@ -144,8 +183,7 @@ public class QuestNavInterface implements PoseProvider {
 
     if (initializedPosition) {
       for (PoseFrame frame : unreadQuestFrames) {
-        Pose3d robotPose =
-            getRobotPoseFromQuestPose(frame.questPose3d()).transformBy(softResetTransform);
+        Pose3d robotPose = applySoftReset(getRobotPoseFromQuestPose(frame.questPose3d()));
         double captureTime = frame.dataTimestamp();
         questObservations.add(
             new PoseObservation(
@@ -172,9 +210,11 @@ public class QuestNavInterface implements PoseProvider {
 
   @Override
   public Matrix<N3, N1> getStdDeviations(PoseObservation observation) {
-    double calib = getConfidence();
+    double calib = TRANSLATION_STD_DEV;
+    double headingCalib = HEADING_STD_DEV;
     if (DriverStation.isDisabled()) {
       calib = 10000;
+      headingCalib = 10000;
     }
     if (null != robotVelocity) {
       Translation2d questVelVector =
@@ -184,20 +224,13 @@ public class QuestNavInterface implements PoseProvider {
               robotVelocity.get().vxMetersPerSecond, robotVelocity.get().vyMetersPerSecond);
       if (Math.abs(questVelVector.getNorm() - robotVelVector.getNorm()) > 1.0) {
         calib = 10;
+        headingCalib = 10;
       }
     }
     stdDevMatrix.set(0, 0, calib);
     stdDevMatrix.set(1, 0, calib);
-    stdDevMatrix.set(2, 0, calib * 0.2);
+    stdDevMatrix.set(2, 0, headingCalib);
     return stdDevMatrix;
-  }
-
-  public double getConfidence() {
-    if (RobotBase.isReal()) {
-      return 0.05;
-    } else {
-      return Double.MAX_VALUE;
-    }
   }
 
   @Override
@@ -206,13 +239,8 @@ public class QuestNavInterface implements PoseProvider {
   }
 
   public boolean isActive() {
-    boolean simulation = RobotBase.isSimulation();
-    // boolean disabled = DriverStation.isDisabled();
-
     boolean isActive =
-        questNav.isConnected()
-            && (questNav.getFrameCount().orElse(0) > 0 && !simulation)
-            && questNav.isTracking();
+        questNav.isConnected() && questNav.getFrameCount().orElse(0) > 0 && questNav.isTracking();
 
     return isActive && initializedPosition;
   }
@@ -224,9 +252,8 @@ public class QuestNavInterface implements PoseProvider {
    * #getRobotPose()}, {@link #getPosition()}, and {@link #getRotation()}.
    */
   public void softReset(Pose3d pose) {
-    // Transform3d(from, to) gives exactly the relative transform needed:
-    // processed.transformBy(softResetTransform) == pose
-    softResetTransform = new Transform3d(getProcessedRobotPose(), pose);
+    softResetBase = getProcessedRobotPose();
+    softResetTarget = pose;
     initializedPosition = true;
   }
 
@@ -240,7 +267,8 @@ public class QuestNavInterface implements PoseProvider {
       Pose3d questPose = getQuestPoseFromRobotPose(pose);
       questNav.setPose(questPose);
       // Clear any accumulated soft-reset so the hard reset is authoritative
-      softResetTransform = new Transform3d();
+      softResetBase = new Pose3d();
+      softResetTarget = new Pose3d();
       initializedPosition = true;
       hasHardReset = initialReset;
       initialReset = true;
@@ -281,16 +309,36 @@ public class QuestNavInterface implements PoseProvider {
 
   @Override
   public void update() {
-    if (RobotBase.isReal()) {
+    // In replay there is no headset or sim; logged inputs are restored by logInput() below.
+    if (RobotBase.isReal() || sim != null) {
+      if (sim != null) {
+        sim.update();
+        SmartDashboard.putNumber(
+            "QuestNavSim/EstimateErrorMeters",
+            getRobotPose()
+                .map(
+                    p ->
+                        p.toPose2d()
+                            .getTranslation()
+                            .getDistance(sim.getTrueRobotPose().getTranslation()))
+                .orElse(Double.NaN));
+      }
       questNav.commandPeriodic();
       updateVelocity();
       updateObservations();
       SmartDashboard.putBoolean(networkTableRoot + "/Reset Pose", false);
       SmartDashboard.putBoolean("QUEST Connected", isConnected());
       SmartDashboard.putBoolean("QUEST Active", isActive());
+      SmartDashboard.putBoolean(networkTableRoot + "/Tracking", questNav.isTracking());
+      SmartDashboard.putNumber(networkTableRoot + "/Latency", questNav.getLatency());
+      questNav
+          .getBatteryPercent()
+          .ifPresent(b -> SmartDashboard.putNumber(networkTableRoot + "/Battery%", b));
+      questNav
+          .getTrackingLostCounter()
+          .ifPresent(c -> SmartDashboard.putNumber(networkTableRoot + "/TrackingLostCount", c));
 
       Pose2d currPose = getRobotPose().orElse(new Pose3d()).toPose2d();
-      latestPoseState = currPose;
       SmartDashboard.putNumberArray(
           networkTableRoot + "/Quest POSE Update",
           new double[] {currPose.getX(), currPose.getY(), currPose.getRotation().getDegrees()});
@@ -305,55 +353,75 @@ public class QuestNavInterface implements PoseProvider {
     logInput(networkTableRoot);
   }
 
-  private Translation2d calculateOffsetToRobotCenter() {
-    if (null == latestPoseState) {
-      return new Translation2d();
+  /**
+   * Offset of the tracked robot origin from the rotation center, from the pose change since the
+   * last soft reset. Empty if there is no usable sample.
+   */
+  private Optional<Translation2d> calculateOffsetToRobotCenter() {
+    if (!isConnected()) {
+      return Optional.empty();
+    }
+    Optional<Pose2d> currentPose = getRobotPose().map(Pose3d::toPose2d);
+    if (currentPose.isEmpty()) {
+      return Optional.empty();
     }
 
-    Pose2d currentPose2d = latestPoseState;
+    Rotation2d angle = currentPose.get().getRotation();
+    Translation2d displacement = currentPose.get().getTranslation();
 
-    Rotation2d angle = currentPose2d.getRotation();
-    Translation2d displacement = currentPose2d.getTranslation();
+    double denominator = 2 * (1 - angle.getCos());
+    if (denominator < 2 * MIN_ONE_MINUS_COS) {
+      return Optional.empty();
+    }
 
     double x =
         ((angle.getCos() - 1) * displacement.getX() + angle.getSin() * displacement.getY())
-            / (2 * (1 - angle.getCos()));
+            / denominator;
     double y =
         ((-1 * angle.getSin()) * displacement.getX() + (angle.getCos() - 1) * displacement.getY())
-            / (2 * (1 - angle.getCos()));
+            / denominator;
 
-    return new Translation2d(x, y);
+    return Optional.of(new Translation2d(x, y));
   }
 
+  /**
+   * Spins the robot in place to measure where the headset sits relative to the rotation center.
+   * Each iteration soft-resets the pose, spins ~1.5 rad, then takes one sample, so every sample
+   * uses a well-conditioned angle. The running average is published to {@code <root>/Quest
+   * Calculated Offset to Robot Center}. Bind with whileTrue to stop it.
+   *
+   * @param drivetrain the drivetrain to spin
+   * @return the calibration command
+   */
   public Command determineOffsetToRobotCenter(GenericDrivetrain drivetrain) {
     return Commands.repeatingSequence(
-            Commands.run(
-                    () -> {
-                      SmartDashboard.putNumber("QUEST POSE", getPosition().getX());
-                      drivetrain.drive(new ChassisSpeeds(0, 0, 0.314));
-                    },
-                    drivetrain)
+            Commands.runOnce(() -> resetPose(new Pose3d())),
+            Commands.run(() -> drivetrain.drive(new ChassisSpeeds(0, 0, 0.5)), drivetrain)
                 .withTimeout(3.0),
             Commands.runOnce(
-                () -> {
-                  // Update current offset
-                  Translation2d offset = calculateOffsetToRobotCenter();
+                () ->
+                    calculateOffsetToRobotCenter()
+                        .ifPresent(
+                            offset -> {
+                              _calculatedOffsetToRobotCenter =
+                                  _calculatedOffsetToRobotCenter
+                                      .times(
+                                          (double) _calculatedOffsetToRobotCenterCount
+                                              / (_calculatedOffsetToRobotCenterCount + 1))
+                                      .plus(offset.div(_calculatedOffsetToRobotCenterCount + 1));
+                              _calculatedOffsetToRobotCenterCount++;
 
-                  _calculatedOffsetToRobotCenter =
-                      _calculatedOffsetToRobotCenter
-                          .times(
-                              (double) _calculatedOffsetToRobotCenterCount
-                                  / (_calculatedOffsetToRobotCenterCount + 1))
-                          .plus(offset.div(_calculatedOffsetToRobotCenterCount + 1));
-                  _calculatedOffsetToRobotCenterCount++;
-
-                  SmartDashboard.putNumberArray(
-                      networkTableRoot + "/Quest Calculated Offset to Robot Center",
-                      new double[] {
-                        _calculatedOffsetToRobotCenter.getX(), _calculatedOffsetToRobotCenter.getY()
-                      });
-                }))
+                              SmartDashboard.putNumberArray(
+                                  networkTableRoot + "/Quest Calculated Offset to Robot Center",
+                                  new double[] {
+                                    _calculatedOffsetToRobotCenter.getX(),
+                                    _calculatedOffsetToRobotCenter.getY()
+                                  });
+                            })))
         .beforeStarting(
-            Commands.runOnce(() -> resetPose(new Pose3d())).andThen(Commands.waitSeconds(1)));
+            () -> {
+              _calculatedOffsetToRobotCenter = new Translation2d();
+              _calculatedOffsetToRobotCenterCount = 0;
+            });
   }
 }
