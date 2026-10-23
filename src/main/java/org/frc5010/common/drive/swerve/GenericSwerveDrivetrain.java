@@ -59,7 +59,9 @@ import org.frc5010.common.drive.swerve.akit.AkitSwerveDrive;
 import org.frc5010.common.drive.swerve_utils.PathConstraints5010;
 import org.frc5010.common.drive.swerve_utils.SwerveSetpointGenerator5010;
 import org.frc5010.common.sensors.Controller;
+import org.frc5010.common.telemetry.DashboardSettings;
 import org.json.simple.parser.ParseException;
+import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.mechanism.LoggedMechanism2d;
 import org.littletonrobotics.junction.mechanism.LoggedMechanismLigament2d;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -181,7 +183,9 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
 
   @Override
   public void initGlassWidget(GenericDrivetrainConstants constants) {
-    SmartDashboard.putData("Drive Visual", mechanismSimulation);
+    if (DashboardSettings.isVerbose()) {
+      SmartDashboard.putData("Drive Visual", mechanismSimulation);
+    }
     GenericSwerveModuleInfo[] modules = swerveDrive.getModulesInfo();
 
     visualRoots.put(
@@ -390,7 +394,7 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
                 () -> {
                   poseEstimator.setTargetPoseOnField(
                       pose.get().transformBy(PathPlanOffset), "Auto Drive Pose");
-                  SmartDashboard.putBoolean("Running AutoDrive", true);
+                  Logger.recordOutput("Drivetrain/Running AutoDrive", true);
                 })
             .until(() -> getPose().getTranslation().getDistance(pose.get().getTranslation()) < 0.5)
             // .until(() -> RobotModel.circularObstacleWillBeAvoided(obstaclePosition,
@@ -411,7 +415,7 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
                         }))
             .finallyDo(
                 () -> {
-                  SmartDashboard.putBoolean("Running AutoDrive", false);
+                  Logger.recordOutput("Drivetrain/Running AutoDrive", false);
                 });
   }
 
@@ -481,7 +485,7 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
                 () -> {
                   poseEstimator.setTargetPoseOnField(
                       pose.get().transformBy(PathPlanOffset), "Auto Drive Pose");
-                  SmartDashboard.putBoolean("Running AutoDrive", true);
+                  Logger.recordOutput("Drivetrain/Running AutoDrive", true);
                 })
             .until(() -> getPose().getTranslation().getDistance(pose.get().getTranslation()) < 2.2)
             .andThen(
@@ -496,7 +500,7 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
             .finallyDo(
                 () -> {
                   // poseEstimator.setState(State.ENABLED_ENV);
-                  SmartDashboard.putBoolean("Running AutoDrive", false);
+                  Logger.recordOutput("Drivetrain/Running AutoDrive", false);
                 });
   }
 
@@ -546,7 +550,7 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
                 () -> {
                   poseEstimator.setTargetPoseOnField(
                       pose.get().transformBy(PathPlanOffset), "Auto Drive Pose");
-                  SmartDashboard.putBoolean("Running AutoDrive", true);
+                  Logger.recordOutput("Drivetrain/Running AutoDrive", true);
                 })
             .until(() -> Math.abs(stoppingDistance.getAsDouble() - distance.getAsDouble()) < 0.1)
             .andThen(
@@ -559,7 +563,7 @@ public class GenericSwerveDrivetrain extends GenericDrivetrain {
                         }))
             .finallyDo(
                 () -> {
-                  SmartDashboard.putBoolean("Running AutoDrive", false);
+                  Logger.recordOutput("Drivetrain/Running AutoDrive", false);
                 });
   }
 

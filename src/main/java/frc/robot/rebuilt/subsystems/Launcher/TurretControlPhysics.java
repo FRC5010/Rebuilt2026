@@ -5,9 +5,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.util.function.BiFunction;
 import java.util.function.DoubleFunction;
+import org.littletonrobotics.junction.Logger;
 
 public class TurretControlPhysics {
   /** Defines configuration parameters and physical constraints for turret aiming calculations */
@@ -216,9 +216,10 @@ public class TurretControlPhysics {
       double minRangeMeters,
       double maxRangeMeters) {
     this.turretOffsetRobotFrame = turretOffsetRobotFrame;
-    SmartDashboard.putNumber("Turret Offset X", turretOffsetRobotFrame.getX());
-    SmartDashboard.putNumber("Turret Offset Y", turretOffsetRobotFrame.getY());
-    SmartDashboard.putNumber("Turret Offset Angle", turretOffsetRobotFrame.getAngle().getDegrees());
+    Logger.recordOutput("Launcher/Turret Offset X", turretOffsetRobotFrame.getX());
+    Logger.recordOutput("Launcher/Turret Offset Y", turretOffsetRobotFrame.getY());
+    Logger.recordOutput(
+        "Launcher/Turret Offset Angle", turretOffsetRobotFrame.getAngle().getDegrees());
 
     this.minTurretAngle = minTurretAngle;
     this.maxTurretAngle = maxTurretAngle;

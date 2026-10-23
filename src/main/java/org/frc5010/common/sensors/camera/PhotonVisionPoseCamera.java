@@ -89,7 +89,9 @@ public class PhotonVisionPoseCamera extends PhotonVisionCamera implements Fiduci
     this.fieldLayout = fieldLayout;
 
     this.fiducialIds = fiducialIds;
-    visionLayout.addDouble("Observations", () -> input.poseObservations.length);
+    if (visionLayout != null) {
+      visionLayout.addDouble("Observations", () -> input.poseObservations.length);
+    }
     List<AprilTag> filteredTags =
         fieldLayout.getTags().stream().filter(tag -> fiducialIds.contains(tag.ID)).toList();
     AprilTagFieldLayout filteredLayout =

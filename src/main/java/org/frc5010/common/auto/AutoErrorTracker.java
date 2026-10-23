@@ -7,8 +7,8 @@ package org.frc5010.common.auto;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import org.littletonrobotics.junction.Logger;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class AutoErrorTracker extends Command {
@@ -24,7 +24,7 @@ public class AutoErrorTracker extends Command {
   private void logXYTarget(Pose2d pose) {
     Pose2d currentPose = AutoBuilder.getCurrentPose();
     double error = currentPose.getTranslation().getDistance(pose.getTranslation());
-    SmartDashboard.putNumber("Auto Error", error);
+    Logger.recordOutput("Auto/Auto Error", error);
 
     if (error < minError) {
       minError = error;
@@ -34,7 +34,7 @@ public class AutoErrorTracker extends Command {
     }
 
     errorSum += error * 0.02;
-    SmartDashboard.putNumber("Auto Error Sum", errorSum);
+    Logger.recordOutput("Auto/Auto Error Sum", errorSum);
   }
 
   // Called when the command is initially scheduled.
@@ -48,9 +48,9 @@ public class AutoErrorTracker extends Command {
   public void end(boolean interrupted) {
     PathPlannerLogging.setLogTargetPoseCallback(null);
 
-    SmartDashboard.putNumber("Auto Error Min", minError);
-    SmartDashboard.putNumber("Auto Error Max", maxError);
-    SmartDashboard.putNumber("Auto Error Sum", errorSum);
+    Logger.recordOutput("Auto/Auto Error Min", minError);
+    Logger.recordOutput("Auto/Auto Error Max", maxError);
+    Logger.recordOutput("Auto/Auto Error Sum", errorSum);
   }
 
   // Returns true when the command should end.

@@ -142,11 +142,13 @@ public class DisplayValuesHelper implements WpiHelperInterface {
    * @param value a Supplier that returns the value to be displayed
    */
   public void display(String key, Supplier<String> value) {
+    if (!DashboardSettings.isVerbose()) return;
     internals.add(new DisplayString("", key, getNtFolder()).setDisplayValuesHelper(this));
     registerListener(value::get);
   }
 
   public void display(String key, Sendable value) {
+    if (!DashboardSettings.isVerbose()) return;
     SmartDashboard.putData(tabName + "/" + layoutName.map(it -> it + "/").orElse("") + key, value);
   }
 

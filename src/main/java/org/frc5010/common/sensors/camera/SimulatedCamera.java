@@ -109,7 +109,9 @@ public class SimulatedCamera extends PhotonVisionPoseCamera {
       double fov) {
     this(name, colIndex, fieldLayout, strategy, cameraToRobot, poseSupplier);
     this.fiducialIds = fiducialIds;
-    visionLayout.addDouble("Target ID", () -> target.map(it -> it.getFiducialId()).orElse(-1));
+    if (visionLayout != null) {
+      visionLayout.addDouble("Target ID", () -> target.map(it -> it.getFiducialId()).orElse(-1));
+    }
   }
 
   /**
