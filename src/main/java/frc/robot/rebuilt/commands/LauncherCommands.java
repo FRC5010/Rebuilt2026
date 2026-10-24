@@ -7,6 +7,7 @@ import static edu.wpi.first.units.Units.Radians;
 import static edu.wpi.first.units.Units.Seconds;
 
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
@@ -102,6 +103,7 @@ public class LauncherCommands {
 
     drivetrain = (GenericDrivetrain) this.subsystems.get(ConfigConstants.DRIVETRAIN);
     configureStateMachine();
+    configureTrenchGuard();
   }
   /** sets the state machine as the default command of the launcher */
   public void setDefaultCommands() {
@@ -165,6 +167,12 @@ public class LauncherCommands {
         .switchTo(lowState)
         .when(() -> launcher.isRequested(LauncherState.LOW_SPEED));
     escapeHammerTimeState.switchTo(prepState).when(() -> launcher.isRequested(LauncherState.PREP));
+    escapeHammerTimeState
+        .switchTo(presetState)
+        .when(() -> launcher.isRequested(LauncherState.PRESET));
+    escapeHammerTimeState
+        .switchTo(hammerTimeState)
+        .when(() -> launcher.isRequested(LauncherState.HAMMERTIME));
 
     // Hammer Time is a special case since it's a toggle state
     hammerTimeState.switchTo(idleState).when(() -> launcher.isRequested(LauncherState.IDLE));
@@ -201,6 +209,19 @@ public class LauncherCommands {
         || (launcher != null && launcher.isFlywheelAtOrAboveGoal());
   }
 
+  /**
+   * Holds the hood down whenever the robot is under, or about to enter, a trench. It is bound here
+   * rather than in {@link #configureButtonBindings} because button bindings are only created at
+   * teleop init and the guard has to protect the hood during autonomous too. The release is
+   * debounced so a robot hovering at the edge does not make the hood chatter.
+   */
+  private void configureTrenchGuard() {
+    Trigger isTrenchTrigger =
+        new Trigger(() -> launcher.isNearTrench())
+            .debounce(Constants.Launcher.TRENCH_RELEASE_DEBOUNCE_S, DebounceType.kFalling);
+    isTrenchTrigger.onTrue(shouldAutoHammerTimeCommand()).onFalse(shouldEscapeHammerTimeCommand());
+  }
+
   public void configureButtonBindings(Controller driver, Controller operator) {
 
     // Hold RT to aim/prep and shoot; releasing drops the launcher back to LOW.
@@ -232,10 +253,6 @@ public class LauncherCommands {
     operator.createYButton().whileTrue(zeroHoodOnStallSequence());
 
     operator.createBackButton().whileTrue(zeroHoodSequence());
-
-    // This allowed auto-hammer time
-    // Trigger isTrenchTrigger = new Trigger(() -> launcher.isNearTrench());
-    // isTrenchTrigger.onTrue(shouldAutoHammerTimeCommand()).onFalse(shouldEscapeHammerTimeCommand());
 
     // When intake is retracting or retracted, force turret to HAMMERTIME (hopper arm interferes)
     Trigger intakeUpTrigger =
