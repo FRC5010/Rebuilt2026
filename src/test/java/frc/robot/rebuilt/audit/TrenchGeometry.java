@@ -26,7 +26,12 @@ public final class TrenchGeometry {
 
   public static final double HUB_X = FieldConstants.LinesVertical.hubCenter;
   public static final double OPP_HUB_X = FieldConstants.LinesVertical.oppHubCenter;
-  public static final double DEPTH = FieldConstants.LeftTrench.depth;
+  /**
+   * Physical depth of the trench structure (47 in). Deliberately not {@code
+   * FieldConstants.LeftTrench.depth}: that value is also used to tune how early the trench guard
+   * reacts and was reduced to 24 in, so the audit would otherwise stop describing the real field.
+   */
+  public static final double DEPTH = Units.inchesToMeters(47.0);
   public static final double OPENING_WIDTH = FieldConstants.LeftTrench.openingWidth;
   public static final double FIELD_WIDTH = FieldConstants.fieldWidth;
 
