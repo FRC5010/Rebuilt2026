@@ -17,7 +17,7 @@ import java.util.TreeMap;
  * The checked-in list of KNOWN hood/trench violations ({@code baseline.json}).
  *
  * <ul>
- *   <li>{@code static}: per kind ("pathplanner" / "bline") and auto, the pass numbers (1-based
+ *   <li>{@code static}: per kind ("pathplanner") and auto, the pass numbers (1-based
  *       trench stays) whose hood angle is above the down threshold in the static analysis
  *   <li>{@code staticGuarded}: the same, after applying the robot's trench guard ({@link
  *       GuardedTimeline}); this is what the robot is expected to do

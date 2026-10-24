@@ -1,9 +1,6 @@
 {
   "_about" : "Known hood/trench violations. Tests fail on anything NOT listed here. Fixed an issue? Regenerate with AUDIT_UPDATE_BASELINE=1 (see docs/AUTO_AUDIT.md) and commit the diff.",
   "static" : {
-    "bline" : {
-      "Intake-Shoot" : [ 2 ]
-    },
     "pathplanner" : {
       "2X-TR-CTR-BUMP-DEP" : [ 2 ],
       "Follow Left Bump Depot" : [ 1 ],
@@ -24,9 +21,6 @@
     }
   },
   "staticGuarded" : {
-    "bline" : {
-      "Intake-Shoot" : [ 2 ]
-    },
     "pathplanner" : {
       "Follow Left Bump Depot" : [ 1 ],
       "Follow Left Bump Depot middle end" : [ 1 ],

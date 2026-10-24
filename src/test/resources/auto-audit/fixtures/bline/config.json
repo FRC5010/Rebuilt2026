@@ -1,6 +1,0 @@
-{
-  "kinematic_constraints": {
-    "default_max_velocity_meters_per_sec": 4.5,
-    "default_max_acceleration_meters_per_sec2": 12.0
-  }
-}

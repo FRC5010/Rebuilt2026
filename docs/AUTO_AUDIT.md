@@ -1,8 +1,7 @@
 # Auto audit: hood vs. trench
 
 Repeatable checks that the launcher hood is down whenever the robot is under a trench beam during an
-autonomous routine, for both B-Line paths (`src/main/deploy/autos/paths`) and PathPlanner autos
-(`src/main/deploy/pathplanner`). The findings that motivated this are in `HOOD_TRENCH_AUDIT.md`.
+autonomous routine, for PathPlanner autos (`src/main/deploy/pathplanner`). The findings that motivated this are in `HOOD_TRENCH_AUDIT.md`.
 
 ## What runs
 
@@ -24,8 +23,7 @@ lower) and the robot's ideal position over time, then walks the timeline in 20 m
 angle with `HoodModel` and noting every "stay" with the robot centre under a trench structure.
 
 * Timing is the fastest plausible case (so lead times are conservative): PathPlanner paths use a
-  rest-to-rest trapezoid from the path's max velocity/acceleration; B-Line segments use the larger of the two
-  adjacent speed limits. Tracking lag, constraint zones and the B-Line handoff radius are ignored.
+  rest-to-rest trapezoid from the path's max velocity/acceleration. Tracking lag and constraint zones are ignored.
 * PathPlanner fires event markers and ends paths on trajectory time, so a robot that lags its trajectory
   is later at each marker's location than the static model assumes. The simulation shows this.
 * Trench geometry comes from `FieldConstants`; the bumper size from `akit_swerve_drivetrain.json`.
@@ -62,7 +60,7 @@ The audit therefore has two views of every auto:
    rewrites the static and staticGuarded sections of `src/test/resources/auto-audit/baseline.json`. Commit the smaller file;
    the diff is the list of fixes. Tick the item in `HOOD_TRENCH_AUDIT.md`.
 4. Confirm in simulation: `tools/auto-audit/run-sim-audit.sh --update-baseline "Right 5010 Double"`
-   (PathPlanner auto name or B-Line path name, such as `Right_5010_Double`).
+   (a PathPlanner auto name).
 
 `AUDIT_STRICT_BASELINE=1` makes both the static and sim tests fail when a baseline entry no longer
 reproduces, which is useful in CI to force the baseline to shrink.
@@ -70,7 +68,7 @@ reproduces, which is useful in CI to force the baseline to shrink.
 ## Simulation runner
 
 ```
-tools/auto-audit/run-sim-audit.sh [--kind bline|pathplanner|all] [--alliance Blue|Red]
+tools/auto-audit/run-sim-audit.sh [--alliance Blue|Red]
                                   [--seconds N] [--repeat N] [--update-baseline] [--strict] [name ...]
 ```
 
@@ -78,9 +76,7 @@ Each auto runs in a fresh JVM (the robot is a singleton). The test boots the rea
 simulator, selects the auto on the dashboard chooser, places the robot at the start pose and steps
 simulated time. Set `AUDIT_OUT=/path/file.csv` for a per-tick trace (pose, hood angle, launcher state).
 
-**What is enforced.** B-Line sim results are repeatable (the worst hood angle under a beam differed by at
-most 0.4 deg between identical runs), so they are checked against the `sim` section of the baseline
-(violation = hood above 22 deg under a beam; with the trench guard the section is empty). PathPlanner sim results are *not* repeatable (39 of 60 autos
+**What is enforced.** PathPlanner sim results are *not* repeatable (39 of 60 autos
 reproduced within 0.5 deg, but others differed by 5-17 deg between identical runs, because the sim robot
 lags its trajectory and PathPlanner ends paths and fires markers on trajectory time). They are printed as a
 stress test and not enforced; the deterministic static analysis is the PathPlanner gate. Use `--repeat N`
@@ -90,7 +86,7 @@ run-to-run variation was not isolated.
 ## Files
 
 * `src/test/java/frc/robot/rebuilt/audit/` : `HoodModel`, `TrenchGeometry`, `TrenchAudit`, `PathPlannerAudit`,
-  `BLineAudit`, `GuardedTimeline`, `AuditBaseline`, the tests, and `AutoAuditSimTest`
+  `GuardedTimeline`, `AuditBaseline`, the tests, and `AutoAuditSimTest`
 * `src/test/resources/auto-audit/fixtures/` : synthetic autos with known answers
 * `src/test/resources/auto-audit/baseline.json` : known violations (the ratchet)
 * `tools/auto-audit/run-sim-audit.sh`

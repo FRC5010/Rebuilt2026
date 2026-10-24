@@ -39,19 +39,17 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
  * <p>Environment:
  *
  * <ul>
- *   <li>{@code AUDIT_KIND}: {@code bline} or {@code pathplanner}
- *   <li>{@code AUDIT_AUTO}: the auto chooser label (e.g. "Bline : Right 5010 Double" or a
- *       PathPlanner auto name)
- *   <li>{@code AUDIT_FILE}: B-Line path name (deploy/autos/paths/NAME.json) or PathPlanner auto
- *       name (used for the start pose and as the baseline key)
+ *   <li>{@code AUDIT_KIND}: {@code pathplanner}
+ *   <li>{@code AUDIT_AUTO}: the auto chooser label (or a PathPlanner auto name)
+ *   <li>{@code AUDIT_FILE}: PathPlanner auto name (used for the start pose and as the baseline
+ *       key)
  *   <li>{@code AUDIT_ALLIANCE} Blue (default) or Red, {@code AUDIT_SECONDS} (default 20), {@code
  *       AUDIT_OUT} optional CSV path
  *   <li>{@code AUDIT_UPDATE_BASELINE=1} record this auto's verdict in baseline.json; {@code
  *       AUDIT_STRICT_BASELINE=1} also fail if a baseline entry no longer reproduces
  * </ul>
  *
- * <p><b>B-Line</b> sim verdicts are repeatable (worst hood angle differed by at most 0.4 deg
- * between identical runs), so they are enforced against the baseline. <b>PathPlanner</b> sim
+ * <p><b>PathPlanner</b> sim
  * verdicts are NOT repeatable: the sim drivetrain lags its trajectory (paths end on their timers
  * and markers fire on trajectory time), and the resulting hood angle under a beam differed by up to
  * 17 deg between identical runs. They are printed as a stress test but not enforced (the
@@ -70,17 +68,6 @@ public class AutoAuditSimTest {
   }
 
   private static Pose2d startPose(String kind, String file) throws Exception {
-    if (kind.equals("bline")) {
-      JsonNode first =
-          MAPPER
-              .readTree(new File("src/main/deploy/autos/paths/" + file + ".json"))
-              .get("path_elements")
-              .get(0);
-      return new Pose2d(
-          first.get("translation_target").get("x_meters").asDouble(),
-          first.get("translation_target").get("y_meters").asDouble(),
-          new Rotation2d(first.get("rotation_target").get("rotation_radians").asDouble()));
-    }
     JsonNode auto =
         MAPPER.readTree(new File("src/main/deploy/pathplanner/autos/" + file + ".auto"));
     String firstPath = firstPath(auto.get("command"));
@@ -108,14 +95,14 @@ public class AutoAuditSimTest {
   @Test
   @EnabledIfEnvironmentVariable(named = "AUDIT_AUTO", matches = ".+")
   public void simulateAutoAndCheckHoodUnderTrench() throws Exception {
-    String kind = env("AUDIT_KIND", "bline");
+    String kind = env("AUDIT_KIND", "pathplanner");
     String label = env("AUDIT_AUTO", null);
     String file = env("AUDIT_FILE", null);
     String alliance = env("AUDIT_ALLIANCE", "Blue");
     double seconds = Double.parseDouble(env("AUDIT_SECONDS", "20"));
     String csvOut = env("AUDIT_OUT", "");
     assertTrue(
-        kind.equals("bline") || kind.equals("pathplanner"), "AUDIT_KIND must be bline|pathplanner");
+        kind.equals("pathplanner"), "AUDIT_KIND must be pathplanner");
     assertTrue(file != null, "AUDIT_FILE is required");
 
     // The robot's config parsers assert on optional directories; a real sim run has assertions off.
@@ -242,8 +229,7 @@ public class AutoAuditSimTest {
         worst,
         violating ? "VIOLATION" : "ok");
 
-    boolean enforce =
-        kind.equals("bline") || "1".equals(System.getenv("AUDIT_SIM_ENFORCE_PATHPLANNER"));
+    boolean enforce = "1".equals(System.getenv("AUDIT_SIM_ENFORCE_PATHPLANNER"));
     if (!enforce) {
       System.out.println(
           "[auto-audit] (PathPlanner sim is informational: results vary run to run)");

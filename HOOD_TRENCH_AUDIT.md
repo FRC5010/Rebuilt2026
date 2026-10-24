@@ -1,7 +1,7 @@
 # Hood / trench audit of autonomous routines
 
 Check items off as they are fixed. Findings come from a static timeline analysis plus a headless
-simulation of the real robot code (October 2026, branch `b-line-implementation` at `a543865`).
+simulation of the real robot code.
 
 ## Terms and assumptions
 
@@ -22,25 +22,14 @@ simulation of the real robot code (October 2026, branch `b-line-implementation` 
       drives the existing AUTO_HAMMERTIME state in teleop and auto. Sim result below. Still to do on the
       robot: measure the hood drop time (`TrenchGuard.HOOD_DROP_TIME_S`, 0.7 s from the sim) and check the
       beam clearance angle.
-- [ ] `B_LineAutoCommands.java` registers `intakeRetracted` and `intakeRetracting` to
-      `IntakeCommands.shouldIntaking()`. Unused by current paths, but any path using them would deploy
-      the intake. Should be `shouldRetracted()` / `shouldRetracting()` (as in `NamedCommandsReg`).
-- [x] Sim only: `AkitSwerveConfig` fed the real robot's kS (amps) into the sim as a friction voltage
-      (4.15 V), so the sim drive undershot low speeds. Fixed: sim constants in `PhoenixUtil`
-      (0.1 V drive / 0.05 V steer), guarded by `AkitSwerveSimFrictionTest`. Sim Square end miss
-      0.218 m -> 0.002 m.
 - [ ] Measure real hood travel time (PREP -> LOW and LOW -> PREP) and update the 0.7 s lead used here.
 
-## Effect of the trench guard (simulation, branch `b-line-implementation`)
+## Effect of the trench guard (simulation)
 
 Worst hood angle under a beam, same sim, before -> after the guard (17.2 deg = down):
 
 | Auto | Before | After |
 | --- | --- | --- |
-| BLine `Right_5010_Double` pass 3 | 33.0 | 21.6 (Blue), 21.0 (Red) |
-| BLine `left-5010-double` pass 3 | 34.5 | 13-19 over four runs |
-| BLine `Right_2056_Double_HP` pass 2 | 33.8 | 17.6 (Blue), 21.0 (Red) |
-| BLine `Intake-Shoot` (parks in far trench) | 37.4 | 16.2 |
 | PP `Orbit Right` | 25-31 | 14-19 |
 | PP `Orbit Right 2 Swipe no HP` | 25-31 | 15-17 |
 | PP `2X-TR-CTR-BUMP-DEP` | 25 | 13-14 |
@@ -50,45 +39,7 @@ Worst hood angle under a beam, same sim, before -> after the guard (17.2 deg = d
 
 Not yet cured: autos that start moving from rest within about 1 m of the beam (the `Follow ...`, `Quals 110`,
 `Right 5010 Double*` family, 14 passes in the static guarded model). The guard cannot react before the robot
-moves; lower the hood earlier in the auto. Some BLine passes sit at 21-22 deg (MARGINAL) for the same
-reason. The checkboxes below are still the right list of autos to fix; `Right_*`/`left-*` BLine items now only
-need the move for margin.
-
-## BLine autos (`src/main/deploy/autos/paths`)
-
-Hood-up trench crossings (confirmed in simulation, Blue and Red):
-
-- [ ] `Right_5010_Double`: 3rd crossing (eastbound) with hood 33.5 deg in PREP. `launcherLow` (element 15)
-      fires at about (7.4, 1.1), after the trench. Move it onto the segment leaving the shooting spot,
-      `t_ratio` 0.0 (tested: hood down 1.2 s before the trench; at `t_ratio` 0.5 only 0.12 s).
-- [ ] `left-5010-double`: 3rd crossing (top trench) with hood 33-34 deg. `launcherLow` (element 15) fires at
-      about (8.0, 7.1), after the trench. Same fix (tested margin 0.86 s at `t_ratio` 0.0).
-- [ ] `Right_2056_Double_HP`: 2nd crossing with hood 34 deg; the path has no `launcherLow` at all. Add one
-      after waypoint (1.05, 1.40) at `t_ratio` 0.0 (tested margin 1.24 s).
-- [ ] `Test: Intake + Shoot` (`Intake-Shoot`): ends inside the far trench with hood at 36 deg (test path).
-- [ ] 5010 autos: first `launcherPrep` fires only ~0.07 m past the trench edge (x = 3.95). Works, but
-      move it a little later on the segment for margin.
-- [ ] Quals_73 raises the hood in the neutral zone and lowers it 1.1 s later (prep @ (8.0, 2.2), low @
-      (6.7, 2.7)). Confirm this is intended.
-- [ ] `Left_2056_Double_HP` has `launcherPrep` twice at the same spot. Remove the duplicate.
-
-Clean for hood vs. trench: `Quals_73`, `Left_2056_Double_HP`.
-
-Rotation targets (27 of 56 waypoint targets within 10 deg when passing, in sim):
-
-- [ ] Rotation controller is P-only, kP = 1.0 (`GenericSwerveDrivetrain.setupBLine`), no feed-forward, so
-      a heading ramp lags by about its rate in rad/s. Targets are met only at roughly <= 1 m/s.
-      Consider a higher kP, rate feed-forward, or slower segments / earlier rotation elements.
-      Worst: `Right_2056_Double_HP` 3/13, `Left_2056_Double_HP` 5/13, `left-5010-double` 7/12,
-      `Right_5010_Double` 7/13, `Quals_73` 5/5.
-- [ ] Follower finishes only when heading is within 2 deg; with kP = 1 the last degree creeps in (about
-      5 s in one Red run). Consider a larger end rotation tolerance or minimum rotation speed.
-- [ ] Intermediate waypoints use a 0.45 m handoff radius, so the robot turns about 0.4 m short of
-      waypoints such as the shooting corner (1.16, 1.29). Use a smaller radius where position matters.
-- [ ] Unexplained in sim: robot wedged ~10 s near (0.75, 0.8) on the final approach of
-      `Right_5010_Double`. Cause not found; re-check on the real robot.
-- [ ] Time budget: the repo documents AUTO as 20 s. Sim reached the final waypoint in about 5.5 s
-      (Quals_73), 15.5 s (both 2056 autos), 17 s (Left 5010); Right 5010 was inconclusive. Verify on carpet.
+moves; lower the hood earlier in the auto. The checkboxes below are still the right list of autos to fix.
 
 ## PathPlanner autos (`src/main/deploy/pathplanner`)
 
@@ -171,5 +122,4 @@ Tests and tooling are now in the repo; see `docs/AUTO_AUDIT.md`.
 
 - The PathPlanner sim drivetrain lags its trajectory more than the real robot likely does, so sim numbers
   for PathPlanner autos are a stress test; the static numbers are the best case.
-- Red alliance was simulated for the five BLine competition autos only (same hood result as Blue).
 - Sim shot counts and final-approach timing are not reliable and were not evaluated.

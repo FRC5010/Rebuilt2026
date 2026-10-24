@@ -3,53 +3,40 @@
 #
 #   tools/auto-audit/run-sim-audit.sh [options] [name ...]
 #
-#   --kind bline|pathplanner|all   which autos to run when no names are given (default: all)
 #   --alliance Blue|Red            default Blue
 #   --seconds N                    simulated seconds per auto (default 20 = the AUTO period)
 #   --update-baseline              record each auto's verdict in src/test/resources/auto-audit/baseline.json
-#   --strict                       also fail when a baseline entry no longer reproduces (B-Line only)
+#   --strict                       also fail when a baseline entry no longer reproduces
 #   --repeat N                     run each auto N times (PathPlanner results vary run to run)
-#   name ...                       B-Line path names (e.g. Right_5010_Double) or PathPlanner auto names
+#   name ...                       PathPlanner auto names (default: all autos)
 #
 # Exit status is non-zero if any auto has a hood-up-in-trench violation that is not in the baseline.
 set -u
 cd "$(dirname "$0")/../.."
 
-kind=all; alliance=Blue; seconds=20; update=0; strict=0; repeat=1; names=()
+alliance=Blue; seconds=20; update=0; strict=0; repeat=1; names=()
 while [ $# -gt 0 ]; do
   case "$1" in
-    --kind) kind=$2; shift 2 ;;
     --alliance) alliance=$2; shift 2 ;;
     --seconds) seconds=$2; shift 2 ;;
     --update-baseline) update=1; shift ;;
     --strict) strict=1; shift ;;
     --repeat) repeat=$2; shift 2 ;;
-    -h|--help) sed -n '2,14p' "$0"; exit 0 ;;
+    -h|--help) sed -n '2,13p' "$0"; exit 0 ;;
     *) names+=("$1"); shift ;;
   esac
 done
 
 # (kind|chooser label|file) triples
 jobs=()
-bline_label() { # B-Line path name -> chooser label, from BLine.java
-  grep -o 'addAuto("[^"]*", *"'"$1"'")' src/main/java/frc/robot/rebuilt/commands/BLine.java | head -1 | sed 's/addAuto("\([^"]*\)".*/\1/'
-}
-add_bline_all() {
-  grep -o 'addAuto("[^"]*", *"[^"]*")' src/main/java/frc/robot/rebuilt/commands/BLine.java |
-    sed 's/addAuto("\([^"]*\)", *"\([^"]*\)")/bline|\1|\2/'
-}
 add_pp_all() {
   for f in src/main/deploy/pathplanner/autos/*.auto; do n=$(basename "$f" .auto); echo "pathplanner|$n|$n"; done
 }
 if [ ${#names[@]} -eq 0 ]; then
-  [ "$kind" = all ] || [ "$kind" = bline ] && while IFS= read -r l; do jobs+=("$l"); done < <(add_bline_all)
-  [ "$kind" = all ] || [ "$kind" = pathplanner ] && while IFS= read -r l; do jobs+=("$l"); done < <(add_pp_all)
+  while IFS= read -r l; do jobs+=("$l"); done < <(add_pp_all)
 else
   for n in "${names[@]}"; do
     if [ -f "src/main/deploy/pathplanner/autos/$n.auto" ]; then jobs+=("pathplanner|$n|$n")
-    elif [ -f "src/main/deploy/autos/paths/$n.json" ]; then
-      lbl=$(bline_label "$n"); [ -n "$lbl" ] || { echo "no chooser entry for B-Line path '$n' in BLine.java"; exit 2; }
-      jobs+=("bline|$lbl|$n")
     else echo "unknown auto '$n'"; exit 2; fi
   done
 fi

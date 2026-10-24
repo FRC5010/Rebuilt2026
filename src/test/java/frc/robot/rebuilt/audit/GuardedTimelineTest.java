@@ -13,11 +13,6 @@ import org.junit.jupiter.api.Test;
 public class GuardedTimelineTest {
   private final PathPlannerAudit pp =
       new PathPlannerAudit(Path.of("src/test/resources/auto-audit/fixtures/pathplanner"));
-  private final BLineAudit bl;
-
-  public GuardedTimelineTest() throws IOException {
-    bl = new BLineAudit(Path.of("src/test/resources/auto-audit/fixtures/bline"));
-  }
 
   private List<Stay> guarded(String auto) throws IOException {
     return TrenchAudit.stays(GuardedTimeline.apply(pp.timeline(auto)), TrenchGeometry.CENTER);
@@ -68,14 +63,5 @@ public class GuardedTimelineTest {
     AutoTimeline g = GuardedTimeline.apply(pp.timeline("NoTrench"));
     assertEquals(1, g.hoodCommands.size());
     assertTrue(g.hoodCommands.get(0).up());
-  }
-
-  @Test
-  public void bLineHoodUpPathsAreProtected() throws IOException {
-    for (String path : List.of("PrepAtStart", "LowTooLate")) {
-      List<Stay> s =
-          TrenchAudit.stays(GuardedTimeline.apply(bl.timeline(path)), TrenchGeometry.CENTER);
-      assertEquals(Severity.OK, s.get(0).severity(), path + " " + s.get(0));
-    }
   }
 }

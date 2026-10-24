@@ -24,7 +24,6 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
  */
 public class AutoAuditBaselineTest {
   static final Path PATHPLANNER = Path.of("src/main/deploy/pathplanner");
-  static final Path BLINE = Path.of("src/main/deploy/autos");
 
   /** kind -> name -> stays (centre criterion) */
   static Map<String, Map<String, List<Stay>>> analyzeAll(
@@ -37,13 +36,6 @@ public class AutoAuditBaselineTest {
       out.computeIfAbsent("pathplanner", k -> new TreeMap<>())
           .put(n, TrenchAudit.stays(tl, TrenchGeometry.CENTER));
     }
-    BLineAudit bl = new BLineAudit(BLINE);
-    for (String n : bl.pathNames()) {
-      AutoTimeline tl = bl.timeline(n);
-      timelines.computeIfAbsent("bline", k -> new TreeMap<>()).put(n, tl);
-      out.computeIfAbsent("bline", k -> new TreeMap<>())
-          .put(n, TrenchAudit.stays(tl, TrenchGeometry.CENTER));
-    }
     return out;
   }
 
@@ -54,7 +46,6 @@ public class AutoAuditBaselineTest {
     assertTrue(
         all.get("pathplanner").size() >= 40,
         "pathplanner autos found: " + all.get("pathplanner").size());
-    assertTrue(all.get("bline").size() >= 10, "bline paths found: " + all.get("bline").size());
   }
 
   @Test
