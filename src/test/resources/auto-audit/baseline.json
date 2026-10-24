@@ -1,42 +1,105 @@
 {
-  "_about" : "Known hood/trench violations. Tests fail on anything NOT listed here. Fixed an issue? Regenerate with AUDIT_UPDATE_BASELINE=1 (see docs/AUTO_AUDIT.md) and commit the diff.",
-  "static" : {
-    "pathplanner" : {
-      "2X-TR-CTR-BUMP-DEP" : [ 2 ],
-      "Follow Left Bump Depot" : [ 1 ],
-      "Follow Left Bump Depot middle end" : [ 1, 2 ],
-      "Follow Left Right Bump  HP" : [ 1 ],
-      "Follow Left Trench " : [ 1 ],
-      "Follow Right Bump HP" : [ 1 ],
-      "Left 2056 double HP" : [ 2 ],
-      "Orbit Right" : [ 3 ],
-      "Orbit Right 2 Swipe no HP" : [ 5 ],
-      "Quals 110" : [ 1 ],
-      "Right 5010 Double" : [ 3 ],
-      "Right 5010 Double Old" : [ 3 ],
-      "Right 5010 Double Optimized" : [ 3 ],
-      "Right 5010 Double Short" : [ 3 ],
-      "TL-QTR-SS-QTRH-DEP-SS" : [ 3, 4 ],
-      "TR-CTR-SS-CTRH-MS-HP-SS" : [ 3 ]
+  "_about": "Known hood/trench violations. Tests fail on anything NOT listed here. Fixed an issue? Regenerate with AUDIT_UPDATE_BASELINE=1 (see docs/AUTO_AUDIT.md) and commit the diff.",
+  "static": {
+    "pathplanner": {
+      "2X-TR-CTR-BUMP-DEP": [
+        2
+      ],
+      "Follow Left Bump Depot": [
+        1
+      ],
+      "Follow Left Bump Depot middle end": [
+        1,
+        2
+      ],
+      "Follow Left Right Bump  HP": [
+        1
+      ],
+      "Follow Left Trench ": [
+        1
+      ],
+      "Follow Right Bump HP": [
+        1
+      ],
+      "Left 2056 double HP": [
+        2
+      ],
+      "Orbit Right": [
+        3
+      ],
+      "Orbit Right 2 Swipe no HP": [
+        5
+      ],
+      "Quals 110": [
+        1
+      ],
+      "Right 5010 Double": [
+        3
+      ],
+      "Right 5010 Double Old": [
+        3
+      ],
+      "Right 5010 Double Optimized": [
+        3
+      ],
+      "Right 5010 Double Short": [
+        3
+      ],
+      "TL-QTR-SS-QTRH-DEP-SS": [
+        3,
+        4
+      ],
+      "TR-CTR-SS-CTRH-MS-HP-SS": [
+        3
+      ]
     }
   },
-  "staticGuarded" : {
-    "pathplanner" : {
-      "Follow Left Bump Depot" : [ 1 ],
-      "Follow Left Bump Depot middle end" : [ 1 ],
-      "Follow Left Right Bump  HP" : [ 1 ],
-      "Follow Left Trench " : [ 1 ],
-      "Follow Right Bump HP" : [ 1 ],
-      "Orbit Right" : [ 3 ],
-      "Orbit Right 2 Swipe no HP" : [ 5 ],
-      "Quals 110" : [ 1 ],
-      "Right 5010 Double" : [ 3 ],
-      "Right 5010 Double Old" : [ 3 ],
-      "Right 5010 Double Optimized" : [ 3 ],
-      "Right 5010 Double Short" : [ 3 ],
-      "TL-QTR-SS-QTRH-DEP-SS" : [ 3, 4 ],
-      "TR-CTR-SS-CTRH-MS-HP-SS" : [ 3 ]
+  "staticGuarded": {
+    "pathplanner": {
+      "Follow Left Bump Depot": [
+        1
+      ],
+      "Follow Left Bump Depot middle end": [
+        1
+      ],
+      "Follow Left Right Bump  HP": [
+        1
+      ],
+      "Follow Left Trench ": [
+        1
+      ],
+      "Follow Right Bump HP": [
+        1
+      ],
+      "Orbit Right": [
+        3
+      ],
+      "Orbit Right 2 Swipe no HP": [
+        5
+      ],
+      "Quals 110": [
+        1
+      ],
+      "Right 5010 Double": [
+        3
+      ],
+      "Right 5010 Double Old": [
+        3
+      ],
+      "Right 5010 Double Optimized": [
+        3
+      ],
+      "Right 5010 Double Short": [
+        3
+      ],
+      "TL-QTR-SS-QTRH-DEP-SS": [
+        3,
+        4
+      ],
+      "TR-CTR-SS-CTRH-MS-HP-SS": [
+        3
+      ]
     }
   },
-  "sim" : { }
+  "sim": {}
 }

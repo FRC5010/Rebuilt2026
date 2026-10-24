@@ -41,19 +41,17 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
  * <ul>
  *   <li>{@code AUDIT_KIND}: {@code pathplanner}
  *   <li>{@code AUDIT_AUTO}: the auto chooser label (or a PathPlanner auto name)
- *   <li>{@code AUDIT_FILE}: PathPlanner auto name (used for the start pose and as the baseline
- *       key)
+ *   <li>{@code AUDIT_FILE}: PathPlanner auto name (used for the start pose and as the baseline key)
  *   <li>{@code AUDIT_ALLIANCE} Blue (default) or Red, {@code AUDIT_SECONDS} (default 20), {@code
  *       AUDIT_OUT} optional CSV path
  *   <li>{@code AUDIT_UPDATE_BASELINE=1} record this auto's verdict in baseline.json; {@code
  *       AUDIT_STRICT_BASELINE=1} also fail if a baseline entry no longer reproduces
  * </ul>
  *
- * <p><b>PathPlanner</b> sim
- * verdicts are NOT repeatable: the sim drivetrain lags its trajectory (paths end on their timers
- * and markers fire on trajectory time), and the resulting hood angle under a beam differed by up to
- * 17 deg between identical runs. They are printed as a stress test but not enforced (the
- * deterministic static analysis is the PathPlanner gate); set {@code
+ * <p><b>PathPlanner</b> sim verdicts are NOT repeatable: the sim drivetrain lags its trajectory
+ * (paths end on their timers and markers fire on trajectory time), and the resulting hood angle
+ * under a beam differed by up to 17 deg between identical runs. They are printed as a stress test
+ * but not enforced (the deterministic static analysis is the PathPlanner gate); set {@code
  * AUDIT_SIM_ENFORCE_PATHPLANNER=1} to enforce anyway. Only violations above {@link
  * AuditBaseline#SIM_THRESHOLD_DEG} are tracked.
  */
@@ -101,8 +99,7 @@ public class AutoAuditSimTest {
     String alliance = env("AUDIT_ALLIANCE", "Blue");
     double seconds = Double.parseDouble(env("AUDIT_SECONDS", "20"));
     String csvOut = env("AUDIT_OUT", "");
-    assertTrue(
-        kind.equals("pathplanner"), "AUDIT_KIND must be pathplanner");
+    assertTrue(kind.equals("pathplanner"), "AUDIT_KIND must be pathplanner");
     assertTrue(file != null, "AUDIT_FILE is required");
 
     // The robot's config parsers assert on optional directories; a real sim run has assertions off.

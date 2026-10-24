@@ -32,6 +32,7 @@ public final class TrenchGeometry {
    * reacts and was reduced to 24 in, so the audit would otherwise stop describing the real field.
    */
   public static final double DEPTH = Units.inchesToMeters(47.0);
+
   public static final double OPENING_WIDTH = FieldConstants.LeftTrench.openingWidth;
   public static final double FIELD_WIDTH = FieldConstants.fieldWidth;
 
